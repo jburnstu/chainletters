@@ -125,7 +125,8 @@ def get_random_available_section(request,userid):
     previous_section_object.sectionstatusid = lockedForAdditionStatus
     print("previous_section_object:",previous_section_object)
 
-    new_section = Section(storyid_id=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
+    new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
+    new_section.save()
 
     # return render(request,template,)
 
