@@ -133,6 +133,14 @@ class SectionTrace(models.Model):
         managed = False
 
 
+class AvailableSectionByUser(models.Model):
+    userid = models.IntegerField()
+    sectionid = models.IntegerField()
+
+    class Meta:
+        db_table = 'availablesectionbyuser'
+        managed = False
+
 
 '''
 
