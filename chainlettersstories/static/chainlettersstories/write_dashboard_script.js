@@ -1,3 +1,10 @@
+const story_list = JSON.parse(document.getElementById('story-data').textContent);
+
+storiesHeaderPanel = document.querySelector(".stories-header-panel");
+storiesMainPanel = document.querySelector(".stories-main-panel");
+joinNewStoryButton = document.querySelector(".join-button");
+
+
 var stories;
 var story_excluding_last_section;
 var last_section;
@@ -5,8 +12,6 @@ var storyButtonHTML;
 var storyTabHTML;
 // var storiesHeaderPanel;
 // var storiesMainPanel;
-
-const story_list = JSON.parse(document.getElementById('story-data').textContent);
 
 
 const createStoryTabsAndButtons = function (stories) {
@@ -49,12 +54,6 @@ const createStoryTabsAndButtons = function (stories) {
 }
 
 
-// window.addEventListener('load', onPageLoaded, false);
-
-// function onPageLoaded() {
-console.log("onpageloaded reahed");
-storiesHeaderPanel = document.querySelector(".stories-header-panel");
-storiesMainPanel = document.querySelector(".stories-main-panel");
 if (story_list) {
     console.log("story_list found");
     createStoryTabsAndButtons(story_list);

@@ -3,8 +3,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 import pandas as pd
+import random
 
-from .models import StoriesUser, Section, SectionTrace
+
+from .models import StoriesUser, Section, SectionTrace, AvailableSectionByUser
 # Create your views here.
 
 
@@ -109,6 +111,18 @@ def write_dashboard(request,userid):
                         userid,
                         "displayname":
                     myusername,})
+
+
+def get_random_available_story(request,userid):
+    available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
+
+    random_available_section_id = random.choice(available_sections)
+
+    new_section = Section(storyid=0, userid=userid, sectionstatusid=1, content="",  previoussectionid=random_available_section_id)
+
+    Section.objects.filter(id=random_available_section_id).update(sectionstatusid=4)
+    
+    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 
 def submit_story_to_section(request,userid):

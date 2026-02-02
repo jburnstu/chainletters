@@ -42,6 +42,7 @@ class Section(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
     content = models.TextField(blank=True, null=True)
+    previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='sectionid')
 
     class Meta:
         db_table = 'section'
@@ -140,9 +141,3 @@ class AvailableSectionByUser(models.Model):
     class Meta:
         db_table = 'availablesectionbyuser'
         managed = False
-
-
-'''
-
-we want SectionTrace to return every ACTIVE story -- so really we only want 
-'''
