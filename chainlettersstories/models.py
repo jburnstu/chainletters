@@ -42,7 +42,7 @@ class Section(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
     content = models.TextField(blank=True, null=True)
-    previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='sectionid')
+    previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='sectionid', null=True)
 
     class Meta:
         db_table = 'section'

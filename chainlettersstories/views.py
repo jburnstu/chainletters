@@ -6,7 +6,7 @@ import pandas as pd
 import random
 
 
-from .models import StoriesUser, Section, SectionTrace, AvailableSectionByUser
+from .models import StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus
 # Create your views here.
 
 
@@ -113,16 +113,23 @@ def write_dashboard(request,userid):
                     myusername,})
 
 
-def get_random_available_story(request,userid):
+def get_random_available_section(request,userid):
+    # template = "chainlettersstories/write_dashboard.html"
+    print(userid)
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
+    print(available_sections)
+    random_available_section_id = random.choice(available_sections)["sectionid"]
+    print(random_available_section_id)
+    previous_section_object = Section.objects.get(id=random_available_section_id)
+    lockedForAdditionStatus = Sectionstatus.objects.get(id=4)
+    previous_section_object.sectionstatusid = lockedForAdditionStatus
+    print("previous_section_object:",previous_section_object)
 
-    random_available_section_id = random.choice(available_sections)
+    new_section = Section(storyid_id=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
 
-    new_section = Section(storyid=0, userid=userid, sectionstatusid=1, content="",  previoussectionid=random_available_section_id)
+    # return render(request,template,)
 
-    Section.objects.filter(id=random_available_section_id).update(sectionstatusid=4)
-    
-    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+    return  HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
 
 
 def submit_story_to_section(request,userid):

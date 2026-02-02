@@ -24,7 +24,11 @@
     <div class="main-section">
         <div class="sidebar">
             <button onclick="newButtonClicked()">NEW</button>
-            <button class="join-button">JOIN</button>
+            <form action="{% url 'chainlettersstories:get_random_available_section' userid %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Join" />
+            </form>
+            {% comment %} <button class="join-button", action="chainlettersstories:get_random_available_section userid">JOIN</button> {% endcomment %}
             <button class="submit-button">SUBMIT</button>
             <div class="counter-text">Hello</div>
         </div>
