@@ -10,8 +10,10 @@ urlpatterns = [
     path("<int:userid>/dashboard/", views.dashboard, name="dashboard"),
 
     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
-    path("<int:userid>/write_dashboard/get_random_available_section/", views. get_random_available_section,                name="get_random_available_section"),
-    path("<int:userid>/write_dashboard/<int:previoussectionid>", views.submit_story_to_section,  name="submit_story_to_section"),
+    path("<int:userid>/write_dashboard/get_random_available_section/", views.get_random_available_section,  name="get_random_available_section"),
+    path("<int:userid>/write_dashboard/<int:previoussectionid>", views.submit_story_to_section,   name="submit_story_to_section"),
+    path("<int:userid>/write_dashboard/create_new_story", views.create_new_story,
+         name="create_new_story"),
 
     path("sectiontrace<int:sectionid>",views.sectiontrace,name="sectiontrace")
 ]

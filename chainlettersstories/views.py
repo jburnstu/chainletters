@@ -6,7 +6,7 @@ import pandas as pd
 import random
 
 
-from .models import StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus
+from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus
 # Create your views here.
 
 
@@ -130,6 +130,13 @@ def get_random_available_section(request,userid):
 
     # return render(request,template,)
 
+    return  HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
+
+def create_new_story(request,userid):
+    new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
+    new_story.save()
+    first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
+    first_section.save()
     return  HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
 
 
