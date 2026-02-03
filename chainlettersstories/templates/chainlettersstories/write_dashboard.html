@@ -7,10 +7,8 @@
     <meta charset="UTF-8" />
     <title>writePage</title>
     <link rel="stylesheet" href= "{% static 'chainlettersstories/styles.css' %}" />
-    {{ story_list|json_script:"story-data" }}
-    <script>
-        console.log("reached script tag in HTML");
-    </script>
+    {% comment %} {{ story_list|json_script:"story-data" }} {% endcomment %}
+    {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> {% endcomment %}
     <script src= "{% static 'chainlettersstories/write_dashboard_script.js' %}" defer></script>
 </head>
 
@@ -31,24 +29,52 @@
                 {% csrf_token %}
                 <input type="submit" value="Join" />
             </form>
-            <form action="{% url 'chainlettersstories:get_random_available_section' userid previoussectionid %}" method="post">
+            {% comment %} <form action="{% url 'chainlettersstories:submit_section_to_story' userid %}" method="post">
                 {% csrf_token %}
                 <input type="submit" value="Submit!" />
-            </form>
+            </form> {% endcomment %}
             <div class="counter-text">Hello</div>
         </div>
         <div class="stories">
+
+
+
             <div class="stories-header-panel">
-            {% if story_list %}{% else %}
+
+            {% for story_dict in story_dicts %}
+
+            <button class="story-tab-button" id="story-tab-button-{{forloop.counter}}">{{forloop.counter}}</button>
+            {% endfor %}
+
+            {% comment %} {% if story_list %}{% else %}
                 <button class="story-tab-button" id="story-tab-button-(-1)">(No Stories)</button>
-            {% endif %}
+            {% endif %} {% endcomment %}
+
+
             </div>
+
             <div class="stories-main-panel">
-            {% if story_list %}{% else %}
+
+            {% for finalsectionid, story_dict in story_dicts.items %}
+                <div class="container-story-tab" id = "container-story-tab-{{forloop.counter}}">
+                    <div class="read-only-div" id="read-only-div-{{forloop.counter}}">{{story_dict.previous}}</div> 
+                    <form action= "{% url 'chainlettersstories:submit_section_to_story' userid finalsectionid %}" method="post">
+                    {% csrf_token %}
+                        <fieldset>
+                            <input class=section-input id="section-input-{{forloop.counter}}" 
+                            type="text" placeholder="Enter Story Here" name="content" 
+                            value= "{{story_dict.current}}"> 
+                        </fieldset>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            {% endfor %}
+
+            {% comment %} {% if story_list %}{% else %}
                 <div class="container-story-tab" id="container-story-tab-(-1)">
                     <div class="read-only-div" id="read-only-div-(-1)">No Stories Active. Press "NEW" to start a new one, or "JOIN" to join a pre-existing one!.</div>
                 </div>
-            {% endif %}
+            {% endif %} {% endcomment %}
             </div>
         </div>
     </div>
@@ -58,7 +84,3 @@
 
 
 
-{% for choice in question.choice_set.all %}
-<input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-<label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-{% endfor %}

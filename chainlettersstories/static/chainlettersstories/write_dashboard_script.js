@@ -1,4 +1,4 @@
-const story_list = JSON.parse(document.getElementById('story-data').textContent);
+// const story_list = JSON.parse(document.getElementById('story-data').textContent);
 
 storiesHeaderPanel = document.querySelector(".stories-header-panel");
 storiesMainPanel = document.querySelector(".stories-main-panel");
@@ -37,9 +37,11 @@ const createStoryTabsAndButtons = function (stories) {
         storyTabHTML = `
         <div class="container-story-tab" id = "container-story-tab-${i}">
             <div class="read-only-div" id="read-only-div-${i}">${story_excluding_last_section}.</div> 
-            <form action="{% url "chainlettersstories:submit_story_to_section"  %}" method="post"> 
+            <form action= "????" method="post"
                 <fieldset>
-                    <input class=section-input id="section-input-${i}" type="text" placeholder="Enter Story Here" name="content" value= "${last_section}"> 
+                    <input class=section-input id="section-input-${i}" 
+                    type="text" placeholder="Enter Story Here" name="content" 
+                    value= "${last_section}"> 
                 </fieldset>
                 <input type="submit" value="Submit">
             </form>
@@ -54,9 +56,15 @@ const createStoryTabsAndButtons = function (stories) {
 }
 
 
+
+
 if (story_list) {
     console.log("story_list found");
-    createStoryTabsAndButtons(story_list);
+    // createStoryTabsAndButtons(story_list);
+    // $(".read-only-div").click(function () {
+    //     $.post()
+    // })
+
 }
 console.log("page loaded");
 // }
