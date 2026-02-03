@@ -89,6 +89,20 @@ def read_dashboard(request, userid):
     myusername = myuser.displayname
 
 def get_random_moderatable_section(request,userid):
+    available_sections = Section.objects\
+                                .filter(sectionstatusid_id=2)\
+                                .excludde(userid_id=userid)
+    random_available_section = random.choice(available_sections)
+    random_available_section.sectionstatusid_id = 3
+
+    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+    # previous_section_object = Section.objects.get(id=random_available_section_id)
+    # previous_section_object.sectionstatusid_id = 5
+    # new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
+    # new_section.save()
+
+
     pass
 
 def approve_new_section(request,userid,finalsectionid):

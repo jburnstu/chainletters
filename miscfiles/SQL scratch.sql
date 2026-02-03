@@ -91,7 +91,7 @@ from
 sectiontrace st
 cross join
 storyschema.user u
-where st.sectionstatusid = 3
+where st.sectionstatusid = 4
 and ( select count (*) from sectiontrace st2
 		join section s on st2.sectionid = s.id
 		where st.finalsectionid = st2.finalsectionid and u.id = s.userid ) = 0
@@ -104,6 +104,27 @@ order by userid, finalsectionid
 -- include no id from the past of a finalsectionid that matches this userid
 
 and not exists (select count(*) from )
+
+select * from section s
+where (select count(*) from sectiontrace st
+	where st.finalsectionid = s.id) = 0
+
+-- create or replace view availablesectionbymoderator as
+select distinct st.finalsectionid, u.id 
+from sectiontrace st
+cross join storyschema.user u
+where st.sectionstatusid = 2
+and (select count(distinct st2.finalsectionid, st2.userid )
+		from sectiontrace st2
+		where st.sectionstatusid = 2
+		and st2.finalsectionid = st.finalsectionid
+		and st2.userid = u.userid) = 0
+
+
+
+select distinct finalsectionid, userid 
+from sectiontrace st
+where st.sectionstatusid = 2
 
 
 
