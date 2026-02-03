@@ -172,8 +172,6 @@ def write_dashboard(request,userid):
 
     section_trace_df = pd.DataFrame(section_trace_QS)
     if not section_trace_df.empty:
-        # separate_story_trace_list = [[key, list(group["sectioncontent"])]
-        #                             for key, group in section_trace_df.groupby("finalsectionid")]
         separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
                                            "current": list(group["sectioncontent"])[-1]
                                            }
@@ -200,6 +198,9 @@ def write_dashboard(request,userid):
 
 def get_random_available_section(request,userid):
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
+    if not available_sections:
+        return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+    
     random_available_section_id = random.choice(available_sections)["sectionid"]
     previous_section_object = Section.objects.get(id=random_available_section_id)
     previous_section_object.sectionstatusid_id = 5

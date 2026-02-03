@@ -10,7 +10,7 @@ from django.db import models
 class Comment(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     commenttypeid = models.ForeignKey('Commenttype', models.DO_NOTHING, db_column='commenttypeid')
-    textcontent = models.TextField(blank=True, null=True)
+    textcontent = models.TextField(default="")
 
     class Meta:
         db_table = 'comment'
@@ -48,7 +48,7 @@ class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
-    content = models.TextField(blank=True, null=True)
+    content = models.TextField(default="")
     previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='previoussectionid', null=True)
 
     class Meta:
