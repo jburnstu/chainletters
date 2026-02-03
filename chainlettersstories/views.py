@@ -88,6 +88,40 @@ def read_dashboard(request, userid):
     myuser = StoriesUser.objects.get(pk=userid)
     myusername = myuser.displayname
 
+    section_ids_to_moderate = ModerationAssignment.objects\
+                                                .filter(userid_id=userid)\
+                                                .filter(isitclosed=False)\
+                                                .values_list("sectionid")
+    
+    section_trace_QS = SectionTrace.objects.filter(finalsectionid_id__in = section_ids_to_moderate)\
+                                            .values("sectionorder","sectioncontent","finalsectionid")
+
+    section_trace_df = pd.DataFrame(section_trace_QS)
+    if not section_trace_df.empty:
+        separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+                                           "current": list(group["sectioncontent"])[-1]
+                                           }
+                                        for key, group in section_trace_df.groupby("finalsectionid")
+        }
+
+        return render(request,template,
+                {
+                    "userid":
+                    userid,
+                    "displayname":
+                myusername,
+                    "story_dicts":
+                separate_story_trace_dicts})  
+    else:
+        return render(request,template,
+                    {
+                        "userid":
+                        userid,
+                        "displayname":
+                    myusername,})
+
+
+
 def get_random_moderatable_section(request,userid):
     available_sections = Section.objects\
                                 .filter(sectionstatusid_id=2)\
