@@ -25,14 +25,9 @@
     <div class="main-section">
         <div class="sidebar">
 
-            <form action="{% url 'chainlettersstories:create_new_story' userid %}" method="post">
+            <form action="{% url 'chainlettersstories:get_random_moderatable_section' userid %}" method="post">
                 {% csrf_token %}
-                <input type="submit" value="New" />
-            </form>
-
-            <form action="{% url 'chainlettersstories:get_random_available_section' userid %}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Join" />
+                <input type="submit" value="Start Review" />
             </form>
         </div>
         <div class="stories">
