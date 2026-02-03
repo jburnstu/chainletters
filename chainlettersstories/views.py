@@ -10,7 +10,6 @@ from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionB
 # Create your views here.
 
 
-
 def login_or_signup_page(request):
     template = "chainlettersstories/login_or_signup_page.html"
     return render(request,template,
@@ -84,6 +83,14 @@ def dashboard(request,userid):
                       "displayname": myusername})
 
 
+def read_dashboard(request, userid):
+    template = "chainlettersstories/read_dashboard.html"
+    myuser = StoriesUser.objects.get(pk=userid)
+    myusername = myuser.displayname
+
+
+
+
 def write_dashboard(request,userid):
     template = "chainlettersstories/write_dashboard.html"
     myuser = StoriesUser.objects.get(pk=userid)
@@ -124,8 +131,7 @@ def get_random_available_section(request,userid):
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
     random_available_section_id = random.choice(available_sections)["sectionid"]
     previous_section_object = Section.objects.get(id=random_available_section_id)
-    # lockedForAdditionStatus = Sectionstatus.objects.get(id=4)
-    previous_section_object.sectionstatusid_id = 4
+    previous_section_object.sectionstatusid_id = 5
     new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
     new_section.save()
 
