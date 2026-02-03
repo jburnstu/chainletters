@@ -21,10 +21,10 @@ urlpatterns = [
          name="submit_section_to_story"),
 
     path("<int:userid>/read_dashboard/",views.read_dashboard, name="read_dashboard"),
-    path("<int:userid>/write_dashboard/get_random_moderatable_section", 
+    path("<int:userid>/read_dashboard/get_random_moderatable_section", 
          views.get_random_moderatable_section,
          name="get_random_moderatable_section"),
-    path("<int:userid>/write_dashboard/approve_new_section/<int:finalsectionid>", 
+    path("<int:userid>/read_dashboard/approve_new_section/<int:finalsectionid>", 
          views.approve_new_section,
          name="approve_new_section"),
     

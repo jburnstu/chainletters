@@ -24,7 +24,6 @@
     </header>
     <div class="main-section">
         <div class="sidebar">
-
             <form action="{% url 'chainlettersstories:get_random_moderatable_section' userid %}" method="post">
                 {% csrf_token %}
                 <input type="submit" value="Start Review" />
@@ -41,15 +40,16 @@
             <div class="stories-main-panel">
             {% for finalsectionid, story_dict in story_dicts.items %}
                 <div class="container-story-tab" id = "container-story-tab-{{forloop.counter}}">
-                    <div class="read-only-div" id="read-only-div-{{forloop.counter}}">{{story_dict.previous}}</div> 
-                    <form action= "{% url 'chainlettersstories:submit_section_to_story' userid finalsectionid %}" method="post">
+                    <div class="read-only-div" 
+                         id="read-only-div-{{forloop.counter}}">{{story_dict.previous}}</div> 
+
+                    <form action= "{% url 'chainlettersstories:approve_new_section' userid finalsectionid %}" method="post">
                     {% csrf_token %}
                         <fieldset>
-                            <input class=section-input id="section-input-{{forloop.counter}}" 
-                            type="text" placeholder="Enter Story Here" name="content" 
-                            value= "{{story_dict.current}}"> 
+                            <div class="moderation-read-only-div" 
+                                    id="moderation-read-only-div-{{forloop.counter}}">{{story_dict.current}}</div> 
                         </fieldset>
-                        <input type="submit" value="Submit">
+                    <input type="submit" value="Approve">
                     </form>
                 </div>
             {% endfor %}

@@ -129,11 +129,11 @@ def read_dashboard(request, userid):
 def get_random_moderatable_section(request,userid):
     available_sections = Section.objects\
                                 .filter(sectionstatusid_id=2)\
-                                .excludde(userid_id=userid)
+                                .exclude(userid_id=userid)
     random_available_section = random.choice(available_sections)
     random_available_section.sectionstatusid_id = 3
-    new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
-                                                     userid_id = userid)
+    new_moderation_assignment = ModerationAssignment(sectionid=random_available_section.id,
+                                                     userid = userid)
     new_moderation_assignment.save()
 
     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
@@ -144,10 +144,20 @@ def get_random_moderatable_section(request,userid):
     # new_section.save()
 
 
-    pass
 
 def approve_new_section(request,userid,finalsectionid):
-    pass
+
+    approved_section = Section.objects.get(pk=finalsectionid)
+    approved_section.sectionstatusid_id = 4
+    approved_section.save()
+
+    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
+    completed_assignment.isitclosed = True
+    completed_assignment.save()
+
+    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+
 
 def write_dashboard(request,userid):
     template = "chainlettersstories/write_dashboard.html"
