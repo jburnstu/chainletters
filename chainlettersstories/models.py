@@ -39,7 +39,10 @@ class Commenttype(models.Model):
 class ModerationAssignment(models.Model):
     sectionid = models.ForeignKey('Section', models.DO_NOTHING,db_column='sectionid')
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING,db_column='userid')
-    isitclosed = models.BooleanField()
+    isitclosed = models.BooleanField(default=False)
+
+
+    
 
 class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
@@ -73,9 +76,9 @@ class Sectionstatus(models.Model):
 
 class Story(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
-    isitclosed = models.BooleanField()
+    isitclosed = models.BooleanField(default=False)
     title = models.CharField(max_length=100, blank=True, null=True)
-    isitmature = models.BooleanField()
+    isitmature = models.BooleanField(default=False)
     maxstorylength = models.SmallIntegerField(blank=True, null=True)
     maxsectionlength = models.SmallIntegerField(blank=True, null=True)
 
