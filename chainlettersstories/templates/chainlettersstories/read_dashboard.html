@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>writePage</title>
+    <link rel="stylesheet" href= "{% static 'chainlettersstories/styles.css' %}" />
+    {% comment %} {{ story_list|json_script:"story-data" }} {% endcomment %}
+    {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> {% endcomment %}
+    <script src= "{% static 'chainlettersstories/write_dashboard_script.js' %}" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>Hi, {{displayname}}!</h1>
+        <button class='header-button write-button' action="chainlettersstories:dashboard userid">WRITE</button>
+        <button class='header-button review-button' action="chainlettersstories:readdashboard">REVIEW</button>
+        <button class="header-button logout-button" action="chainlettersstories:login-or-signup-page">LOGOUT</button>
+    </header>
+    <div class="main-section">
+        <div class="sidebar">
+            <form action="{% url 'chainlettersstories:create_new_story' userid %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="New" />
+            </form>
+            <form action="{% url 'chainlettersstories:get_random_available_section' userid %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Join" />
+            </form>
+            {% comment %} <form action="{% url 'chainlettersstories:submit_section_to_story' userid %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Submit!" />
+            </form> {% endcomment %}
+            <div class="counter-text">Hello</div>
+        </div>
+        <div class="stories">
+
+
+
+            <div class="stories-header-panel">
+
+            {% for story_dict in story_dicts %}
+
+            <button class="story-tab-button" id="story-tab-button-{{forloop.counter}}">{{forloop.counter}}</button>
+            {% endfor %}
+
+            {% comment %} {% if story_list %}{% else %}
+                <button class="story-tab-button" id="story-tab-button-(-1)">(No Stories)</button>
+            {% endif %} {% endcomment %}
+
+
+            </div>
+
+            <div class="stories-main-panel">
+
+            {% for finalsectionid, story_dict in story_dicts.items %}
+                <div class="container-story-tab" id = "container-story-tab-{{forloop.counter}}">
+                    <div class="read-only-div" id="read-only-div-{{forloop.counter}}">{{story_dict.previous}}</div> 
+                    <form action= "{% url 'chainlettersstories:submit_section_to_story' userid finalsectionid %}" method="post">
+                    {% csrf_token %}
+                        <fieldset>
+                            <input class=section-input id="section-input-{{forloop.counter}}" 
+                            type="text" placeholder="Enter Story Here" name="content" 
+                            value= "{{story_dict.current}}"> 
+                        </fieldset>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            {% endfor %}
+
+            {% comment %} {% if story_list %}{% else %}
+                <div class="container-story-tab" id="container-story-tab-(-1)">
+                    <div class="read-only-div" id="read-only-div-(-1)">No Stories Active. Press "NEW" to start a new one, or "JOIN" to join a pre-existing one!.</div>
+                </div>
+            {% endif %} {% endcomment %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+

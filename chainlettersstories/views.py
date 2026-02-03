@@ -88,8 +88,11 @@ def read_dashboard(request, userid):
     myuser = StoriesUser.objects.get(pk=userid)
     myusername = myuser.displayname
 
+def get_random_moderatable_section(request,userid):
+    pass
 
-
+def approve_new_section(request,userid,finalsectionid):
+    pass
 
 def write_dashboard(request,userid):
     template = "chainlettersstories/write_dashboard.html"
