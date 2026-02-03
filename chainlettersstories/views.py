@@ -140,17 +140,17 @@ def create_new_story(request,userid):
     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 
-def submit_story_to_section(request,userid):
+def submit_section_to_story(request, userid, previoussectionid):
     content = request.POST["content"]
-    previoussectionid = request.POST["previoussectionid"]
     old_section = Section.objects.get(pk=previoussectionid)
+    old_section.previoussectionid_id = 2
     new_section = Section(storyid=old_section.storyid,
-                          userid=userid,
-                          sectionstatusid=1,
+                          userid_id=userid,
+                          sectionstatusid_id=1,
                           content=content,
-                          previoussectionid=previoussectionid)
+                          previoussectionid_id=previoussectionid)
     new_section.save()
-    return HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
+    return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 def sectiontrace(sectionid):
     section_object_array = SectionTrace.objects.filter(finalsectionid=sectionid).order_by("sectionorder")
