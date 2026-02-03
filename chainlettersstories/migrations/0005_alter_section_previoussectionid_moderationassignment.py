@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='section',
-            name='previoussectionid',
-            field=models.ForeignKey(db_column='previoussectionid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='chainlettersstories.section'),
-        ),
         migrations.CreateModel(
             name='ModerationAssignment',
             fields=[

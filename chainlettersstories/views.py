@@ -92,9 +92,13 @@ def read_dashboard(request, userid):
                                                 .filter(userid_id=userid)\
                                                 .filter(isitclosed=False)\
                                                 .values_list("sectionid")
-    
-    section_trace_QS = SectionTrace.objects.filter(finalsectionid_id__in = section_ids_to_moderate)\
+    print("section_ids_to_moderate, ",section_ids_to_moderate)
+    # section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+    #                                         .values("sectionorder","sectioncontent","finalsectionid")
+
+    section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
                                             .values("sectionorder","sectioncontent","finalsectionid")
+    print("1:", section_trace_QS)
 
     section_trace_df = pd.DataFrame(section_trace_QS)
     if not section_trace_df.empty:
