@@ -6,7 +6,7 @@ import pandas as pd
 import random
 
 
-from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus
+from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
 # Create your views here.
 
 
@@ -94,6 +94,9 @@ def get_random_moderatable_section(request,userid):
                                 .excludde(userid_id=userid)
     random_available_section = random.choice(available_sections)
     random_available_section.sectionstatusid_id = 3
+    new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
+                                                     userid_id = userid)
+    new_moderation_assignment.save()
 
     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
 

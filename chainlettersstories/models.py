@@ -36,6 +36,10 @@ class Commenttype(models.Model):
     class Meta:
         db_table = 'commenttype'
 
+class ModerationAssignment(models.Model):
+    sectionid = models.ForeignKey('Section', models.DO_NOTHING,db_column='sectionid')
+    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING,db_column='userid')
+    isitclosed = models.BooleanField()
 
 class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
