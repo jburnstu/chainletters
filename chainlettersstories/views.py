@@ -210,15 +210,15 @@ def get_random_available_section(request,userid):
 
 
 def submit_section_to_story(request, userid, sectionid):
-    content = request.POST["content"]
-    print("POST dict", request.POST.__dict__)
-    print("POST", request.POST)
-    print("REQUEST", request)
-    save_or_submit = request.POST["save-or-submit"]
-
     section = Section.objects.get(pk=sectionid)
+
+    content = request.POST["content"]
+    save_or_submit = request.POST["save-or-submit"]
     if save_or_submit == "submit":
         section.sectionstatusid_id = 2
+    elif save_or_submit == "abandon":
+        section.sectionstatusid_id = 6
+        section.previoussectionid.sectionstatusid_id = 4
     section.content = content
     section.save()
 
