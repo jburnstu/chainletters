@@ -22,6 +22,7 @@ $(".story-tab-button").click(function () {
     $(thisPanelId).show();
 }
 )
+$("#story-tab-button-1").click()
 // if (story_list) {
 //     console.log("story_list found");
 
