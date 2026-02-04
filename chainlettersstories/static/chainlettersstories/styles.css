@@ -1,17 +1,56 @@
-header {
-    display: flex;
-    background-color: DodgerBlue;
-}
-
-h1 {
-    background-color: red;
-    color: purple;
-}
-
 button {
     color: green;
 }
 
-div {
-    color: orange;
+
+
+div.container {
+    display: grid;
+    grid-template-areas:
+        "header     header              header"
+        "sidebar    tabs                tabs"
+        "sidebar    read-only-content   comments"
+        "sidebar    input-content       comments"
+        "sidebar    submissions         comments";
+    grid-template-columns: 1fr 3fr;
+    gap: 3px;
+    background-color: dodgerblue;
+    padding: 5px;
+}
+
+div.header {
+    grid-area: header;
+    background-color: indigo;
+}
+
+div.sidebar {
+    grid-area: sidebar;
+    background-color: grey;
+}
+
+div.tabs {
+    grid-area: tabs;
+    display: flex;
+    background-color: magenta;
+}
+
+input.read-only-content {
+    grid-area: read-only-content;
+    background-color: yellow;
+}
+
+input.input-content {
+    grid-area: input-content;
+    background-color: orange;
+}
+
+div.submissions {
+    grid-area: submissions;
+    display: flex;
+    background-color: red;
+}
+
+div.comments {
+    grid-area: comments;
+    background-color: cyan;
 }

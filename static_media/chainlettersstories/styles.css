@@ -1,5 +1,5 @@
 header {
-    display: flex;
+    display: inline-flex;
     background-color: DodgerBlue;
 }
 
@@ -12,6 +12,39 @@ button {
     color: green;
 }
 
-div {
-    color: orange;
+div.container {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "sidebar tabs tabs"
+        "sidebar main-content comments"
+        "sidebar submissions comments";
+    grid-template-columns: 1fr 3fr;
+    gap: 3px;
+    background-color: dodgerblue;
+    padding: 5px;
+}
+
+div.header {
+    grid-area: header;
+}
+
+div.sidebar {
+    grid-area: sidebar;
+}
+
+div.tabs {
+    grid-area: tabs;
+}
+
+div.main-content {
+    grid-area: main-content;
+}
+
+div.submissions {
+    grid-area: submissions;
+}
+
+div.comments {
+    grid-area: comments;
 }
