@@ -216,6 +216,7 @@ def create_new_story(request,userid):
     first_section.save()
     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
+<<<<<<< Updated upstream
 
 def submit_section_to_story(request, userid, finalsectionid):
     print("made it to SSTS function")
@@ -226,6 +227,21 @@ def submit_section_to_story(request, userid, finalsectionid):
     finished_section.content = content
     finished_section.save()
     print(finished_section.__dict__)
+=======
+def submit_section_to_story(request, userid, sectionid):
+    section = Section.objects.get(pk=sectionid)
+
+    content = request.POST["content"]
+    save_or_submit = request.POST["save-or-submit"]
+    if save_or_submit == "submit":
+        section.sectionstatusid_id = 2
+    elif save_or_submit == "abandon":
+        section.sectionstatusid = 6
+        section.previoussectionid.sectionstatusid = 4
+    
+    section.content = content
+    section.save()
+>>>>>>> Stashed changes
 
     return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 

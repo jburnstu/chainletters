@@ -26,6 +26,7 @@
 
             <form action="{% url 'chainlettersstories:create_new_story' userid %}" method="post">
                 {% csrf_token %}
+<<<<<<< Updated upstream
                 <input type="submit" value="New" />
             </form>
 
@@ -39,6 +40,27 @@
             <div class="stories-header-panel">
             {% for story_dict in story_dicts %}
             <button class="story-tab-button" id="story-tab-button-{{forloop.counter}}">{{forloop.counter}}</button>
+=======
+                    <input class="read-only-content" 
+                        id="read-only-content-{{forloop.counter}}" 
+                        type="text"
+                        value="{{story_dict.previous}}" 
+                        readonly>
+                    <input class="input-content"
+                            id="input-content-{{forloop.counter}}" 
+                            type="text"
+                            placeholder="Enter Story Here"
+                            name="content"
+                            value="{{story_dict.current}}"> 
+                    <div class="submissions">
+                        <button type="submit" name = "save-or-submit" value="save">Save</button>
+                        <button type="submit" name = "save-or-submit" value="submit">Submit</button>
+                        <button type="submit" name = "save-or-submit" value="abandon">Abandon</button>
+                    </div>
+                </form>
+                <div class="comments">Hello</div>
+            </div>
+>>>>>>> Stashed changes
             {% endfor %}
             </div>
 
