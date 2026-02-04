@@ -16,7 +16,7 @@ urlpatterns = [
     path("<int:userid>/write_dashboard/get_random_available_section/", 
          views.get_random_available_section,  
          name="get_random_available_section"),
-    path("<int:userid>/write_dashboard/submit_section_to_story/<int:finalsectionid>", 
+    path("<int:userid>/write_dashboard/submit_section_to_story/<int:sectionid>", 
          views.submit_section_to_story,   
          name="submit_section_to_story"),
 

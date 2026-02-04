@@ -14,11 +14,20 @@
 
 <body>
     <header>
-        <h1>Hi, {{displayname}}!</h1><br>
-        <a href="{% url 'chainlettersstories:dashboard' userid %}">DASHBOARD</a>
-        <a href="{% url 'chainlettersstories:write_dashboard' userid %}">WRITE!!</a>
-        <a href="{% url 'chainlettersstories:read_dashboard' userid %}">READ!!</a>
-        <a href="{% url 'chainlettersstories:login_or_signup_page' %}">LOG OUT</a>
+        <h1>Hi, {{displayname}}!</h1>
+        <br>
+        <form action="{% url 'chainlettersstories:dashboard' userid %}">
+            <button type="submit">DASHBOARD</button>
+        </form>
+        <form action="{% url 'chainlettersstories:write_dashboard' userid %}">
+            <button type="submit">WRITE</button>
+        </form>
+        <form action="{% url 'chainlettersstories:read_dashboard' userid %}">
+            <button type="submit">READ</button>
+        </form>
+        <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
+            <button type="submit">LOG OUT</button>
+        </form>
     </header>
     <div class="main-section">
         <div class="sidebar">
