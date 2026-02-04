@@ -13,7 +13,8 @@
 
 <body>
     <div class="container">
-        <div class="header">
+        <header>
+            <h1>CHAIN MATES</h1>
             <h1>Hi, {{displayname}}!</h1>
             <form action="{% url 'chainlettersstories:dashboard' userid %}">
                 <button type="submit">DASHBOARD</button>
@@ -27,7 +28,7 @@
             <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
                 <button type="submit">LOG OUT</button>
             </form>
-        </div>
+        </header>
 
         <div class="sidebar">
             <form action="{% url 'chainlettersstories:create_new_story' userid %}">
