@@ -1,53 +1,76 @@
+// const story_list = JSON.parse(document.getElementById('story-data').textContent);
+
+const storiesHeaderPanel = document.querySelector(".stories-header-panel");
+const storiesMainPanel = document.querySelector(".stories-main-panel");
+const joinNewStoryButton = document.querySelector(".join-button");
+const tabButtons = document.querySelectorAll("tab-button");
+
 var stories;
 var story_excluding_last_section;
 var last_section;
 var storyButtonHTML;
 var storyTabHTML;
+// var storiesHeaderPanel;
+// var storiesMainPanel;
 
-window.addEventListener('load', onPageLoaded, false);
-
-
-function onPageLoaded() {
-    console.log("onpageloaded reahed");
-    const storiesHeaderPanel = document.querySelector(".stories-header-panel");
-    const storiesMainPanel = document.querySelector(".stories-main-panel");
-    if (story_list) {
-        console.log("story_list found");
-        createStoryTabsAndButtons(story_list);
-    }
-    console.log("page loaded");
+$(".story-tab-button").click(function () {
+    $(".main-content").hide();
+    id = $(this).attr("id").slice(-1);
+    thisPanelId = "#main-content-" + id
+    console.log(thisPanelId)
+    console.log()
+    $(thisPanelId).show();
 }
+)
+$("#story-tab-button-1").click()
+// if (story_list) {
+//     console.log("story_list found");
 
 
-const createStoryTabsAndButtons = function (stories) {
-    storiesHeaderPanel.innerHTML = '';
-    storiesMainPanel.innerHTML = '';
-
-    stories.forEach(function (story, i) {
-
-        story_excluding_last_section = story[1].slice(0, -1).join(" ");
-        last_section = story[1].slice(-1);
+// }
+console.log("page loaded");
+// }
 
 
-        storyButtonHTML = `
-        <button class="story-tab-button" id="story-tab-button-${i}">${i}</button>
-        `;
-
-        storyTabHTML = `
-        <div class="container-story-tab" id = "container-story-tab-${i}">
-            <div class="read-only-div" id="read-only-div-${i}">${story_excluding_last_section}.</div> 
-            <form action="{% url "chainlettersstories:submit_story_to_section"  %}" method="post"> 
-                <fieldset>
-                    <input class=section-input id="section-input-${i}" type="text" placeholder=${last_section == "" ? "Enter Story Here." : last_section} name="content"> 
-                </fieldset>
-                <input type="submit" value="Submit">
-            </form>
-        </div>
-        `;
 
 
-        storiesHeaderPanel.insertAdjacentHTML('afterbegin', storyButtonHTML);
-        storiesMainPanel.insertAdjacentHTML('afterbegin', storyTabHTML);
-    });
+// const createStoryTabsAndButtons = function (stories) {
+//     storiesHeaderPanel.innerHTML = '';
+//     storiesMainPanel.innerHTML = '';
 
-}
+//     console.log(stories);
+//     console.log(typeof (stories));
+
+//     stories.forEach(function (story, i) {
+
+//         story_excluding_last_section = story[1].slice(0, -1).join(" ");
+//         last_section = story[1].slice(-1).join(" ");
+
+//         console.log(last_section);
+//         console.log(typeof (last_section))
+
+
+//         storyButtonHTML = `
+//         <button class="story-tab-button" id="story-tab-button-${i}">${i}</button>
+//         `;
+
+//         storyTabHTML = `
+//         <div class="container-story-tab" id = "container-story-tab-${i}">
+//             <div class="read-only-div" id="read-only-div-${i}">${story_excluding_last_section}.</div>
+//             <form action= "????" method="post"
+//                 <fieldset>
+//                     <input class=section-input id="section-input-${i}"
+//                     type="text" placeholder="Enter Story Here" name="content"
+//                     value= "${last_section}">
+//                 </fieldset>
+//                 <input type="submit" value="Submit">
+//             </form>
+//         </div>
+//         `;
+
+
+//         storiesHeaderPanel.insertAdjacentHTML('afterbegin', storyButtonHTML);
+//         storiesMainPanel.insertAdjacentHTML('afterbegin', storyTabHTML);
+//     });
+
+// }
