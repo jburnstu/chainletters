@@ -3,10 +3,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 import pandas as pd
+import random
 
-from .models import StoriesUser, Section, SectionTrace
+
+from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
 # Create your views here.
-
 
 
 def login_or_signup_page(request):
@@ -82,6 +83,85 @@ def dashboard(request,userid):
                       "displayname": myusername})
 
 
+def read_dashboard(request, userid):
+    template = "chainlettersstories/read_dashboard.html"
+    myuser = StoriesUser.objects.get(pk=userid)
+    myusername = myuser.displayname
+
+    section_ids_to_moderate = ModerationAssignment.objects\
+                                                .filter(userid_id=userid)\
+                                                .filter(isitclosed=False)\
+                                                .values_list("sectionid")
+    print("section_ids_to_moderate, ",section_ids_to_moderate)
+    # section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+    #                                         .values("sectionorder","sectioncontent","finalsectionid")
+
+    section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+                                            .values("sectionorder","sectioncontent","finalsectionid")
+    print("1:", section_trace_QS)
+
+    section_trace_df = pd.DataFrame(section_trace_QS)
+    if not section_trace_df.empty:
+        separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+                                           "current": list(group["sectioncontent"])[-1]
+                                           }
+                                        for key, group in section_trace_df.groupby("finalsectionid")
+        }
+
+        return render(request,template,
+                {
+                    "userid":
+                    userid,
+                    "displayname":
+                myusername,
+                    "story_dicts":
+                separate_story_trace_dicts})  
+    else:
+        return render(request,template,
+                    {
+                        "userid":
+                        userid,
+                        "displayname":
+                    myusername,})
+
+
+
+def get_random_moderatable_section(request,userid):
+    available_sections = Section.objects\
+                                .filter(sectionstatusid_id=2)\
+                                .exclude(userid_id=userid)
+    if not available_sections:
+        return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+    random_available_section = random.choice(available_sections)
+    random_available_section.sectionstatusid_id = 3
+    new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
+                                                     userid_id = userid)
+    new_moderation_assignment.save()
+
+    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+    # previous_section_object = Section.objects.get(id=random_available_section_id)
+    # previous_section_object.sectionstatusid_id = 5
+    # new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
+    # new_section.save()
+
+
+
+def approve_new_section(request,userid,finalsectionid):
+
+    approved_section = Section.objects.get(pk=finalsectionid)
+    approved_section.sectionstatusid_id = 4
+    approved_section.save()
+
+    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
+    completed_assignment.isitclosed = True
+    completed_assignment.save()
+
+    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+
+
 def write_dashboard(request,userid):
     template = "chainlettersstories/write_dashboard.html"
     myuser = StoriesUser.objects.get(pk=userid)
@@ -92,16 +172,21 @@ def write_dashboard(request,userid):
 
     section_trace_df = pd.DataFrame(section_trace_QS)
     if not section_trace_df.empty:
-        separate_story_trace_list = [[key, list(group["sectioncontent"])]
-                                    for key, group in section_trace_df.groupby("finalsectionid")]
+        separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+                                           "current": list(group["sectioncontent"])[-1]
+                                           }
+                                        for key, group in section_trace_df.groupby("finalsectionid")
+        }
+
+
         return render(request,template,
                     {
                         "userid":
                         userid,
                         "displayname":
                     myusername,
-                        "story_list":
-                    separate_story_trace_list})  
+                        "story_dicts":
+                    separate_story_trace_dicts})  
     else:
         return render(request,template,
                     {
@@ -111,36 +196,40 @@ def write_dashboard(request,userid):
                     myusername,})
 
 
-def submit_story_to_section(request,userid):
-    content = request.POST["content"]
-    previoussectionid = request.POST["previoussectionid"]
-    old_section = Section.objects.get(pk=previoussectionid)
-    new_section = Section(storyid=old_section.storyid,
-                          userid=userid,
-                          sectionstatusid=1,
-                          content=content,
-                          previoussectionid=previoussectionid)
+def get_random_available_section(request,userid):
+    available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
+    if not available_sections:
+        return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+    
+    random_available_section_id = random.choice(available_sections)["sectionid"]
+    previous_section_object = Section.objects.get(id=random_available_section_id)
+    previous_section_object.sectionstatusid_id = 5
+    new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
     new_section.save()
-    return HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
+
+    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+
+def create_new_story(request,userid):
+    new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
+    new_story.save()
+    first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
+    first_section.save()
+    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+
+
+def submit_section_to_story(request, userid, finalsectionid):
+    print("made it to SSTS function")
+    content = request.POST["content"]
+    print("content:",content)
+    finished_section = Section.objects.get(pk=finalsectionid)
+    finished_section.sectionstatusid_id = 2
+    finished_section.content = content
+    finished_section.save()
+    print(finished_section.__dict__)
+
+    return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 def sectiontrace(sectionid):
     section_object_array = SectionTrace.objects.filter(finalsectionid=sectionid).order_by("sectionorder")
     section_content_array = list(section_object.sectioncontent for section_object in section_object_array)
     return HttpResponse
-
-
-
-'''
-so, we want a full story in array form:
-["it was a long night", "nobody could sleep", etc....]
- question:
-
- view contains content + this is pulled into object
- VS
- view doesn't contain content, further request per story part to pull this up
-
-so when we INITIALLY load dashboard, that's when we want the stories 
- 
-
-
-'''

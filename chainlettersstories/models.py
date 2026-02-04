@@ -10,7 +10,7 @@ from django.db import models
 class Comment(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     commenttypeid = models.ForeignKey('Commenttype', models.DO_NOTHING, db_column='commenttypeid')
-    textcontent = models.TextField(blank=True, null=True)
+    textcontent = models.TextField(default="")
 
     class Meta:
         db_table = 'comment'
@@ -36,12 +36,20 @@ class Commenttype(models.Model):
     class Meta:
         db_table = 'commenttype'
 
+class ModerationAssignment(models.Model):
+    sectionid = models.ForeignKey('Section', models.DO_NOTHING,db_column='sectionid')
+    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING,db_column='userid')
+    isitclosed = models.BooleanField(default=False)
+
+
+    
 
 class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
-    content = models.TextField(blank=True, null=True)
+    content = models.TextField(default="")
+    previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='previoussectionid', null=True)
 
     class Meta:
         db_table = 'section'
@@ -68,9 +76,9 @@ class Sectionstatus(models.Model):
 
 class Story(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
-    isitclosed = models.BooleanField()
+    isitclosed = models.BooleanField(default=False)
     title = models.CharField(max_length=100, blank=True, null=True)
-    isitmature = models.BooleanField()
+    isitmature = models.BooleanField(default=False)
     maxstorylength = models.SmallIntegerField(blank=True, null=True)
     maxsectionlength = models.SmallIntegerField(blank=True, null=True)
 
@@ -133,8 +141,10 @@ class SectionTrace(models.Model):
         managed = False
 
 
+class AvailableSectionByUser(models.Model):
+    userid = models.IntegerField()
+    sectionid = models.IntegerField()
 
-'''
-
-we want SectionTrace to return every ACTIVE story -- so really we only want 
-'''
+    class Meta:
+        db_table = 'availablesectionbyuser'
+        managed = False

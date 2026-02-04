@@ -11,20 +11,11 @@
 <body>
     <header>
         <h1>Hi, {{displayname}}!</h1>
-        <form action="chainlettersstories:write_dashboard userid">
-            <input type="submit" value="WRITE!" />
-        </form>
+        <a href="{% url 'chainlettersstories:dashboard' userid %}">DASHBOARD</a>
         <a href="{% url 'chainlettersstories:write_dashboard' userid %}">WRITE!!</a>
-        <button class='header-button review-button' action="chainlettersstories:readdashboard">REVIEW</button>
-        <button class="header-button logout-button" action="chainlettersstories:login-or-signup-page">LOGOUT</button>
+        <a href="{% url 'chainlettersstories:read_dashboard' userid %}">READ!!</a>
+        <a href="{% url 'chainlettersstories:login_or_signup_page' %}">LOG OUT</a>
+        {% comment %} <button class="header-button logout-button" action="chainlettersstories:login-or-signup-page">LOGOUT</button> {% endcomment %}
     </header>
 </body>
-
 </html>
-
-
-
-{% for choice in question.choice_set.all %}
-<input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-<label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-{% endfor %}
