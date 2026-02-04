@@ -141,13 +141,6 @@ def get_random_moderatable_section(request,userid):
 
     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
 
-    # previous_section_object = Section.objects.get(id=random_available_section_id)
-    # previous_section_object.sectionstatusid_id = 5
-    # new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
-    # new_section.save()
-
-
-
 def approve_new_section(request,userid,finalsectionid):
 
     approved_section = Section.objects.get(pk=finalsectionid)
@@ -195,6 +188,12 @@ def write_dashboard(request,userid):
                         "displayname":
                     myusername,})
 
+def create_new_story(request,userid):
+    new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
+    new_story.save()
+    first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
+    first_section.save()
+    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 def get_random_available_section(request,userid):
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
@@ -209,23 +208,19 @@ def get_random_available_section(request,userid):
 
     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
-def create_new_story(request,userid):
-    new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
-    new_story.save()
-    first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
-    first_section.save()
-    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
-
-def submit_section_to_story(request, userid, finalsectionid):
-    print("made it to SSTS function")
+def submit_section_to_story(request, userid, sectionid):
     content = request.POST["content"]
-    print("content:",content)
-    finished_section = Section.objects.get(pk=finalsectionid)
-    finished_section.sectionstatusid_id = 2
-    finished_section.content = content
-    finished_section.save()
-    print(finished_section.__dict__)
+    print("POST dict", request.POST.__dict__)
+    print("POST", request.POST)
+    print("REQUEST", request)
+    save_or_submit = request.POST["save-or-submit"]
+
+    section = Section.objects.get(pk=sectionid)
+    if save_or_submit == "submit":
+        section.sectionstatusid_id = 2
+    section.content = content
+    section.save()
 
     return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 

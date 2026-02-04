@@ -16,10 +16,18 @@
     <header>
         <h1>Hi, {{displayname}}!</h1>
         <br>
-        <a href="{% url 'chainlettersstories:dashboard' userid %}">DASHBOARD</a>
-        <a href="{% url 'chainlettersstories:write_dashboard' userid %}">WRITE!!</a>
-        <a href="{% url 'chainlettersstories:read_dashboard' userid %}">READ!!</a>
-        <a href="{% url 'chainlettersstories:login_or_signup_page' %}">LOG OUT</a>
+        <form action="{% url 'chainlettersstories:dashboard' userid %}">
+            <button type="submit">DASHBOARD</button>
+        </form>
+        <form action="{% url 'chainlettersstories:write_dashboard' userid %}">
+            <button type="submit">WRITE</button>
+        </form>
+        <form action="{% url 'chainlettersstories:read_dashboard' userid %}">
+            <button type="submit">READ</button>
+        </form>
+        <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
+            <button type="submit">LOG OUT</button>
+        </form>
     </header>
     <div class="main-section">
         <div class="sidebar">
@@ -43,17 +51,18 @@
             </div>
 
             <div class="stories-main-panel">
-            {% for finalsectionid, story_dict in story_dicts.items %}
+            {% for sectionid, story_dict in story_dicts.items %}
                 <div class="container-story-tab" id = "container-story-tab-{{forloop.counter}}">
                     <div class="read-only-div" id="read-only-div-{{forloop.counter}}">{{story_dict.previous}}</div> 
-                    <form action= "{% url 'chainlettersstories:submit_section_to_story' userid finalsectionid %}" method="post">
+                    <form action= "{% url 'chainlettersstories:submit_section_to_story' userid sectionid %}" method="post">
                     {% csrf_token %}
                         <fieldset>
                             <input class=section-input id="section-input-{{forloop.counter}}" 
                             type="text" placeholder="Enter Story Here" name="content" 
                             value= "{{story_dict.current}}"> 
                         </fieldset>
-                        <input type="submit" value="Submit">
+                        <button type="submit" name = "save-or-submit" value="save">Save</button>
+                        <button type="submit" name = "save-or-submit" value="submit">Submit</button>
                     </form>
                 </div>
             {% endfor %}
