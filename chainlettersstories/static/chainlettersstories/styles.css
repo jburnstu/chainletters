@@ -72,7 +72,19 @@ div.content-submissions-comments {
     height: 100%
 }
 
-input.read-only-content {
+
+div.textarea-wrap {
+    display: grid;
+}
+
+div.textarea-wrap::after {
+    content: attr(data-replicated-value) " ";
+    white-space: pre-wrap;
+
+    visibility: hidden;
+}
+
+div.read-only-content {
     grid-area: read-only-content;
     background-color: yellow;
     min-height: 50px;
@@ -80,15 +92,17 @@ input.read-only-content {
     padding: 5px;
     margin: 5px;
     overflow: auto;
+    word-wrap: normal;
 }
 
-input.input-content {
+div.input-content {
     grid-area: input-content;
     background-color: pink;
     min-height: 50px;
     width: 90%;
     padding: 5px;
     margin: 5px;
+    word-wrap: normal;
 }
 
 div.submissions {

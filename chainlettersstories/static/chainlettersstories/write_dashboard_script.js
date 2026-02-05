@@ -11,8 +11,7 @@ var last_section;
 var storyButtonHTML;
 var storyTabHTML;
 // var storiesHeaderPanel;
-// var storiesMainPanel;
-
+// var storiesMainPanel;s
 $(".story-tab-button").click(function () {
     $(".content-submissions-comments").hide();
     id = $(this).attr("id").slice(-1);

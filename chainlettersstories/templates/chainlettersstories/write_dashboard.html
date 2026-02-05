@@ -53,17 +53,27 @@
                     id ="content-submissions-{{forloop.counter}}"
                     action="{% url 'chainlettersstories:submit_section_to_story' userid sectionid %}"        method="post">
                 {% csrf_token %}
-                    <input class="read-only-content" 
-                        id="read-only-content-{{forloop.counter}}" 
-                        type="text"
-                        value="{{story_dict.previous}}" 
-                        readonly>
-                    <input class="input-content"
+                <div class="all-read-only-content">
+                    {% for key, story_section in story_dict.items %}
+                        <div class="read-only-content textarea-wrap">
+                            <textarea class="read-only-content" 
+                                id="read-only-content-{{forloop.counter}}" 
+                                type="text"
+                                value="{{story_dict.previous}}" 
+                                readonly>{{story_section}}
+                            </textarea>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="input-content textarea-wrap">
+                    <textarea class="input-content"
                             id="input-content-{{forloop.counter}}" 
                             type="text"
                             placeholder="Enter Story Here"
                             name="content"
-                            value="{{story_dict.current}}"> 
+                            value="{{story_dict.current}}">{{story_dict.current}}
+                    </textarea>
+                </div>
                     <div class="submissions">
                         <button type="submit" name = "save-or-submit" value="save">Save</button>
                         <button type="submit" name = "save-or-submit" value="submit">Submit</button>
