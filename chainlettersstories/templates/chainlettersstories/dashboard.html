@@ -10,15 +10,15 @@
 </head>
 
 <body>
-    <h1>Hi, {{displayname}}!</h1><br>
+    <h1>Hi, {{object.displayname}}!</h1><br>
     <header>
-        <form action="{% url 'chainlettersstories:dashboard' userid %}">
+        <form action="{% url 'chainlettersstories:dashboard' object.id %}">
             <button type="submit">DASHBOARD</button>
         </form>
-        <form action="{% url 'chainlettersstories:write_dashboard' userid %}">
+        <form action="{% url 'chainlettersstories:write_dashboard' object.id %}">
             <button type="submit">WRITE</button>
         </form>
-        <form action="{% url 'chainlettersstories:read_dashboard' userid %}">
+        <form action="{% url 'chainlettersstories:read_dashboard' object.id %}">
             <button type="submit">READ</button>
         </form>
         <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
@@ -26,4 +26,5 @@
         </form>
     </header>
 </body>
+
 </html>

@@ -73,14 +73,21 @@ def login(request):
 
 
 
-def dashboard(request,userid):
-    template = "chainlettersstories/dashboard.html"
-    myuser = StoriesUser.objects.get(pk=userid)
-    myusername = myuser.displayname
-    return render(request,template, 
-                  {
-                      "userid": userid,
-                      "displayname": myusername})
+# def dashboard(request,userid):
+#     template = "chainlettersstories/dashboard.html"
+#     myuser = StoriesUser.objects.get(pk=userid)
+#     myusername = myuser.displayname
+#     return render(request,template, 
+#                   {
+#                       "userid": userid,
+#                       "displayname": myusername})
+
+from django.views.generic.detail import DetailView
+
+class UserDetailView(DetailView):
+    model = StoriesUser
+    template_name = "chainlettersstories/dashboard.html"
+
 
 
 def read_dashboard(request, userid):
