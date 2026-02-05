@@ -148,13 +148,13 @@ def get_random_moderatable_section(request,userid):
 
     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
 
-def approve_new_section(request,userid,finalsectionid):
+def approve_new_section(request,userid,sectionid):
 
-    approved_section = Section.objects.get(pk=finalsectionid)
+    approved_section = Section.objects.get(pk=sectionid)
     approved_section.sectionstatusid_id = 4
     approved_section.save()
 
-    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
+    completed_assignment = ModerationAssignment.objects.get(sectionid=sectionid,userid=userid)
     completed_assignment.isitclosed = True
     completed_assignment.save()
 
@@ -195,12 +195,14 @@ def write_dashboard(request,userid):
                         "displayname":
                     myusername,})
 
+
 def create_new_story(request,userid):
     new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
     new_story.save()
     first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
     first_section.save()
     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+
 
 def get_random_available_section(request,userid):
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
@@ -231,7 +233,5 @@ def submit_section_to_story(request, userid, sectionid):
 
     return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
-def sectiontrace(sectionid):
-    section_object_array = SectionTrace.objects.filter(finalsectionid=sectionid).order_by("sectionorder")
-    section_content_array = list(section_object.sectioncontent for section_object in section_object_array)
-    return HttpResponse
+
+class SectionSubmissionView(View):

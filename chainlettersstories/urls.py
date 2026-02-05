@@ -24,7 +24,7 @@ urlpatterns = [
     path("<int:userid>/read_dashboard/get_random_moderatable_section", 
          views.get_random_moderatable_section,
          name="get_random_moderatable_section"),
-    path("<int:userid>/read_dashboard/approve_new_section/<int:finalsectionid>", 
+    path("<int:userid>/read_dashboard/approve_new_section/<int:sectionid>", 
          views.approve_new_section,
          name="approve_new_section"),
     
