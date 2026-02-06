@@ -6,6 +6,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
     plugins: [react()],
+    server: {
+        watch: {
+            usePolling: true,
+        }
+    },
     base: 'static/', // This should match Django's settings.STATIC_URL
     build: {
         // Where Vite will save its output files.
