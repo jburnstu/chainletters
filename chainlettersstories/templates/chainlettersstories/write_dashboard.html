@@ -1,4 +1,5 @@
 {% load static %}
+{% load django_vite %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,6 +7,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>writePage</title>
+    {% vite_hmr_client %}
     <link rel="stylesheet" href= "{% static 'chainlettersstories/styles.css' %}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src= "{% static 'chainlettersstories/write_dashboard_script.js' %}" defer></script>
@@ -58,6 +60,8 @@
                         type="text"
                         value="{{story_dict.previous}}" 
                         readonly>
+                    <div id="react-read-only-content"></div>
+                    {% vite_asset 'assets/write_dashboard_components.jsx' %}
                     <input class="input-content" 
                             id="input-content-{{forloop.counter}}" 
                             type="text"

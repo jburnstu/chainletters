@@ -14,9 +14,9 @@ var storyTabHTML;
 // var storiesMainPanel;
 
 $(".story-tab-button").click(function () {
-    $(".main-content").hide();
+    $(".content-submissions-comments").hide();
     id = $(this).attr("id").slice(-1);
-    thisPanelId = "#main-content-" + id
+    thisPanelId = "#content-submissions-comments-" + id
     console.log(thisPanelId)
     console.log()
     $(thisPanelId).show();
