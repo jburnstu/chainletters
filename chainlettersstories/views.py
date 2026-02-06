@@ -218,7 +218,8 @@ def submit_section_to_story(request, userid, sectionid):
         section.sectionstatusid_id = 2
     elif save_or_submit == "abandon":
         section.sectionstatusid_id = 6
-        section.previoussectionid.sectionstatusid_id = 4
+        if section.previoussectionid is not None:
+            section.previoussectionid.sectionstatusid_id = 4
     section.content = content
     section.save()
 
