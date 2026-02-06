@@ -15,7 +15,7 @@ export default defineConfig({
     build: {
         // Where Vite will save its output files.
         // This should be something in your settings.STATICFILES_DIRS
-        outDir: path.resolve(__dirname, './static'),
+        outDir: path.resolve(__dirname, './static_media'),
         emptyOutDir: false, // Preserve the outDir to not clobber Django's other files.
         manifest: "manifest.json",
         rollupOptions: {

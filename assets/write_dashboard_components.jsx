@@ -8,7 +8,7 @@ import { createRoot } from 'react-dom/client';
 function StorySoFarSplitOut() {
     var elementPerSection;
 
-    console.log("React function reached");
+    console.log("React function reached - second update");
     const storySoFar = [
         { "sectionid": 12, "content": "First Section" },
         { "sectionid": 13, "content": "Second Section" },
