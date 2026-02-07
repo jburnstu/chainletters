@@ -84,7 +84,7 @@ div.textarea-wrap::after {
     visibility: hidden;
 }
 
-div.read-only-content {
+div.all-read-only-content {
     grid-area: read-only-content;
     background-color: yellow;
     min-height: 50px;

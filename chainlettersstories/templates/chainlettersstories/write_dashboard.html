@@ -54,12 +54,11 @@
                     action="{% url 'chainlettersstories:submit_section_to_story' userid sectionid %}"        method="post">
                 {% csrf_token %}
                 <div class="all-read-only-content">
-                    {% for key, story_section in story_dict.items %}
+                    {% for story_section in story_dict.previous %}
                         <div class="read-only-content textarea-wrap">
                             <textarea class="read-only-content" 
                                 id="read-only-content-{{forloop.counter}}" 
                                 type="text"
-                                value="{{story_dict.previous}}" 
                                 readonly>{{story_section}}
                             </textarea>
                         </div>

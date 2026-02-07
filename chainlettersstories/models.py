@@ -42,7 +42,8 @@ class ModerationAssignment(models.Model):
     isitclosed = models.BooleanField(default=False)
 
 
-    
+    def __str__(self):
+        return "USERID: " + str(self.userid_id) + ", SECTIONID: " + str(self.sectionid_id)
 
 class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')

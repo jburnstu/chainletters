@@ -92,13 +92,13 @@ def read_dashboard(request, userid):
                                                 .filter(userid_id=userid)\
                                                 .filter(isitclosed=False)\
                                                 .values_list("sectionid")
-    print("section_ids_to_moderate, ",section_ids_to_moderate)
+    # print("section_ids_to_moderate, ",section_ids_to_moderate)
     # section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
     #                                         .values("sectionorder","sectioncontent","finalsectionid")
 
     section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
                                             .values("sectionorder","sectioncontent","finalsectionid")
-    print("1:", section_trace_QS)
+    # print("1:", section_trace_QS)
 
     section_trace_df = pd.DataFrame(section_trace_QS)
     if not section_trace_df.empty:
@@ -135,6 +135,7 @@ def get_random_moderatable_section(request,userid):
 
     random_available_section = random.choice(available_sections)
     random_available_section.sectionstatusid_id = 3
+
     new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
                                                      userid_id = userid)
     new_moderation_assignment.save()
@@ -147,7 +148,9 @@ def approve_new_section(request,userid,finalsectionid):
     approved_section.sectionstatusid_id = 4
     approved_section.save()
 
-    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
+
+    print(ModerationAssignment.objects.all())
+    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid, isitclosed=False)
     completed_assignment.isitclosed = True
     completed_assignment.save()
 
@@ -166,11 +169,13 @@ def write_dashboard(request,userid):
     section_trace_df = pd.DataFrame(section_trace_QS)
     if not section_trace_df.empty:
         separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                           "current": list(group["sectioncontent"])[-1]
+                                           "current": list(group["sectioncontent"])[-1],
                                            }
                                         for key, group in section_trace_df.groupby("finalsectionid")
         }
 
+        list_of_prevs = [separate_story_trace_dicts[key]["previous"] for key in separate_story_trace_dicts.keys()]
+        print("previous story",list_of_prevs)
 
         return render(request,template,
                     {
