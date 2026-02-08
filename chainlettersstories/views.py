@@ -17,21 +17,16 @@ def login_or_signup_page(request):
 
 
 def login(request):
+    template = "chainlettersstories/login_or_signup_page.html"
     try:
         login = request.POST["login-or-signup"]
         username_or_email = request.POST["username-or-email"]
         password = request.POST["password"]
         if "" in {username_or_email, password}:
-            print('"" found')
             raise KeyError("neither field may be blank.")
     except KeyError as e:
         print(e)
-        return render(request,
-        "chainlettersstories/login_or_signup_page.html",
-        {
-            "message":
-            "Please ensure both fields are filled in."
-        })
+        return render(request,template,{"message":"Please ensure both fields are filled in."})
     if bool(int(login)):
         print("login true")
         try:
@@ -42,12 +37,7 @@ def login(request):
             try:
                 myuser = StoriesUser.objects.get(email=username_or_email,password=password)
             except StoriesUser.DoesNotExist:
-                return render(request,
-                            "chainlettersstories/login_or_signup_page.html",
-                            {
-                                "message":
-                                "No account found matching this username / email and password. Please try again or sign up."
-                            })
+                return render(request, template,{"message":"No account found matching this username / email and password. Please try again or sign up."})
         return HttpResponseRedirect(reverse("chainlettersstories:dashboard", args=(userid,)))
     else:
         print("login false")
@@ -56,20 +46,8 @@ def login(request):
         except StoriesUser.DoesNotExist:
             newStoriesUser = StoriesUser(displayname=username_or_email,email=username_or_email+"@example.com",password=password)
             newStoriesUser.save()
-            return render(request,
-                        "chainlettersstories/login_or_signup_page.html",
-                          {
-                              "message":
-                          "Login successfully added! Please now login."
-                          }
-            )
-        return render (request,
-                        "chainlettersstories/login_or_signup_page.html",
-                          {
-                              "message":
-                          "Account already exists. Please log in instead."
-                          }
-            )
+            return render(request,template,{"message": "Login successfully added! Please now login."})
+        return render (request,template,{"message":"Account already exists. Please log in instead."})
 
 
 
