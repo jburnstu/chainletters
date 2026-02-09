@@ -67,6 +67,47 @@ def create_submit_and_approve_section(user_creator,content,user_moderator,previo
     approve_moderation(section)
     return section
 
+class SectionContentTests(TestCase):
+    def test_not_empty(self):
+        pass
+
+    def test_not_equivalent(self):
+        pass
+
+    def test_formatting_preserved(self):
+        pass
+
+    def test_length_preserved(self):
+        pass
+
+class WriteDashboardDisplayTests(TestCase):
+    def test_no_stories(self):
+        pass
+
+    def test_no_stories_to_join(self):
+        pass
+
+    def test_multiple_stories(self):
+        pass
+
+    def test_submitted_story_leaves_page(self):
+        pass
+
+    def test_saved_story_still_present(self):
+        pass
+
+class ReadDashboardDisplayTests(TestCase):
+    def test_no_stories(self):
+        pass
+
+    def test_no_stories_to_moderate(self):
+        pass
+
+    def test_moderatable_story_will_be_accessed(self):
+        pass
+
+class LoginTests(self):
+
 
 
 class QuestionIndexViewTests(TestCase):
