@@ -77,123 +77,126 @@ def dashboard(request,userid):
     template = "chainlettersstories/dashboard.html"
     myuser = StoriesUser.objects.get(pk=userid)
     myusername = myuser.displayname
+
+
+
     return render(request,template, 
                   {
                       "userid": userid,
                       "displayname": myusername})
 
 
-def read_dashboard(request, userid):
-    template = "chainlettersstories/read_dashboard.html"
-    myuser = StoriesUser.objects.get(pk=userid)
-    myusername = myuser.displayname
+# def read_dashboard(request, userid):
+#     template = "chainlettersstories/read_dashboard.html"
+#     myuser = StoriesUser.objects.get(pk=userid)
+#     myusername = myuser.displayname
 
-    section_ids_to_moderate = ModerationAssignment.objects\
-                                                .filter(userid_id=userid)\
-                                                .filter(isitclosed=False)\
-                                                .values_list("sectionid")
-    print("section_ids_to_moderate, ",section_ids_to_moderate)
-    # section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-    #                                         .values("sectionorder","sectioncontent","finalsectionid")
+#     section_ids_to_moderate = ModerationAssignment.objects\
+#                                                 .filter(userid_id=userid)\
+#                                                 .filter(isitclosed=False)\
+#                                                 .values_list("sectionid")
+#     print("section_ids_to_moderate, ",section_ids_to_moderate)
+#     # section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+#     #                                         .values("sectionorder","sectioncontent","finalsectionid")
 
-    section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-                                            .values("sectionorder","sectioncontent","finalsectionid")
-    print("1:", section_trace_QS)
+#     section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+#                                             .values("sectionorder","sectioncontent","finalsectionid")
+#     print("1:", section_trace_QS)
 
-    section_trace_df = pd.DataFrame(section_trace_QS)
-    if not section_trace_df.empty:
-        separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                           "current": list(group["sectioncontent"])[-1]
-                                           }
-                                        for key, group in section_trace_df.groupby("finalsectionid")
-        }
+#     section_trace_df = pd.DataFrame(section_trace_QS)
+#     if not section_trace_df.empty:
+#         separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+#                                            "current": list(group["sectioncontent"])[-1]
+#                                            }
+#                                         for key, group in section_trace_df.groupby("finalsectionid")
+#         }
 
-        return render(request,template,
-                {
-                    "userid":
-                    userid,
-                    "displayname":
-                myusername,
-                    "story_dicts":
-                separate_story_trace_dicts})  
-    else:
-        return render(request,template,
-                    {
-                        "userid":
-                        userid,
-                        "displayname":
-                    myusername,})
-
-
-
-def get_random_moderatable_section(request,userid):
-    available_sections = Section.objects\
-                                .filter(sectionstatusid_id=2)\
-                                .exclude(userid_id=userid)
-    if not available_sections:
-        return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
-
-    random_available_section = random.choice(available_sections)
-    random_available_section.sectionstatusid_id = 3
-    new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
-                                                     userid_id = userid)
-    new_moderation_assignment.save()
-
-    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
-
-def approve_new_section(request,userid,finalsectionid):
-
-    approved_section = Section.objects.get(pk=finalsectionid)
-    approved_section.sectionstatusid_id = 4
-    approved_section.save()
-
-    completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
-    completed_assignment.isitclosed = True
-    completed_assignment.save()
-
-    return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+#         return render(request,template,
+#                 {
+#                     "userid":
+#                     userid,
+#                     "displayname":
+#                 myusername,
+#                     "story_dicts":
+#                 separate_story_trace_dicts})  
+#     else:
+#         return render(request,template,
+#                     {
+#                         "userid":
+#                         userid,
+#                         "displayname":
+#                     myusername,})
 
 
 
-def write_dashboard(request,userid):
-    template = "chainlettersstories/write_dashboard.html"
-    myuser = StoriesUser.objects.get(pk=userid)
-    myusername = myuser.displayname
+# def get_random_moderatable_section(request,userid):
+#     available_sections = Section.objects\
+#                                 .filter(sectionstatusid_id=2)\
+#                                 .exclude(userid_id=userid)
+#     if not available_sections:
+#         return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+#     random_available_section = random.choice(available_sections)
+#     random_available_section.sectionstatusid_id = 3
+#     new_moderation_assignment = ModerationAssignment(sectionid_id=random_available_section.id,
+#                                                      userid_id = userid)
+#     new_moderation_assignment.save()
+
+#     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
+
+# def approve_new_section(request,userid,finalsectionid):
+
+#     approved_section = Section.objects.get(pk=finalsectionid)
+#     approved_section.sectionstatusid_id = 4
+#     approved_section.save()
+
+#     completed_assignment = ModerationAssignment.objects.get(sectionid=finalsectionid,userid=userid)
+#     completed_assignment.isitclosed = True
+#     completed_assignment.save()
+
+#     return HttpResponseRedirect(reverse("chainlettersstories:read_dashboard", args=(userid,)))
 
 
-    section_trace_QS = SectionTrace.objects.filter(userid=userid).filter(sectionstatusid=1).values("sectionorder","sectioncontent","finalsectionid")
 
-    section_trace_df = pd.DataFrame(section_trace_QS)
-    if not section_trace_df.empty:
-        separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                           "current": list(group["sectioncontent"])[-1]
-                                           }
-                                        for key, group in section_trace_df.groupby("finalsectionid")
-        }
+# def write_dashboard(request,userid):
+#     template = "chainlettersstories/write_dashboard.html"
+#     myuser = StoriesUser.objects.get(pk=userid)
+#     myusername = myuser.displayname
 
 
-        return render(request,template,
-                    {
-                        "userid":
-                        userid,
-                        "displayname":
-                    myusername,
-                        "story_dicts":
-                    separate_story_trace_dicts})  
-    else:
-        return render(request,template,
-                    {
-                        "userid":
-                        userid,
-                        "displayname":
-                    myusername,})
+#     section_trace_QS = SectionTrace.objects.filter(userid=userid).filter(sectionstatusid=1).values("sectionorder","sectioncontent","finalsectionid")
 
-def create_new_story(request,userid):
-    new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
-    new_story.save()
-    first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
-    first_section.save()
-    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+#     section_trace_df = pd.DataFrame(section_trace_QS)
+#     if not section_trace_df.empty:
+#         separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+#                                            "current": list(group["sectioncontent"])[-1]
+#                                            }
+#                                         for key, group in section_trace_df.groupby("finalsectionid")
+#         }
+
+
+#         return render(request,template,
+#                     {
+#                         "userid":
+#                         userid,
+#                         "displayname":
+#                     myusername,
+#                         "story_dicts":
+#                     separate_story_trace_dicts})  
+#     else:
+#         return render(request,template,
+#                     {
+#                         "userid":
+#                         userid,
+#                         "displayname":
+#                     myusername,})
+
+# def create_new_story(request,userid):
+#     new_story = Story(userid_id=userid,isitclosed=False,isitmature=True)
+#     new_story.save()
+#     first_section = Section(storyid_id=new_story.id,userid_id=userid,sectionstatusid_id=1)
+#     first_section.save()
+#     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 def get_random_available_section(request,userid):
     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
@@ -209,23 +212,23 @@ def get_random_available_section(request,userid):
     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 
-def submit_section_to_story(request, userid, sectionid):
-    section = Section.objects.get(pk=sectionid)
+# def submit_section_to_story(request, userid, sectionid):
+#     section = Section.objects.get(pk=sectionid)
 
-    content = request.POST["content"]
-    save_or_submit = request.POST["save-or-submit"]
-    if save_or_submit == "submit":
-        section.sectionstatusid_id = 2
-    elif save_or_submit == "abandon":
-        section.sectionstatusid_id = 6
-        if section.previoussectionid is not None:
-            section.previoussectionid.sectionstatusid_id = 4
-    section.content = content
-    section.save()
+#     content = request.POST["content"]
+#     save_or_submit = request.POST["save-or-submit"]
+#     if save_or_submit == "submit":
+#         section.sectionstatusid_id = 2
+#     elif save_or_submit == "abandon":
+#         section.sectionstatusid_id = 6
+#         if section.previoussectionid is not None:
+#             section.previoussectionid.sectionstatusid_id = 4
+#     section.content = content
+#     section.save()
 
-    return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+#     return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
-def sectiontrace(sectionid):
-    section_object_array = SectionTrace.objects.filter(finalsectionid=sectionid).order_by("sectionorder")
-    section_content_array = list(section_object.sectioncontent for section_object in section_object_array)
-    return HttpResponse
+# def sectiontrace(sectionid):
+#     section_object_array = SectionTrace.objects.filter(finalsectionid=sectionid).order_by("sectionorder")
+#     section_content_array = list(section_object.sectioncontent for section_object in section_object_array)
+#     return HttpResponse

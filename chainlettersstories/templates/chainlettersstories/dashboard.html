@@ -1,4 +1,5 @@
 {% load static %}
+{% load django_vite %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,23 +8,11 @@
     <meta charset="UTF-8" />
     <title>writePage</title>
     <link rel="stylesheet" href= "{% static 'chainlettersstories/styles.css' %}" />
+    {% vite_hmr_client %}   
 </head>
 
 <body>
-    <h1>Hi, {{displayname}}!</h1><br>
-    <header>
-        <form action="{% url 'chainlettersstories:dashboard' userid %}">
-            <button type="submit">DASHBOARD</button>
-        </form>
-        <form action="{% url 'chainlettersstories:write_dashboard' userid %}">
-            <button type="submit">WRITE</button>
-        </form>
-        <form action="{% url 'chainlettersstories:read_dashboard' userid %}">
-            <button type="submit">READ</button>
-        </form>
-        <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
-            <button type="submit">LOG OUT</button>
-        </form>
-    </header>
+    <div id="myappcontainer"></div>
+    {% vite_asset 'assets/write_dashboard_components.jsx' %}
 </body>
-</html>
+</html> 
