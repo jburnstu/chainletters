@@ -18,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_ROOT = os.path.join(BASE_DIR,'static_media/')
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static_media",
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static_media",
+# ]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -44,8 +44,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "chainlettersstories.apps.ChainLettersStoriesConfig",
-    'django_vite'
+    'django_vite',
+    'drf_spectacular'
 ]
+
+
+REST_FRAMEWORK = {
+    # your other DRF settings here
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

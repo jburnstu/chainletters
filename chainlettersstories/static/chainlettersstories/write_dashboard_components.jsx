@@ -3,6 +3,61 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
 
 
+function AppByUser(userid, displayname, writeDicts, readDicts) {
+
+    console.log(writeDicts);
+
+    return (
+
+        <BrowserRouter>
+            {/* Navigation */}
+            <UniversalHeader userid={userid} displayname={displayname} />
+
+            {/* Routes */}
+            <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/write_dashboard" element={<WriteDashboard writeDicts={writeDicts} />}>
+                    <Route path="/:sectionid" element={<StoryInProgress />} />
+                </Route>
+                <Route path="/write_dashboard" element={<ReadDashboard readDicts={readDicts} />}>
+                    <Route path="/:sectionid" element={<ReadStories />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
+}
+
+
+function UniversalHeader(props) {
+    return (
+        <header>
+            <h1>CHAIN MATES</h1>
+            <h1>Hi, {props.displayname}!</h1>
+            <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
+            <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
+            <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
+            <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" />
+        </header >
+    )
+}
+
+function Dashboard(props) { }
+
+function WriteDashboard(writeDicts) {
+
+
+
+    return (
+        <div className="write-dashboard-container">
+            {/* <UniversalHeader userid={props.userid} displayname={props.displayname} /> */}
+            <WriteSidebar />
+            <Tabs />
+            <Outlet />
+        </div>
+    )
+}
+
+function ReadDashboard(props) { }
 
 function StorySoFarSplitOut() {
 
@@ -35,18 +90,6 @@ function GetButton(props) {
     )
 }
 
-function UniversalHeader(props) {
-    return (
-        <header>
-            <h1>CHAIN MATES</h1>
-            <h1>Hi, {props.displayname}!</h1>
-            <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
-            <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
-            <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
-            <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" />
-        </header >
-    )
-}
 
 function WriteSidebar() {
     return (
@@ -73,60 +116,29 @@ function StoryContent(props) {
 
 }
 
-function WriteDashboard(props) {
-
-    writeDashbaordHTML = (<>
-        <UniversalHeader userid={props.userid} displayname={props.displayname} />
-        <WriteSidebar />
-        <Tabs />
-        <StoryContent />
-        <SubmitButtons />
-        <Comments />
-    </>
-    )
-
-}
-
-function ReadDashboard(props) { }
-
-function Dashboard(props) { }
 
 
-function getUserCurrentData(userid) {
-    url = "rgstfgbsrftb"
-
-
-}
-
-
-
-function AppByUser(props) {
-
-    getUserCurrentData(props.userid)
+function StoryInProgress(props) {
 
     return (
-        <BrowserRouter>
-            {/* Navigation */}
-            <UniversalHeader userid={props.userid} displayname={props.displayname} />
-
-            {/* Routes */}
-            <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/write_dashboard" element={<WriteDashboard />}>
-                    <Route path="/:sectionid" element={<StoryInProgress />} />
-                </Route>
-                <Route path="/write_dashboard" element={<ReadDashboard />}>
-                    <Route path="/:sectionid" element={<ReadStories />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+        <div className="story-in-progress-container"> key=""
+            <StoryContent />
+            <SubmitButtons />
+            <Comments />
+        </div>
+    )
 }
 
 
 
+
+
+const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
+const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
+const USERID = JSON.parse(document.getElementById('user').textContent);
+const DISPLAYNAME = JSON.parse(document.getElementById('displayname').textContent);
 createRoot(document.getElementById('myappcontainer')).render(
-    <AppByUser userid={userid} />
+    <AppByUser userid={USERID} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} displayname={DISPLAYNAME} />
 );
 
 

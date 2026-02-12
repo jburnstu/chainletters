@@ -1,6 +1,9 @@
 from django.urls import path
 
 from . import views
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
+
 
 app_name = "chainlettersstories"
 urlpatterns = [
@@ -8,6 +11,11 @@ urlpatterns = [
     path("login", views.login, name="login"),
     
     path("<int:userid>/dashboard/", views.dashboard, name="dashboard"),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+     # Swagger UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # Redoc UI:
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 #     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
 #     path("<int:userid>/write_dashboard/create_new_story", 
@@ -31,3 +39,4 @@ urlpatterns = [
 
 #     path("sectiontrace<int:sectionid>",views.sectiontrace,name="sectiontrace")
 ]
+

@@ -78,12 +78,35 @@ def dashboard(request,userid):
     myuser = StoriesUser.objects.get(pk=userid)
     myusername = myuser.displayname
 
+    section_ids_to_moderate = ModerationAssignment.objects\
+                                                .filter(userid_id=userid)\
+                                                .filter(isitclosed=False)\
+                                                .values_list("sectionid")
+    read_section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
+                                            .values("sectionorder","sectioncontent","finalsectionid")
+    read_section_trace_df = pd.DataFrame(read_section_trace_QS)
+    read_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+                                           "current": list(group["sectioncontent"])[-1]
+                                           }
+                                        for key, group in read_section_trace_df.groupby("finalsectionid")
+        }
+
+    write_section_trace_QS = SectionTrace.objects.filter(userid=userid).filter(sectionstatusid=1).values("sectionorder","sectioncontent","finalsectionid")
+
+    write_section_trace_df = pd.DataFrame(write_section_trace_QS)
+    write_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
+                                        "current": list(group["sectioncontent"])[-1]
+                                        }
+                                    for key, group in write_section_trace_df.groupby("finalsectionid")
+    }
 
 
     return render(request,template, 
                   {
                       "userid": userid,
-                      "displayname": myusername})
+                      "displayname": myusername,
+                      "read_dicts":read_separate_story_trace_dicts,
+                      "write_dicts":write_separate_story_trace_dicts})
 
 
 # def read_dashboard(request, userid):
