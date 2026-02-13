@@ -17,6 +17,8 @@ urlpatterns = [
     # Redoc UI:
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
+    
+
 #     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
 #     path("<int:userid>/write_dashboard/create_new_story", 
 #          views.create_new_story,

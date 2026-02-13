@@ -1,8 +1,0 @@
-{
-  "assets/write_dashboard_components.jsx": {
-    "file": "js/write_dashboard_components-bundle.js",
-    "name": "write_dashboard_components",
-    "src": "assets/write_dashboard_components.jsx",
-    "isEntry": true
-  }
-}

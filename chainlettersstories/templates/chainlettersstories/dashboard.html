@@ -1,5 +1,6 @@
 {% load static %}
 {% load django_vite %}
+{% vite_react_refresh %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +18,6 @@
     {{ displayname|json_script:'displayname' }}
     {{ read_separate_story_trace_dicts|json_script:'read-dicts' }}
     {{ write_separate_story_trace_dicts|json_script:'write-dicts' }}
-    {% vite_asset 'assets/write_dashboard_components.jsx' %}
+    {% vite_asset 'frontend/components.jsx' %}
 </body>
 </html> 
