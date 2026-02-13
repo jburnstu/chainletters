@@ -16,8 +16,8 @@
     <div id="myappcontainer"></div>
     {{ userid|json_script:'userid' }}
     {{ displayname|json_script:'displayname' }}
-    {{ read_separate_story_trace_dicts|json_script:'read-dicts' }}
-    {{ write_separate_story_trace_dicts|json_script:'write-dicts' }}
+    {{ read_dicts|json_script:'read-dicts' }}
+    {{ write_dicts|json_script:'write-dicts' }}
     {% vite_asset 'frontend/components.jsx' %}
 </body>
 </html> 

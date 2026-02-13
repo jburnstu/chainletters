@@ -76,7 +76,9 @@ def login(request):
 def dashboard(request,userid):
     template = "chainlettersstories/dashboard.html"
     myuser = StoriesUser.objects.get(pk=userid)
+    print("MYUSER",myuser)
     myusername = myuser.displayname
+    print(myusername)
 
     section_ids_to_moderate = ModerationAssignment.objects\
                                                 .filter(userid_id=userid)\
@@ -108,6 +110,8 @@ def dashboard(request,userid):
                                         for key, group in write_section_trace_df.groupby("finalsectionid")
         }
 
+
+    print(write_separate_story_trace_dicts)
 
     return render(request,template, 
                   {

@@ -11,6 +11,7 @@ urlpatterns = [
     path("login", views.login, name="login"),
     
     path("<int:userid>/dashboard/", views.dashboard, name="dashboard"),
+    
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
      # Swagger UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
