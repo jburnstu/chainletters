@@ -11,6 +11,8 @@ function AppByUser(props) {
     let readDicts = props.readDicts;
     let rootPath = `/chainlettersstories/${userid}/`;
 
+    let dashboardLink = `${rootPath}/dashboard`;
+    let writeLink = `${rootPath}/write/`;
     Object.keys(writeDicts).forEach(key =>
         console.log(key, writeDicts[key]));
 
@@ -18,39 +20,21 @@ function AppByUser(props) {
     return (
 
         <BrowserRouter>
-            {/* Navigation */}
-            {/* <UniversalHeader userid={userid} displayname={displayname} /> */}
-
-            <header>
-                <h1>CHAIN MATES</h1>
-                <h1>Hi, {displayname}!</h1>
-                <nav>
-                    <Link to="../dashboard" ><button type="button">DASHBOARD</button></Link>
-                    <Link to="../write" relative="path"><button type="button">WRITE</button></Link>
-                    <Link to="read" relative="path"><button type="button">READ</button></Link>
-
-                    {/* <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
-                <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
-                <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
-                <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" /> */}
-                </nav>
-            </header >
-
-            {/* Routes */}
             <Routes>
-                <Route path={rootPath}>
-                    <Route path="dashboard" relative element={<Dashboard />} />
-                    <Route path="write" element={<WriteDashboard dicts={writeDicts} userid={userid} />}>
+                <Route path={rootPath} element={<Home displayname={displayname} />}>
+                    <Route index path="" relative element={<Dashboard />} />
+                    <Route index path="write" element={<WriteDashboard dicts={writeDicts} userid={userid} />}>
                         {Object.keys(writeDicts).forEach(key =>
-                            <Route path={slashFollowedByString(key)} key={key}
+                            <Route index path={slashFollowedByString(key)} key={key}
                                 element={<WriteStory dict={writeDicts[key]} />} />)}
                     </Route>
-                    <Route path="read" element={<ReadDashboard dicts={readDicts} />}>
+                    <Route index path="read" element={<ReadDashboard dicts={readDicts} />}>
                         {Object.keys(readDicts).forEach(key =>
-                            <Route path={slashFollowedByString(key)} key={key}
+                            <Route index path={slashFollowedByString(key)} key={key}
                                 element={<ReadStory dict={readDicts[key]} />} />)}
                     </Route>
                 </Route>
+                <Route path="*" element={<NoMatch />} />
             </Routes>
         </BrowserRouter>
     );
@@ -58,6 +42,14 @@ function AppByUser(props) {
 
 const slashFollowedByString = (myString) => "/" + myString;
 
+function NoMatch() {
+    return (
+        <div style={{ padding: 20 }}>
+            <h2>404: Page Not Found</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
+        </div>
+    );
+}
 
 function UniversalHeader(props) {
 
@@ -87,6 +79,32 @@ function Dashboard(props) {
 }
 
 
+function Home(props) {
+
+
+    console.log("HOME RUN");
+    return (
+        <>
+            <header>
+                <h1>CHAIN MATES</h1>
+                <h1>Hi, {props.displayname}!</h1>
+                <nav>
+                    <Link to="" ><button type="button">DASHBOARD</button></Link>|{" "}
+                    <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
+                    <Link to="read"><button type="button">READ</button></Link>
+
+
+                    {/* <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
+                <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
+                <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
+                <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" /> */}
+                </nav>
+            </header >
+            <Outlet></Outlet>
+        </>
+    )
+}
+
 
 function WriteDashboard(props) {
 
@@ -97,12 +115,15 @@ function WriteDashboard(props) {
     console.log(typeof (arrayOfStoryIDs));
 
     return (
-        <div className="write-dashboard-container">
-            {/* <UniversalHeader userid={props.userid} displayname={props.displayname} /> */}
-            <WriteSidebar userid={props.userid} />
-            <Tabs stories={arrayOfStoryIDs} />
-            <Outlet />
-        </div>
+        <>
+            <div>Write Dashboard</div>
+            <div className="write-dashboard-container">
+                {/* <UniversalHeader userid={props.userid} displayname={props.displayname} /> */}
+                <WriteSidebar userid={props.userid} />
+                <Tabs stories={arrayOfStoryIDs} />
+                <Outlet />
+            </div>
+        </>
     )
 }
 
