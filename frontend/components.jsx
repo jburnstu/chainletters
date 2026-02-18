@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams } from 'react-router-dom';
 
-const slashFollowedByString = (myString) => "/" + myString;
-
 function AppByUser(props) {
 
     let userid = props.userid;
@@ -47,7 +45,6 @@ function NoMatch() {
     );
 }
 
-
 function Home(props) {
     return (<></>);
 }
@@ -74,8 +71,6 @@ function UniversalHeader(props) {
 function Dashboard(props) {
 
     let arrayOfStoryIDs = Object.keys(props.dicts);
-
-    arrayOfStoryIDs.forEach(storyID => console.log(storyID));
 
     return (
         <div className={props.dashboardType + "-dashboard-container"}>
@@ -127,18 +122,11 @@ function Story(props) {
     let storySoFar = storyDict["previous"];
     let presavedCurrentSection = storyDict["current"].toString();
 
-
     const [value, setValue] = useState(presavedCurrentSection);
-
 
     function handleChange(e) {
         setValue(e.target.value);
     }
-
-    // console.log(storySoFar);
-    // console.log(typeof (currentSection), currentSection);
-    // storySoFar.forEach(storySection => console.log(typeof (storySection), storySection));
-
 
     let storySoFarElement = storySoFar.map(storySection =>
         <textarea readOnly key={storySection} value={storySection}></ textarea>
@@ -156,7 +144,6 @@ function Story(props) {
     )
 }
 
-
 function SubmitButtons(props) {
 
     return (
@@ -167,8 +154,6 @@ function SubmitButtons(props) {
         </div>
     )
 }
-
-
 
 function LinkButton(props) {
     return (
@@ -194,7 +179,6 @@ function PostButton(props) {
     )
 }
 
-
 function Comments() {
     return (
         <></>
@@ -208,8 +192,6 @@ const DISPLAYNAME = JSON.parse(document.getElementById('displayname').textConten
 createRoot(document.getElementById('myappcontainer')).render(
     <AppByUser userid={USERID} displayname={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
 );
-
-
 
 // console.log(document.getElementById('write-dicts'));
 // console.log(WRITE_DICTS);
