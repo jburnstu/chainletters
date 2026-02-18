@@ -1,4 +1,5 @@
 
+import React, { useState } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams } from 'react-router-dom';
 
@@ -121,25 +122,29 @@ function Story(props) {
     const { storyID } = useParams();
 
     let storyDict = props.dicts[storyID];
-
     let storyType = props.storyType;
 
     let storySoFar = storyDict["previous"];
-    let currentSection = storyDict["current"].toString();
+    let presavedCurrentSection = storyDict["current"].toString();
 
 
+    const [value, setValue] = useState(presavedCurrentSection);
 
-    console.log(storySoFar);
-    console.log(typeof (currentSection), currentSection);
-    storySoFar.forEach(storySection => console.log(typeof (storySection), storySection));
+
+    function handleChange(e) {
+        setValue(e.target.value);
+    }
+
+    // console.log(storySoFar);
+    // console.log(typeof (currentSection), currentSection);
+    // storySoFar.forEach(storySection => console.log(typeof (storySection), storySection));
 
 
     let storySoFarElement = storySoFar.map(storySection =>
         <textarea readOnly key={storySection} value={storySection}></ textarea>
     )
 
-
-    let currentSectionElement = <input type="text" value={currentSection}></input>
+    let currentSectionElement = <input type="text" value={value} onChange={handleChange}></input>
 
     return (
         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
