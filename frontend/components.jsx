@@ -2,6 +2,7 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink } from 'react-router-dom';
 
+const slashFollowedByString = (myString) => "/" + myString;
 
 function AppByUser(props) {
 
@@ -11,27 +12,25 @@ function AppByUser(props) {
     let readDicts = props.readDicts;
     let rootPath = `/chainlettersstories/${userid}/`;
 
-    let dashboardLink = `${rootPath}/dashboard`;
-    let writeLink = `${rootPath}/write/`;
     Object.keys(writeDicts).forEach(key =>
-        console.log(key, writeDicts[key]));
+        console.log(key));
 
 
     return (
 
         <BrowserRouter>
             <Routes>
-                <Route path={rootPath} element={<Home displayname={displayname} />}>
-                    <Route index path="" relative element={<Dashboard />} />
-                    <Route index path="write" element={<WriteDashboard dicts={writeDicts} userid={userid} />}>
+                <Route path={rootPath} element={<UniversalHeader displayname={displayname} />}>
+                    <Route index path="" relative element={<Home />} />
+                    <Route index path="write/" element={<Dashboard dashboardType="write" dicts={writeDicts} userid={userid} />}>
                         {Object.keys(writeDicts).forEach(key =>
-                            <Route index path={slashFollowedByString(key)} key={key}
-                                element={<WriteStory dict={writeDicts[key]} />} />)}
+                            <Route index path={key + "/"} key={key}
+                                element={<Story type={"write"} dict={writeDicts[key]} />} />)}
                     </Route>
-                    <Route index path="read" element={<ReadDashboard dicts={readDicts} />}>
+                    <Route index path="read/" element={<Dashboard dashboardType="read" dicts={readDicts} userid={userid} />}>
                         {Object.keys(readDicts).forEach(key =>
-                            <Route index path={slashFollowedByString(key)} key={key}
-                                element={<ReadStory dict={readDicts[key]} />} />)}
+                            <Route index path={key + "/"} key={key}
+                                element={<Story type={"read"} dict={readDicts[key]} />} />)}
                     </Route>
                 </Route>
                 <Route path="*" element={<NoMatch />} />
@@ -39,8 +38,6 @@ function AppByUser(props) {
         </BrowserRouter>
     );
 }
-
-const slashFollowedByString = (myString) => "/" + myString;
 
 function NoMatch() {
     return (
@@ -51,53 +48,23 @@ function NoMatch() {
     );
 }
 
-function UniversalHeader(props) {
 
-    // let rootPath = `/chainlettersstories/${props.userid}`;
-    return (
-        <header>
-            <h1>CHAIN MATES</h1>
-            <h1>Hi, {props.displayname}!</h1>
-            <nav>
-                <Link to="dashboard">
-                    <button type="button">DASHBOARD</button></Link>
-                <Link to="write"><button type="button">WRITE</button></Link>
-                <Link to="read"><button type="button">READ</button></Link>
-
-                {/* <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
-                <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
-                <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
-                <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" /> */}
-            </nav>
-        </header >
-    )
-}
-
-function Dashboard(props) {
-
+function Home(props) {
     return (<></>);
 }
 
 
-function Home(props) {
+function UniversalHeader(props) {
 
-
-    console.log("HOME RUN");
     return (
         <>
             <header>
                 <h1>CHAIN MATES</h1>
                 <h1>Hi, {props.displayname}!</h1>
                 <nav>
-                    <Link to="" ><button type="button">DASHBOARD</button></Link>|{" "}
+                    <Link to="" ><button type="button">HOME</button></Link>|{" "}
                     <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
                     <Link to="read"><button type="button">READ</button></Link>
-
-
-                    {/* <LinkButton userid={props.userid} link='chainlettersstories:dashboard' name="DASHBOARD" />
-                <LinkButton userid={props.userid} link='chainlettersstories:write_dashboard' name="WRITE" />
-                <LinkButton userid={props.userid} link='chainlettersstories:read_dashboard' name="READ" />
-                <LinkButton userid={props.userid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" /> */}
                 </nav>
             </header >
             <Outlet></Outlet>
@@ -105,66 +72,55 @@ function Home(props) {
     )
 }
 
+function Dashboard(props) {
 
-function WriteDashboard(props) {
+    let arrayOfStoryIDs = Object.keys(props.dicts);
 
-
-    console.log("WriteDashboard run");
-
-    let arrayOfStoryIDs = Array.from(Array.prototype.keys(props.dicts));
-    console.log(typeof (arrayOfStoryIDs));
+    arrayOfStoryIDs.forEach(storyID => console.log(storyID));
 
     return (
-        <>
-            <div>Write Dashboard</div>
-            <div className="write-dashboard-container">
-                {/* <UniversalHeader userid={props.userid} displayname={props.displayname} /> */}
-                <WriteSidebar userid={props.userid} />
-                <Tabs stories={arrayOfStoryIDs} />
-                <Outlet />
-            </div>
-        </>
-    )
-}
+        <div className={props.dashboardType + "-dashboard-container"}>
+            <Sidebar userid={props.userid} sidebarType={props.dashboardType} />
 
-function ReadDashboard(props) {
-    return (
-        <div className="read-dashboard-container">
-            {/* <UniversalHeader userid={props.userid} displayname={props.displayname} /> */}
-            <ReadSidebar />
-            <Tabs stories={Object.keys(props.dicts)} />
+            <nav className="tabs">
+                {arrayOfStoryIDs.map((storyID, index) =>
+                    <Link to={storyID} key={storyID}>
+                        <button className="story-tab-button"
+                        >{index}</button>
+                    </Link>
+                )}
+            </nav>
+
             <Outlet />
         </div>
     )
+
 }
 
-function ReadStory(props) { }
+function Sidebar(props) {
 
-
-
-function WriteSidebar(props) {
-    return (
-        <div className="sidebar">
-            <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW" />
-            <GetButton userid={props.userid} link='chainlettersstories:get_random_available_section' name="JOIN" />
-        </div>
-    )
-}
-
-function Tabs(props) {
-
-    return (
-        <>
-            {props.stories.map(story =>
-                <button className="story-tab-button"
-                    id="story-tab-button-{{forloop.counter}}">{{}}</button>
-            )}
-        </>
-    )
+    switch (props.sidebarType) {
+        case "write":
+            return (
+                <div className="sidebar">
+                    <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW" />
+                    <GetButton userid={props.userid} link='chainlettersstories:get_random_available_section' name="JOIN" />
+                </div>
+            )
+        default:
+            return (
+                <div className="sidebar">
+                    <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW" />
+                    <GetButton userid={props.userid} link='chainlettersstories:get_random_available_section' name="JOIN" />
+                </div>
+            )
+    }
 }
 
 
-function WriteStory(props) {
+function Story(props) {
+
+    storyType = props.storyType
 
     let storySoFar = props.dict["previous"];
     let currentSection = props.dict["current"];
@@ -173,26 +129,26 @@ function WriteStory(props) {
         <textarea key={storySection.content}>{storySection.content}</ textarea>
     )
 
+
     currentSectionElement = <input>{currentSection}</input>
 
     return (
         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
             {storySoFarElement}
-
             <SubmitButtons />
             <Comments />
         </div>
     )
 }
 
-function SubmitButtons(props) {
 
+function SubmitButtons(props) {
 
     return (
         <div className="submit-buttons-container">
-            {/* <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="SAVE" />
+            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="SAVE" />
             <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="SUBMIT" />
-            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="ABANDON" /> */}
+            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="ABANDON" />
         </div>
     )
 }
@@ -224,38 +180,133 @@ function PostButton(props) {
 }
 
 
-console.log(document.getElementById('write-dicts'));
 const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
 const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
 const USERID = JSON.parse(document.getElementById('userid').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('displayname').textContent);
-console.log(WRITE_DICTS);
-console.log(USERID);
-console.log(DISPLAYNAME);
 createRoot(document.getElementById('myappcontainer')).render(
     <AppByUser userid={USERID} displayname={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
 );
 
 
 
+// console.log(document.getElementById('write-dicts'));
+// console.log(WRITE_DICTS);
+// console.log(USERID);
+// console.log(DISPLAYNAME);
+// console.dir(<AppByUser userid={USERID} displayname={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />)
+
+// function Tabs(props) {
+
+//     let stories = props.stories;
+//     console.log(stories)
+
+//     return (
+//         <>
+//             {stories.map((story, index) =>
+//                 <Link to={story}>
+//                     <button className="story-tab-button"
+//                         key={story}
+//                         id={'story-tab-button-' + story}>{index}</button>
+//                 </Link>
+//             )}
+//         </>
+//     )
+// }
+
+// function WriteStory(props) {
+
+//     let storySoFar = props.dict["previous"];
+//     let currentSection = props.dict["current"];
+
+//     storySoFarElement = storySoFar.map(storySection =>
+//         <textarea key={storySection.content}>{storySection.content}</ textarea>
+//     )
+
+//     currentSectionElement = <input>{currentSection}</input>
+
+//     return (
+//         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
+//             {storySoFarElement}
+//             <SubmitButtons />
+//             <Comments />
+//         </div>
+//     )
+// }
+
+
+// function WriteSidebar(props) {
+//     return (
+//         <div className="sidebar">
+//             <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW" />
+//             <GetButton userid={props.userid} link='chainlettersstories:get_random_available_section' name="JOIN" />
+//         </div>
+//     )
+// }
+
+// function ReadSidebar(props) {
+//     return (
+//         <div className="sidebar">
+//             <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW FOR MODERATION" />
+//         </div>
+//     )
+// }
+
+// function StorySoFarSplitOut() {
+
+//     storySoFar = [{ "sectionid": 12, "content": "First Section" },
+//     { "sectionid": 13, "content": "Second Section" },
+//     { "sectionid": 1, "content": "Third Section" },
+//     { "sectionid": 9, "content": "Fourth Section" }
+//     ] // list holding all the story sections, of format {"sectionid":sectionid, "content":content}
+
+//     return storySoFar.map(storySection =>
+//         <textarea key={storySection.sectionid}>{storySection.content}</ textarea>
+//     )
+
+
+// }
 
 
 
+// function WriteDashboard(props) {
 
-function StorySoFarSplitOut() {
+//     let arrayOfStoryIDs = Object.keys(props.dicts);
 
-    storySoFar = [{ "sectionid": 12, "content": "First Section" },
-    { "sectionid": 13, "content": "Second Section" },
-    { "sectionid": 1, "content": "Third Section" },
-    { "sectionid": 9, "content": "Fourth Section" }
-    ] // list holding all the story sections, of format {"sectionid":sectionid, "content":content}
+//     return (
+//         <div className={props.dashboardType + "-dashboard-container"}>
+//             <Sidebar userid={props.userid} sidebarType={props.dashboardType} />
+//             <Tabs stories={Object.keys(props.dicts)} />
 
-    return storySoFar.map(storySection =>
-        <textarea key={storySection.sectionid}>{storySection.content}</ textarea>
-    )
+//             <div className="tabs">
+//                 {stories.map((story, index) =>
+//                     <Link to={story}>
+//                         <button className="story-tab-button"
+//                             key={story}
+//                             id={'story-tab-button-' + story}>{index}</button>
+//                     </Link>
+//                 )}
+//             </div>
+
+//             <Outlet />
+//         </div>
+//     )
+
+// }
+
+// function ReadDashboard(props) {
 
 
-}
+//     return (
+//         <div className="read-dashboard-container">
+//             <ReadSidebar userid={props.userid} />
+//             <Tabs stories={Object.keys(props.dicts)} />
+//             <Outlet />
+//         </div>
+//     )
+// }
+
+// function ReadStory(props) { }
 
 
 // <div class="container">
