@@ -25,14 +25,10 @@ function AppByUser(props) {
                     <Route path="write/" element={<Dashboard dashboardType="write" dicts={writeDicts} userid={userid} />}>
                         <Route path=":storyID/"
                             element={<Story type="write" dicts={writeDicts} />} />
-                        {/* {Object.keys(writeDicts).forEach(key =>
-                            <Route index path={key + "/"} key={key}
-                                element={<Story type={"write"} dict={writeDicts[key]} />} />)} */}
                     </Route>
                     <Route path="read/" element={<Dashboard dashboardType="read" dicts={readDicts} userid={userid} />}>
-                        {/* {Object.keys(readDicts).forEach(key =>
-                            <Route index path={key + "/"} key={key}
-                                element={<Story type={"read"} dict={readDicts[key]} />} />)} */}
+                        <Route path=":storyID/"
+                            element={<Story type="read" dicts={readDicts} />} />
                     </Route>
                 </Route>
                 <Route path="*" element={<NoMatch />} />
