@@ -1,6 +1,6 @@
 
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Link, Outlet, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams } from 'react-router-dom';
 
 const slashFollowedByString = (myString) => "/" + myString;
 
@@ -22,15 +22,17 @@ function AppByUser(props) {
             <Routes>
                 <Route path={rootPath} element={<UniversalHeader displayname={displayname} />}>
                     <Route index path="" relative element={<Home />} />
-                    <Route index path="write/" element={<Dashboard dashboardType="write" dicts={writeDicts} userid={userid} />}>
-                        {Object.keys(writeDicts).forEach(key =>
+                    <Route path="write/" element={<Dashboard dashboardType="write" dicts={writeDicts} userid={userid} />}>
+                        <Route path=":storyID/"
+                            element={<Story type="write" dicts={writeDicts} />} />
+                        {/* {Object.keys(writeDicts).forEach(key =>
                             <Route index path={key + "/"} key={key}
-                                element={<Story type={"write"} dict={writeDicts[key]} />} />)}
+                                element={<Story type={"write"} dict={writeDicts[key]} />} />)} */}
                     </Route>
-                    <Route index path="read/" element={<Dashboard dashboardType="read" dicts={readDicts} userid={userid} />}>
-                        {Object.keys(readDicts).forEach(key =>
+                    <Route path="read/" element={<Dashboard dashboardType="read" dicts={readDicts} userid={userid} />}>
+                        {/* {Object.keys(readDicts).forEach(key =>
                             <Route index path={key + "/"} key={key}
-                                element={<Story type={"read"} dict={readDicts[key]} />} />)}
+                                element={<Story type={"read"} dict={readDicts[key]} />} />)} */}
                     </Route>
                 </Route>
                 <Route path="*" element={<NoMatch />} />
@@ -120,21 +122,33 @@ function Sidebar(props) {
 
 function Story(props) {
 
-    storyType = props.storyType
+    const { storyID } = useParams();
 
-    let storySoFar = props.dict["previous"];
-    let currentSection = props.dict["current"];
+    let storyDict = props.dicts[storyID];
 
-    storySoFarElement = storySoFar.map(storySection =>
-        <textarea key={storySection.content}>{storySection.content}</ textarea>
+    let storyType = props.storyType;
+
+    let storySoFar = storyDict["previous"];
+    let currentSection = storyDict["current"].toString();
+
+
+
+    console.log(storySoFar);
+    console.log(typeof (currentSection), currentSection);
+    storySoFar.forEach(storySection => console.log(typeof (storySection), storySection));
+
+
+    let storySoFarElement = storySoFar.map(storySection =>
+        <textarea readOnly key={storySection} value={storySection}></ textarea>
     )
 
 
-    currentSectionElement = <input>{currentSection}</input>
+    let currentSectionElement = <input type="text" value={currentSection}></input>
 
     return (
         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
             {storySoFarElement}
+            {currentSectionElement}
             <SubmitButtons />
             <Comments />
         </div>
@@ -179,6 +193,12 @@ function PostButton(props) {
     )
 }
 
+
+function Comments() {
+    return (
+        <></>
+    )
+}
 
 const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
 const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
