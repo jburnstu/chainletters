@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Section, AvailableSectionByUser
+from .models import Story, Section, AvailableSectionByUser
+
+class StorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Story
+        fields = '__all__'
 
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:

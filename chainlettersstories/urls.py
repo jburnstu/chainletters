@@ -8,6 +8,7 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'sections',views.SectionViewSet)
 router.register(r'availablesectionsbyuser',views.AvailableSectionByUserViewSet)
+router.register(r'stories',views.StoryViewSet)
 
 app_name = "chainlettersstories"
 urlpatterns = [
