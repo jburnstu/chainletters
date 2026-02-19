@@ -4,7 +4,7 @@ from .models import Story, Section, AvailableSectionByUser
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
-        fields = '__all__'
+        fields = ['id', 'userid']
 
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:

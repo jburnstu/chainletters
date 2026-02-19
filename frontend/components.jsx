@@ -94,14 +94,61 @@ function Dashboard(props) {
 
 function NewButton(props) {
 
-    function handleSubmit(e) {
-        fetch()
+    console.log(props.userid);
+
+    async function handleSubmit(e) {
+        let storyCreationResponse = await fetch('http://127.0.0.1:8000/api/stories/',
+            {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'userid': props.userid
+                })
+            }
+        )
+
+        if (!storyCreationResponse.ok) {
+            console.log("HTTP Error:", storyCreationResponse.status);
+            return;
+        }
+
+        let storyResponseData = await storyCreationResponse.json();
+
+        console.log("STORY SUCCESS");
+        console.log(storyResponseData);
+
+
+        let sectionCreationResponse = await fetch('http://127.0.0.1:8000/api/sections/',
+            {
+                'method': 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                'body': JSON.stringify({
+                    'storyid': storyResponseData.id,
+                    'userid': props.userid,
+                    'sectionstatusid': 1,
+                })
+            }
+        );
+
+        if (!sectionCreationResponse.ok) {
+            console.log("HTTP Error:", sectionCreationResponse.status);
+            return;
+        }
+
+        let sectionResponseData = await sectionCreationResponse.json();
+
+        console.log("SECTION SUCCESS");
+        console.log(sectionResponseData);
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <button type="submit">{props.name}</button>
-        </form >
+        <button onClick={handleSubmit}>NEW</button>
     )
 }
 
@@ -111,7 +158,7 @@ function Sidebar(props) {
         case "write":
             return (
                 <div className="sidebar">
-                    <GetButton userid={props.userid} link='chainlettersstories:create_new_story' name="NEW" />
+                    <NewButton userid={props.userid} />
                     <GetButton userid={props.userid} link='chainlettersstories:get_random_available_section' name="JOIN" />
                 </div>
             )
