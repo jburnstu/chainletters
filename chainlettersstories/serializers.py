@@ -13,8 +13,8 @@ class SectionSerializer(serializers.ModelSerializer):
 
 class AvailableSectionByUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Section
-        fields = ['id',
+        model = AvailableSectionByUser
+        fields = [
                 'userid',
                   'sectionid'
         ]
