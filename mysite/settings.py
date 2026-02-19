@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "chainlettersstories.apps.ChainLettersStoriesConfig",
     'django_vite',
-    'drf_spectacular'
+    'drf_spectacular',
+    'rest_framework'
 ]
 
 

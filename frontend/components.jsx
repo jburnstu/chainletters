@@ -91,6 +91,20 @@ function Dashboard(props) {
 
 }
 
+
+function NewButton(props) {
+
+    function handleSubmit(e) {
+        fetch()
+    }
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <button type="submit">{props.name}</button>
+        </form >
+    )
+}
+
 function Sidebar(props) {
 
     switch (props.sidebarType) {

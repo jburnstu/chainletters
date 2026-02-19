@@ -1,17 +1,20 @@
-from django.urls import path
+from django.urls import path, include
 
 from . import views
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
 
+router = DefaultRouter()
+router.register(r'sections',views.SectionViewSet)
+router.register(r'availablesectionsbyuser',views.AvailableSectionByUserViewSet)
 
 app_name = "chainlettersstories"
 urlpatterns = [
     path("", views.login_or_signup_page, name="login_or_signup_page"),
     path("login", views.login, name="login"),
-    
-    # path("<int:userid>/dashboard/", views.dashboard, name="dashboard"),
     path("<int:userid>/", views.home, name="home"),
+
     
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
      # Swagger UI:
@@ -19,7 +22,12 @@ urlpatterns = [
     # Redoc UI:
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-    
+    path('',include(router.urls))
+
+]
+
+
+
 
 #     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
 #     path("<int:userid>/write_dashboard/create_new_story", 
@@ -42,5 +50,3 @@ urlpatterns = [
     
 
 #     path("sectiontrace<int:sectionid>",views.sectiontrace,name="sectiontrace")
-]
-

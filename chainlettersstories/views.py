@@ -1,3 +1,4 @@
+from rest_framework import viewsets
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -7,6 +8,7 @@ import random
 
 
 from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
+from .serializers import SectionSerializer, AvailableSectionByUserSerializer
 # Create your views here.
 
 
@@ -109,52 +111,6 @@ def home(request,userid):
         }
 
 
-    print(write_separate_story_trace_dicts)
-
-    return render(request,template, 
-                  {
-                      "userid": userid,
-                      "displayname": myusername,
-                      "read_dicts":read_separate_story_trace_dicts,
-                      "write_dicts":write_separate_story_trace_dicts})
-
-def dashboard(request,userid):
-    template = "chainlettersstories/dashboard.html"
-    myuser = StoriesUser.objects.get(pk=userid)
-    print("MYUSER",myuser)
-    myusername = myuser.displayname
-    print(myusername)
-
-    section_ids_to_moderate = ModerationAssignment.objects\
-                                                .filter(userid_id=userid)\
-                                                .filter(isitclosed=False)\
-                                                .values_list("sectionid")
-    if not section_ids_to_moderate:
-        read_separate_story_trace_dicts = {0:{"previous":["No stories currently being moderated."],
-                                              "current":[""]}}
-    else:
-        read_section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-                                                .values("sectionorder","sectioncontent","finalsectionid")
-        read_section_trace_df = pd.DataFrame(read_section_trace_QS)
-        read_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                            "current": list(group["sectioncontent"])[-1]
-                                            }
-                                            for key, group in read_section_trace_df.groupby("finalsectionid")
-            }
-
-
-    write_section_trace_QS = SectionTrace.objects.filter(userid=userid).filter(sectionstatusid=1).values("sectionorder","sectioncontent","finalsectionid")
-    if not write_section_trace_QS:
-        write_separate_story_trace_dicts = {0:{"previous":["No stories currently being written."],
-                                              "current":[""]}}
-    else:
-        write_section_trace_df = pd.DataFrame(write_section_trace_QS)
-        write_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                            "current": list(group["sectioncontent"])[-1]
-                                            }
-                                        for key, group in write_section_trace_df.groupby("finalsectionid")
-        }
-
 
     print(write_separate_story_trace_dicts)
 
@@ -165,6 +121,14 @@ def dashboard(request,userid):
                       "read_dicts":read_separate_story_trace_dicts,
                       "write_dicts":write_separate_story_trace_dicts})
 
+class SectionViewSet(viewsets.ModelViewSet):
+    queryset = Section.objects.all()
+
+    serializer_class = SectionSerializer
+
+class AvailableSectionByUserViewSet(viewsets.ModelViewSet):
+    queryset = AvailableSectionByUser.objects.all()
+    serializer_class = AvailableSectionByUserSerializer
 
 # def read_dashboard(request, userid):
 #     template = "chainlettersstories/read_dashboard.html"
