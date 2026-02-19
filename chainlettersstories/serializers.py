@@ -12,10 +12,13 @@ class SectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailableSectionByUserSerializer(serializers.ModelSerializer):
+    sectionid = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+
     class Meta:
         model = AvailableSectionByUser
         fields = [
+            # 'id',
                 'userid',
-                  'sectionid'
-        ]
+                'sectionid'
+        ] 
 

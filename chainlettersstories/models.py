@@ -142,8 +142,9 @@ class SectionTrace(models.Model):
 
 
 class AvailableSectionByUser(models.Model):
-    userid = models.IntegerField()
-    sectionid = models.IntegerField()
+    # id = models.IntegerField
+    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid')
+    sectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='sectionid',related_name="sectionid")
 
     class Meta:
         db_table = 'availablesectionbyuser'
