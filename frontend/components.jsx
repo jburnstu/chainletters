@@ -1,7 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams } from 'react-router-dom';
+import { NewButton, JoinButton, SubmissionButton } from './buttons.jsx';
 
 function AppByUser(props) {
 
@@ -91,156 +92,6 @@ function Dashboard(props) {
 
 }
 
-
-function NewButton(props) {
-
-    console.log(props.userid);
-
-    async function handleSubmit(e) {
-        let storyCreationResponse = await fetch('http://127.0.0.1:8000/api/stories/',
-            {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    'userid': props.userid
-                })
-            }
-        )
-
-        if (!storyCreationResponse.ok) {
-            console.log("HTTP Error:", storyCreationResponse.status);
-            return;
-        }
-
-        let storyResponseData = await storyCreationResponse.json();
-
-        console.log("STORY SUCCESS");
-        console.log(storyResponseData);
-
-
-        let sectionCreationResponse = await fetch('http://127.0.0.1:8000/api/sections/',
-            {
-                'method': 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'storyid': storyResponseData.id,
-                    'userid': props.userid,
-                    'sectionstatusid': 1,
-                })
-            }
-        );
-
-        if (!sectionCreationResponse.ok) {
-            console.log("HTTP Error:", sectionCreationResponse.status);
-            return;
-        }
-
-        let sectionResponseData = await sectionCreationResponse.json();
-
-        console.log("SECTION SUCCESS");
-        console.log(sectionResponseData);
-    }
-
-    return (
-        <button onClick={handleSubmit}>NEW</button>
-    )
-}
-
-
-function JoinButton(props) {
-
-    console.log(props.userid);
-
-    async function handleSubmit(e) {
-        let availabilityResponse = await fetch(`http://127.0.0.1:8000/api/usersincludingavailability/${props.userid}`,
-            {
-                method: 'get'
-            }
-        )
-
-        if (availabilityResponse.status != 200) {
-            console.log("HTTP Error:", availabilityResponse.status);
-            return;
-        }
-
-        let availabilityData = await availabilityResponse.json();
-        console.log("STORY SUCCESS");
-        console.log(availabilityData);
-
-        let availableSections = availabilityData.availablesections;
-        console.log(availableSections);
-
-        let randomSectionID = availableSections[Math.floor(Math.random() * availableSections.length)]
-        console.log(randomSectionID);
-        console.log(`http://127.0.0.1:8000/api/sections/${randomSectionID}`);
-
-        let updatePreviousSectionResponse = await fetch(`http://127.0.0.1:8000/api/sections/${randomSectionID}/`,
-            {
-                'method': 'patch',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'sectionstatusid': 5
-                })
-            }
-        );
-
-        if (!updatePreviousSectionResponse.ok) {
-            console.log("HTTP Error:", updatePreviousSectionResponse.status);
-            return;
-        }
-        let updatePreviousSectionData = await updatePreviousSectionResponse.json();
-        console.log("UPDATE PREVIOUS SECTION SUCCESS");
-        console.log(updatePreviousSectionData);
-
-        let sectionCreationResponse = await fetch('http://127.0.0.1:8000/api/sections/',
-            {
-                'method': 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'storyid': updatePreviousSectionData.storyid,
-                    'userid': props.userid,
-                    'sectionstatusid': 1,
-                    'previoussectionid': randomSectionID
-                })
-            }
-        );
-
-        if (!sectionCreationResponse.ok) {
-            console.log("HTTP Error:", sectionCreationResponse.status);
-            return;
-        }
-
-        let sectionResponseData = await sectionCreationResponse.json();
-
-        console.log("SECTION SUCCESS");
-        console.log(sectionResponseData);
-
-    }
-
-
-
-    return (
-        <button onClick={handleSubmit}>JOIN</button>
-    )
-}
-
-
-
-
-
-
 function Sidebar(props) {
 
     switch (props.sidebarType) {
@@ -268,7 +119,6 @@ function Story(props) {
 
     let storyDict = props.dicts[storyID];
     let storyType = props.storyType;
-
     let storySoFar = storyDict["previous"];
     let presavedCurrentSection = storyDict["current"].toString();
 
@@ -276,6 +126,7 @@ function Story(props) {
 
     function handleChange(e) {
         setValue(e.target.value);
+        currentSectionRef = value;
     }
 
     let storySoFarElement = storySoFar.map(storySection =>
@@ -288,46 +139,23 @@ function Story(props) {
         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
             {storySoFarElement}
             {currentSectionElement}
-            <SubmitButtons />
+            <SubmissionButtons passRef={currentSectionRef} />
             <Comments />
         </div>
     )
 }
 
-function SubmitButtons(props) {
+function SubmissinoButtons(props) {
 
     return (
         <div className="submit-buttons-container">
-            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="SAVE" />
-            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="SUBMIT" />
-            <PostButton userid={props.userid} link='chainlettersstories:create_new_story' name="ABANDON" />
+            <SubmissionButton passRef={props.passRef} submissionsType="SAVE" userid={props.userid} sectionid={props.sectionid} />
+            <SubmissionButton passRef={props.passRef} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} />
+            <SubmissionButton passRef={props.passRef} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} />
         </div>
     )
 }
 
-function LinkButton(props) {
-    return (
-        <form action="{props.link} {props.userid}">
-            <button type="submit">{props.name}</button>
-        </form>
-    )
-}
-
-function GetButton(props) {
-    return (
-        <form action="{props.link} {props.userid}">
-            <button type="submit">{props.name}</button>
-        </form>
-    )
-}
-
-function PostButton(props) {
-    return (
-        <form action="{props.link} {props.userid}">
-            <button type="submit">{props.name}</button>
-        </form>
-    )
-}
 
 function Comments() {
     return (
