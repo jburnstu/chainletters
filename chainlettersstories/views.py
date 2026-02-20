@@ -8,7 +8,7 @@ import random
 
 
 from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
-from .serializers import StorySerializer, SectionSerializer, AvailableSectionByUserSerializer
+from .serializers import StorySerializer, SectionSerializer, AvailableSectionByUserSerializer, StoriesUserIncludingAvailabilitySerializer
 # Create your views here.
 
 
@@ -134,6 +134,10 @@ class StoryViewSet(viewsets.ModelViewSet):
 class AvailableSectionByUserViewSet(viewsets.ModelViewSet):
     queryset = AvailableSectionByUser.objects.all()
     serializer_class = AvailableSectionByUserSerializer
+
+class StoriesUserIncludingAvailabilityViewSet(viewsets.ModelViewSet):
+    queryset = StoriesUser.objects.all()
+    serializer_class = StoriesUserIncludingAvailabilitySerializer
 
 # def read_dashboard(request, userid):
 #     template = "chainlettersstories/read_dashboard.html"

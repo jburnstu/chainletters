@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Story, Section, AvailableSectionByUser
+from .models import Story, Section, AvailableSectionByUser, StoriesUser
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,13 +12,25 @@ class SectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailableSectionByUserSerializer(serializers.ModelSerializer):
-    sectionid = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    sectionid = serializers.PrimaryKeyRelatedField(read_only=True)
+    # sectionid = SectionSerializer(many=True)
 
     class Meta:
         model = AvailableSectionByUser
         fields = [
-            # 'id',
                 'userid',
                 'sectionid'
         ] 
 
+class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
+    availablesections = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    sections = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+
+    class Meta:
+        model = StoriesUser
+        fields = [
+            'id',
+            'displayname',
+            'sections',
+            'availablesections'
+        ]

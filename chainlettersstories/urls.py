@@ -9,6 +9,7 @@ router = DefaultRouter()
 router.register(r'sections',views.SectionViewSet)
 router.register(r'availablesectionsbyuser',views.AvailableSectionByUserViewSet)
 router.register(r'stories',views.StoryViewSet)
+router.register(r'usersincludingavailability',views.StoriesUserIncludingAvailabilityViewSet)
 
 app_name = "chainlettersstories"
 urlpatterns = [

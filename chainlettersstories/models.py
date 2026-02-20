@@ -46,7 +46,7 @@ class ModerationAssignment(models.Model):
 
 class Section(models.Model):
     storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
-    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
+    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid', related_name = "sections")
     sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
     content = models.TextField(default="")
     previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='previoussectionid', null=True)
@@ -143,9 +143,12 @@ class SectionTrace(models.Model):
 
 class AvailableSectionByUser(models.Model):
     # id = models.IntegerField
-    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid')
-    sectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='sectionid',related_name="sectionid")
+    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="availablesections")
+    sectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='sectionid')
 
     class Meta:
         db_table = 'availablesectionbyuser'
+        unique_together = ['userid','sectionid']
         managed = False
+
+
