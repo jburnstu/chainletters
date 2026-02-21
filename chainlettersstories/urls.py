@@ -15,9 +15,14 @@ app_name = "chainlettersstories"
 urlpatterns = [
     path("", views.login_or_signup_page, name="login_or_signup_page"),
     path("login", views.login, name="login"),
-    path("<int:userid>/", views.home, name="home"),
+    path(r"<int:userid>/", views.home, name="home"),
+        path(r"<int:userid>\/.*", views.home, name="home"),
+    # path("<int:userid>/write/", views.home, name="home"),
+    # path("<int:userid>/read/", views.home, name="home"),
+    # path("<int:userid>/write/<int:sectionid>", views.home, name="home"),
+    #     path("<int:userid>/read/<int:sedctionid>", views.home, name="home"),
 
-    
+
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
      # Swagger UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -28,7 +33,7 @@ urlpatterns = [
 
 ]
 
-
+# sdsds
 
 
 #     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),

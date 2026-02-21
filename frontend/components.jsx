@@ -120,38 +120,40 @@ function Story(props) {
     let storyDict = props.dicts[storyID];
     let storyType = props.storyType;
     let storySoFar = storyDict["previous"];
-    let presavedCurrentSection = storyDict["current"].toString();
+    let presavedCurrentContent = storyDict["current"].toString();
 
-    const [value, setValue] = useState(presavedCurrentSection);
+    const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
+
 
     function handleChange(e) {
-        setValue(e.target.value);
-        currentSectionRef = value;
+        setCurrentContent(e.target.value);
+
     }
 
     let storySoFarElement = storySoFar.map(storySection =>
         <textarea readOnly key={storySection} value={storySection}></ textarea>
     )
 
-    let currentSectionElement = <input type="text" value={value} onChange={handleChange}></input>
+    let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
         <div className="writeStoryContainer" id="writeStoryContainer{currentSection}">
             {storySoFarElement}
             {currentSectionElement}
-            <SubmissionButtons passRef={currentSectionRef} />
+            <SubmissionButtons currentContent={currentContent} userid={props.userid} sectionid={storyID} />
             <Comments />
         </div>
     )
 }
 
-function SubmissinoButtons(props) {
+function SubmissionButtons(props) {
 
+    console.log(props.passRef);
     return (
         <div className="submit-buttons-container">
-            <SubmissionButton passRef={props.passRef} submissionsType="SAVE" userid={props.userid} sectionid={props.sectionid} />
-            <SubmissionButton passRef={props.passRef} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} />
-            <SubmissionButton passRef={props.passRef} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" userid={props.userid} sectionid={props.sectionid} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} />
         </div>
     )
 }
