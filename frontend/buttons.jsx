@@ -151,7 +151,6 @@ export function JoinButton(props) {
 export function SubmissionButton(props) {
 
 
-    console.log(props.submissionType);
     let sectionstatusid;
     switch (props.submissionType) {
         case "SAVE":
@@ -165,13 +164,9 @@ export function SubmissionButton(props) {
             break;
     }
 
-    console.log(sectionstatusid)
     async function handleSubmit(e) {
 
         let currentContent = props.currentContent;
-        console.log(sectionstatusid)
-        console.log(props.currentContent);
-        console.log()
         let updateSectionResponse = await fetch(`http://127.0.0.1:8000/api/sections/${props.sectionid}/`,
             {
                 'method': 'patch',
