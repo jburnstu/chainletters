@@ -6,7 +6,7 @@ export default { NewButton, JoinButton, SubmissionButton };
 
 
 
-async function handleSubmit(e, urlTarget, method, bodyDict) {
+async function contactAPI(urlTarget, method, bodyDict) {
 
     const urlStub = "http://127.0.0.1:8000/api/";
 
@@ -22,68 +22,31 @@ async function handleSubmit(e, urlTarget, method, bodyDict) {
         }
     )
 
-    if ((method == "get" && storyCreationResponse.status != 200) || !storyCreationResponse.ok) {
-        console.log("HTTP Error:", storyCreationResponse.status);
+    if ((method == "get" && response.status != 200) || !response.ok) {
+        console.log("HTTP Error:", response.status);
         return;
     }
 
     return await response.json();
-}
+};
 
 export function NewButton(props) {
 
-    console.log(props.userid);
-
-
     async function handleSubmit(e) {
-        let storyCreationResponse = await fetch('http://127.0.0.1:8000/api/stories/',
+
+        let storyCreationData = await contactAPI("stories/", "post",
             {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    'userid': props.userid
-                })
+                'userid': props.userid
             }
         )
 
-        if (!storyCreationResponse.ok) {
-            console.log("HTTP Error:", storyCreationResponse.status);
-            return;
-        }
-
-        let storyResponseData = await storyCreationResponse.json();
-
-        console.log("STORY SUCCESS");
-        console.log(storyResponseData);
-
-
-        let sectionCreationResponse = await fetch('http://127.0.0.1:8000/api/sections/',
+        let sectionCreationData = await contactAPI("sections/", "post",
             {
-                'method': 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'storyid': storyResponseData.id,
-                    'userid': props.userid,
-                    'sectionstatusid': 1,
-                })
+                'storyid': storyCreationData.id,
+                'userid': props.userid,
+                'sectionstatusid': 1,
             }
-        );
-
-        if (!sectionCreationResponse.ok) {
-            console.log("HTTP Error:", sectionCreationResponse.status);
-            return;
-        }
-
-        let sectionResponseData = await sectionCreationResponse.json();
-
-        console.log("SECTION SUCCESS");
-        console.log(sectionResponseData);
+        )
     }
 
     return (
@@ -222,5 +185,3 @@ export function SubmissionButton(props) {
         <button onClick={handleSubmit}>{props.submissionType}</button>
     )
 }
-
-export function 
