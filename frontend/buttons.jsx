@@ -4,9 +4,36 @@ import { createRoot } from 'react-dom/client';
 
 export default { NewButton, JoinButton, SubmissionButton };
 
+
+
+async function handleSubmit(e, urlTarget, method, bodyDict) {
+
+    const urlStub = "http://127.0.0.1:8000/api/";
+
+
+    let response = await fetch(`${urlStub}${urlTarget}`,
+        {
+            method: method,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyDict)
+        }
+    )
+
+    if ((method == "get" && storyCreationResponse.status != 200) || !storyCreationResponse.ok) {
+        console.log("HTTP Error:", storyCreationResponse.status);
+        return;
+    }
+
+    return await response.json();
+}
+
 export function NewButton(props) {
 
     console.log(props.userid);
+
 
     async function handleSubmit(e) {
         let storyCreationResponse = await fetch('http://127.0.0.1:8000/api/stories/',
@@ -195,3 +222,5 @@ export function SubmissionButton(props) {
         <button onClick={handleSubmit}>{props.submissionType}</button>
     )
 }
+
+export function 
