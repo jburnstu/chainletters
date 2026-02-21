@@ -5,8 +5,11 @@ import { createRoot } from 'react-dom/client';
 export default { NewButton, JoinButton, SubmissionButton };
 
 
+function getRandomItem(array) {
+    return array[Math.floor(Math.random() * array.length)]
+}
 
-async function contactAPI(urlTarget, method, bodyDict) {
+async function contactAPI(urlTarget, method, bodyDict = {}) {
 
     const urlStub = "http://127.0.0.1:8000/api/";
 
@@ -57,81 +60,30 @@ export function NewButton(props) {
 
 export function JoinButton(props) {
 
-    console.log(props.userid);
+
 
     async function handleSubmit(e) {
-        let availabilityResponse = await fetch(`http://127.0.0.1:8000/api/usersincludingavailability/${props.userid}`,
-            {
-                method: 'get'
-            }
-        )
 
-        if (availabilityResponse.status != 200) {
-            console.log("HTTP Error:", availabilityResponse.status);
-            return;
-        }
-
-        let availabilityData = await availabilityResponse.json();
-        console.log("STORY SUCCESS");
-        console.log(availabilityData);
+        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
 
         let availableSections = availabilityData.availablesections;
-        console.log(availableSections);
+        let randomSectionID = getRandomItem(availableSections);
 
-        let randomSectionID = availableSections[Math.floor(Math.random() * availableSections.length)]
-        console.log(randomSectionID);
-        console.log(`http://127.0.0.1:8000/api/sections/${randomSectionID}`);
-
-        let updatePreviousSectionResponse = await fetch(`http://127.0.0.1:8000/api/sections/${randomSectionID}/`,
+        let updatePreviousSectionData = await contactAPI(`sections/${randomSectionID}/`, "patch",
             {
-                'method': 'patch',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'sectionstatusid': 5
-                })
+                'sectionstatusid': 5
             }
         );
 
-        if (!updatePreviousSectionResponse.ok) {
-            console.log("HTTP Error:", updatePreviousSectionResponse.status);
-            return;
-        }
-        let updatePreviousSectionData = await updatePreviousSectionResponse.json();
-        console.log("UPDATE PREVIOUS SECTION SUCCESS");
-        console.log(updatePreviousSectionData);
-
-        let sectionCreationResponse = await fetch('http://127.0.0.1:8000/api/sections/',
+        let createSectionData = await contactAPI("sections/", "post",
             {
-                'method': 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'storyid': updatePreviousSectionData.storyid,
-                    'userid': props.userid,
-                    'sectionstatusid': 1,
-                    'previoussectionid': randomSectionID
-                })
+                'storyid': updatePreviousSectionData.storyid,
+                'userid': props.userid,
+                'sectionstatusid': 1,
+                'previoussectionid': randomSectionID
             }
         );
-
-        if (!sectionCreationResponse.ok) {
-            console.log("HTTP Error:", sectionCreationResponse.status);
-            return;
-        }
-
-        let sectionResponseData = await sectionCreationResponse.json();
-
-        console.log("SECTION SUCCESS");
-        console.log(sectionResponseData);
-
     }
-
-
 
     return (
         <button onClick={handleSubmit}>JOIN</button>
@@ -155,31 +107,23 @@ export function SubmissionButton(props) {
     }
 
     async function handleSubmit(e) {
-
         let currentContent = props.currentContent;
-        let updateSectionResponse = await fetch(`http://127.0.0.1:8000/api/sections/${props.sectionid}/`,
+        let updateSectionStatusData = await contactAPI(`sections/${props.sectionid}/`, "patch",
             {
-                'method': 'patch',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'sectionstatusid': sectionstatusid,
-                    'content': currentContent
-                })
+                'sectionstatusid': sectionstatusid,
+                'content': currentContent
             }
         );
 
-        if (!updateSectionResponse.ok) {
-            console.log("HTTP Error:", updateSectionResponse.status);
-            return;
+        console.log(updateSectionStatusData);
+        if (props.submissionType == "ABANDON" && updateSectionStatusData.previoussectionid != null) {
+            await contactAPI(`sections/${updateSectionStatusData.previoussectionid}/`, "patch",
+                {
+                    'sectionstatusid': 4
+                }
+            )
         }
-        let updateSectionData = await updateSectionResponse.json();
-        console.log("UPDATE PREVIOUS SECTION SUCCESS");
-        console.log(updateSectionData);
     }
-
 
     return (
         <button onClick={handleSubmit}>{props.submissionType}</button>
