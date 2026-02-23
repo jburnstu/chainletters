@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from 'react-dom';
 export default { NewButton, JoinButton, SubmissionButton };
 
@@ -148,36 +148,50 @@ export function SubmissionButton(props) {
 export function ModalButton() {
     const [isOpen, setIsOpen] = useState(false);
 
-    async function handleSubmit(e) {
-        setIsOpen(true);
+    function onClose() {
+        console.log("ISOPEN PRE CALL", isOpen);
+        console.log("ONCLOSE CALLED");
+        setIsOpen(false);
     }
 
+    useEffect(() => console.log("STATESET"));
+
     return (
-        <button onClick={handleSubmit}> OpenMyModal
-            {
-                createPortal(
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <div style={{
-                            background: 'white',
-                            padding: '20px',
-                            borderRadius: '8px'
-                        }}>
-                            <button onClick={() => setIsOpen(false)}>Close</button>
-                        </div>
-                    </div>,
-                    document.body
-                )
-            }
-        </ button >
+        <>
+            <button onClick={() => setIsOpen(true)}> OpenMyModal
+            </ button >
+            <ModalWindow isOpen={isOpen} onClose={onClose} />
+        </>
+    )
+}
+
+function ModalWindow(props) {
+
+    if (!(props.isOpen)) return null;
+
+
+    return (
+        createPortal(
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '8px'
+                }}>
+                    <button onClick={props.onClose}>Close</button>
+                </div>
+            </div>,
+            document.body
+        )
     )
 }
