@@ -12,7 +12,23 @@ function getRandomItem(array) {
 async function contactAPI(urlTarget, method, bodyDict = {}) {
 
     const urlStub = "http://127.0.0.1:8000/api/";
-
+    let fetchData;
+    switch (method) {
+        case "get":
+            fetchData = {
+                method: method
+            }
+            break;
+        default:
+            fetchData = {
+                method: method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyDict)
+            }
+    }
 
     let response = await fetch(`${urlStub}${urlTarget}`,
         {
@@ -27,10 +43,10 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 
     if ((method == "get" && response.status != 200) || !response.ok) {
         console.log("HTTP Error:", response.status);
-        return;
+        return {};
     }
 
-    return await response.json();
+    return response.json();
 };
 
 export function NewButton(props) {
@@ -108,16 +124,17 @@ export function SubmissionButton(props) {
 
     async function handleSubmit(e) {
         let currentContent = props.currentContent;
+        console.log(currentContent)
         let updateSectionStatusData = await contactAPI(`sections/${props.sectionid}/`, "patch",
             {
                 'sectionstatusid': sectionstatusid,
                 'content': currentContent
             }
-        );
+        )
 
         console.log(updateSectionStatusData);
         if (props.submissionType == "ABANDON" && updateSectionStatusData.previoussectionid != null) {
-            await contactAPI(`sections/${updateSectionStatusData.previoussectionid}/`, "patch",
+            contactAPI(`sections/${updateSectionStatusData.previoussectionid}/`, "patch",
                 {
                     'sectionstatusid': 4
                 }
