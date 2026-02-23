@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams } from 'react-router-dom';
-import { NewButton, JoinButton, SubmissionButton } from './buttons.jsx';
+import { NewButton, JoinButton, SubmissionButton, ModalButton } from './buttons.jsx';
 
 function AppByUser(props) {
 
@@ -100,6 +100,7 @@ function Sidebar(props) {
                 <div className="sidebar">
                     <NewButton userid={props.userid} />
                     <JoinButton userid={props.userid} />
+                    <ModalButton />
                 </div>
             )
         default:
