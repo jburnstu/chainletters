@@ -81,10 +81,8 @@ export function JoinButton(props) {
     async function handleSubmit(e) {
 
         let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
-
         let availableSections = availabilityData.availablesections;
         let randomSectionID = getRandomItem(availableSections);
-
         let updatePreviousSectionData = await contactAPI(`sections/${randomSectionID}/`, "patch",
             {
                 'sectionstatusid': 5

@@ -251,18 +251,18 @@ class StoriesUserIncludingAvailabilityViewSet(viewsets.ModelViewSet):
 #     first_section.save()
 #     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
-def get_random_available_section(request,userid):
-    available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
-    if not available_sections:
-        return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+# def get_random_available_section(request,userid):
+#     available_sections = AvailableSectionByUser.objects.filter(userid = userid).values("sectionid")
+#     if not available_sections:
+#         return HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
     
-    random_available_section_id = random.choice(available_sections)["sectionid"]
-    previous_section_object = Section.objects.get(id=random_available_section_id)
-    previous_section_object.sectionstatusid_id = 5
-    new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
-    new_section.save()
+#     random_available_section_id = random.choice(available_sections)["sectionid"]
+#     previous_section_object = Section.objects.get(id=random_available_section_id)
+#     previous_section_object.sectionstatusid_id = 5
+#     new_section = Section(storyid=previous_section_object.storyid, userid_id=userid, sectionstatusid_id=1, content="",  previoussectionid_id=random_available_section_id)
+#     new_section.save()
 
-    return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
+#     return  HttpResponseRedirect(reverse("chainlettersstories:write_dashboard", args=(userid,)))
 
 
 # def submit_section_to_story(request, userid, sectionid):
