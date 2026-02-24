@@ -4,8 +4,11 @@ import { createPortal } from 'react-dom';
 export default { NewButton, JoinButton, SubmissionButton };
 
 
-function getRandomItem(array) {
-    return array[Math.floor(Math.random() * array.length)]
+function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
+    let newArray = array.slice();
+
+
+    return newArray[Math.floor(Math.random() * newArray.length)]
 }
 
 async function contactAPI(urlTarget, method, bodyDict = {}) {
@@ -146,11 +149,26 @@ export function SubmissionButton(props) {
 
 
 export function ModalButton() {
+    const storiesInModal = 3;
+
+    async function getSectionsForModal() {
+        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
+        let availableSections = availabilityData.availablesections;
+        let randomSectionIDArray = getRandomItem(availableSections, numberOfResults = storiesInModal);
+
+        randomSectionIDArray.forEach(
+    }
+
     const [isOpen, setIsOpen] = useState(false);
 
+    const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState(getSectionsForModal());
+
+    function onClick() {
+        setIsOpen(true);
+
+    }
+
     function onClose() {
-        console.log("ISOPEN PRE CALL", isOpen);
-        console.log("ONCLOSE CALLED");
         setIsOpen(false);
     }
 
@@ -158,17 +176,21 @@ export function ModalButton() {
 
     return (
         <>
-            <button onClick={() => setIsOpen(true)}> OpenMyModal
+            <button onClick={onClick}> OpenMyModal
             </ button >
-            <ModalWindow isOpen={isOpen} onClose={onClose} />
+            <ModalWindow isOpen={isOpen} onClose={onClose} >
+                <div></div>
+            </ModalWindow >
         </>
     )
 }
 
+
+
+
 function ModalWindow(props) {
 
     if (!(props.isOpen)) return null;
-
 
     return (
         createPortal(
@@ -188,6 +210,7 @@ function ModalWindow(props) {
                     padding: '20px',
                     borderRadius: '8px'
                 }}>
+                    {props.children}
                     <button onClick={props.onClose}>Close</button>
                 </div>
             </div>,
