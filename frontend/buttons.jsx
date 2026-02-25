@@ -178,9 +178,8 @@ export function ModalButton() {
 
     }
 
-    function onStoryDisplayClick() {
+    function onStoryDisplaySelect(storyKey) {
         setIsOpen(false);
-
     }
 
     useEffect(() => console.log("STATESET"));
@@ -189,10 +188,10 @@ export function ModalButton() {
         <>
             <button onClick={onModalClick}> OpenMyModal
             </ button >
-            <ModalWindow isOpen={isOpen} onClose={onStoryDisplayClick} arrayOfStoryOptions={arrayOfAvailableStories}>
+            <ModalWindow isOpen={isOpen} onClose={onStoryDisplaySelect} arrayOfStoryOptions={arrayOfAvailableStories}>
                 <div className="allDisplayStoriesContainer">
                     {arrayOfAvailableStories.map(availableStory =>
-                        <StoryDisplayInModal onClick={onStoryDisplayClick} storyArray={availableStory} />
+                        <StoryDisplayInModal key={availableStory.id} onClick={onStoryDisplaySelect} storyArray={availableStory} />
                     )}
                 </div>
             </ModalWindow >
@@ -205,6 +204,7 @@ function StoryDisplayInModal(props) {
     let finalSection = props.storyArray[-1]
     finalSection = (finalSection == firstSection) ? null : finalSection
 
+
     return (
         <button onClick={props.onClick} className="displayStoryContainer">
             <textarea value={firstSection} readOnly />
@@ -216,8 +216,6 @@ function StoryDisplayInModal(props) {
 function ModalWindow(props) {
 
     if (!(props.isOpen)) return null;
-
-
 
     return (
         createPortal(
