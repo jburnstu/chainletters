@@ -40,6 +40,7 @@ class SectionTraceSerializer(serializers.ModelSerializer):
     class Meta: 
         model = SectionTrace
         fields = [
+                    # 'earliersectionordering'
                     'earliersectionid',
                   'earliersectioncontent'
                   ]

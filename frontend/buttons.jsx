@@ -151,46 +151,73 @@ export function SubmissionButton(props) {
 export function ModalButton() {
     const storiesInModal = 3;
 
+
     async function getSectionsForModal() {
         let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
         let availableSections = availabilityData.availablesections;
         let randomSectionIDArray = getRandomItem(availableSections, numberOfResults = storiesInModal);
 
-        randomSectionIDArray.forEach(
+        let sectionTraceDataArray = [];
+        let sectionTraceData;
+        await Promise.all(randomSectionIDArray.map(async (sectionID) => {
+            sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
+            sectionTraceDataArray.push(sectionTraceData);
+        }
+        )
+        )
+        return sectionTraceDataArray;
     }
+
 
     const [isOpen, setIsOpen] = useState(false);
 
     const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState(getSectionsForModal());
 
-    function onClick() {
+    function onModalClick() {
         setIsOpen(true);
 
     }
 
-    function onClose() {
+    function onStoryDisplayClick() {
         setIsOpen(false);
+
     }
 
     useEffect(() => console.log("STATESET"));
 
     return (
         <>
-            <button onClick={onClick}> OpenMyModal
+            <button onClick={onModalClick}> OpenMyModal
             </ button >
-            <ModalWindow isOpen={isOpen} onClose={onClose} >
-                <div></div>
+            <ModalWindow isOpen={isOpen} onClose={onStoryDisplayClick} arrayOfStoryOptions={arrayOfAvailableStories}>
+                <div className="allDisplayStoriesContainer">
+                    {arrayOfAvailableStories.map(availableStory =>
+                        <StoryDisplayInModal onClick={onStoryDisplayClick} storyArray={availableStory} />
+                    )}
+                </div>
             </ModalWindow >
         </>
     )
 }
 
+function StoryDisplayInModal(props) {
+    let firstSection = props.storyArray[0]
+    let finalSection = props.storyArray[-1]
+    finalSection = (finalSection == firstSection) ? null : finalSection
 
-
+    return (
+        <button onClick={props.onClick} className="displayStoryContainer">
+            <textarea value={firstSection} readOnly />
+            {(finalSecion) ? <textarea value={props.storyArray[-1]} readOnly /> : null}
+        </button>
+    )
+}
 
 function ModalWindow(props) {
 
     if (!(props.isOpen)) return null;
+
+
 
     return (
         createPortal(
@@ -210,7 +237,7 @@ function ModalWindow(props) {
                     padding: '20px',
                     borderRadius: '8px'
                 }}>
-                    {props.children}
+
                     <button onClick={props.onClose}>Close</button>
                 </div>
             </div>,
