@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Story, Section, AvailableSectionByUser, StoriesUser
+from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,4 +33,22 @@ class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
             'displayname',
             'sections',
             'availablesections'
+        ]
+
+class SectionTraceSerializer(serializers.ModelSerializer):
+
+    class Meta: 
+        model = SectionTrace
+        fields = [
+                    'earliersectionid',
+                  'earliersectioncontent'
+                  ]
+
+class SectionTraceBySectionSerializer(serializers.ModelSerializer):
+    sectiontraces = SectionTraceSerializer(many=True,read_only=True)
+
+    class Meta:
+        model = Section
+        fields = ['id',
+                  'sectiontraces'
         ]
