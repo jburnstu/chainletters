@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from 'react-dom';
-export default { NewButton, JoinButton, SubmissionButton };
+export default { NewButton, JoinButton, SubmissionButton, NewModerationButton };
 
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
@@ -68,7 +68,16 @@ export function NewButton(props) {
                 'sectionstatusid': 1,
             }
         )
+
+        let newSectionID = sectionCreationData.sectionid;
+
+        let newStoryDict = {
+            newSectionID: [{ newSectionID: "" }]
+        }
+        props.addNewStory(newStoryDict)
     }
+
+
 
     return (
         <button onClick={handleSubmit}>NEW</button>
@@ -82,16 +91,18 @@ export function JoinButton(props) {
 
     async function handleSubmit(e) {
 
-        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
+        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`,
+            "get");
+
         let availableSections = availabilityData.availablesections;
         let randomSectionID = getRandomItem(availableSections);
-        let updatePreviousSectionData = await contactAPI(`sections/${randomSectionID}/`, "patch",
-            {
-                'sectionstatusid': 5
-            }
+        let updatePreviousSectionData = await contactAPI(`sections/${randomSectionID}/`,
+            "patch",
+            { 'sectionstatusid': 5 }
         );
 
-        let createSectionData = await contactAPI("sections/", "post",
+        let createSectionData = await contactAPI("sections/",
+            "post",
             {
                 'storyid': updatePreviousSectionData.storyid,
                 'userid': props.userid,
@@ -99,6 +110,14 @@ export function JoinButton(props) {
                 'previoussectionid': randomSectionID
             }
         );
+
+        let getNewSectionTraceData = await contactAPI(`sectiontraces/${createSectionData.sectionid}`, "get");
+
+
+        let newStoryDict = {
+            newSectionID: [{ newSectionID: "" }]
+        }
+        props.addNewStory(newStoryDict)
     }
 
     return (
@@ -148,7 +167,11 @@ export function SubmissionButton(props) {
 }
 
 
-export function ModalButton() {
+export function NewModerationButton(props) {
+    return null;
+}
+
+export function ModalButton(props) {
     const storiesInModal = 3;
 
 
@@ -180,6 +203,7 @@ export function ModalButton() {
 
     function onStoryDisplaySelect(storyKey) {
         setIsOpen(false);
+        props.addNewStory(storyKey);
     }
 
     useEffect(() => console.log("STATESET"));
