@@ -70,9 +70,8 @@ export function NewButton(props) {
         )
 
         let newSectionID = sectionCreationData.sectionid;
-
         let newStoryDict = {
-            newSectionID: [{ newSectionID: "" }]
+            "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
         }
         props.addNewStory(newStoryDict)
     }
@@ -112,12 +111,8 @@ export function JoinButton(props) {
         );
 
         let getNewSectionTraceData = await contactAPI(`sectiontraces/${createSectionData.sectionid}`, "get");
-
-
-        let newStoryDict = {
-            newSectionID: [{ newSectionID: "" }]
-        }
-        props.addNewStory(newStoryDict)
+        console.log(getNewSectionTraceData);
+        props.addNewStory(getNewSectionTraceData);
     }
 
     return (

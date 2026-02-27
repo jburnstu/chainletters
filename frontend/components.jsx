@@ -15,18 +15,23 @@ function AppByUser(props) {
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-    // Structure of eg writeDicts is [{"34":["56":"hi there", ...,"34":"what's your name"]},...]
+    // Structure of eg writeDicts is {"34":[{"earliersectionid":"56", "earliersectioncontent":"hi there"}, ...,{earliersectionid:"34", "earliersectioncontent":"what's your name"}]},...}
+
+    // OR 
+
+    // Structure of eg writeDicts is [{"id":"34","sectiontrace":[{"earliersectionid":"56", "earliersectioncontent":"hi there"}, ...,{earliersectionid:"34", "earliersectioncontent":"what's your name"}] },...]
 
     const rootPath = `/chainlettersstories/${userid}/`;
 
+
     function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
+        let dictArrayToChange = (readOrWrite == "write") ? writeDicts : readDicts
         let setFunction = (readOrWrite == "write") ? setWriteDicts : setReadDicts
-        let dictArrayToChange = readAndWriteDicts[readOrWrite];
         let newDictArray;
         switch (addOrRemove) {
             case "remove":
                 newDictArray = dictArrayToChange.map(originalStoryDict =>
-                    (Object.keys(originalStoryDict)[0] = Object.keys(storyDict[0])) ?
+                    (originalStoryDict.id == storyDict.id) ?
                         null : originalStoryDict);
                 break
             case "add":
@@ -94,7 +99,8 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
-    arrayOfStoryIDs = Object.keys(props.dicts);
+    arrayOfStoryIDs = props.dicts.map(dict => dict.id);
+    console.log(arrayOfStoryIDs);
 
     function addNewStory(storyID) {
         props.changeStoryDicts(storyID, readOrWrite = props.readOrWrite, addOrRemove = "add");
@@ -143,12 +149,17 @@ function Story(props) {
 
     const { storyID } = useParams();
 
-    let storyDict = props.dicts[storyID];
-    let readOrWrite = props.readOrWrite;
-    let storySoFar = storyDict["previous"];
-    let presavedCurrentContent = storyDict["current"].toString();
+    function getStoryByID(storyDictArray, id) {
+        const idMatch = (storyDict) => storyDict.id == id;
+        return storyDictArray.find(idMatch);
+    }
+    let storyDict = getStoryByID(props.dicts, storyID);
 
-    const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
+    let readOrWrite = props.readOrWrite;
+    let storySoFar = storyDict.sectionTrace.slice(0, -1);
+    let presavedCurrentContent = storyDict.sectionTrace.slice(-1);
+
+    const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earliersectioncontent);
 
     function handleChange(e) {
         setCurrentContent(e.target.value);
@@ -158,8 +169,8 @@ function Story(props) {
         props.changeStoryDicts(storyDict, readOrWrite = readOrWrite, addOrRemove = "remove");
     }
 
-    let storySoFarElement = storySoFar.map(storySection =>
-        <textarea readOnly key={storySection} value={storySection}></ textarea>
+    let storySoFarElement = storySoFar.map(sectionDict =>
+        <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earlierseectioncontent}></ textarea>
     )
 
     let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>

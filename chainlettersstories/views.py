@@ -89,26 +89,22 @@ def home(request,userid):
                                               "current":[""]}}
     else:
         read_section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-                                                .values("sectionorder","sectioncontent","finalsectionid")
+                                                .values("earliersectionid","earliersectioncontent","finalsectionid")\
+                                                .order_by("earliersectionordering")
         read_section_trace_df = pd.DataFrame(read_section_trace_QS)
-        read_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                            "current": list(group["sectioncontent"])[-1]
-                                            }
-                                            for key, group in read_section_trace_df.groupby("finalsectionid")
-            }
+        read_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              
+                                           for key, group in read_section_trace_df.groupby("finalsectionid")
+        ]
 
-
-    write_section_trace_QS = SectionTrace.objects.filter(userid=userid).filter(sectionstatusid=1).values("sectionorder","sectioncontent","finalsectionid")
+    write_section_trace_QS = SectionTrace.objects.filter(finaluserid=userid).filter(finalsectionstatusid=1).values("earliersectionorder","earliersectioncontent","finalsectionid")
     if not write_section_trace_QS:
         write_separate_story_trace_dicts = {0:{"previous":["No stories currently being written."],
                                               "current":[""]}}
     else:
         write_section_trace_df = pd.DataFrame(write_section_trace_QS)
-        write_separate_story_trace_dicts = {key:{"previous":list(group["sectioncontent"])[:-1],
-                                            "current": list(group["sectioncontent"])[-1]
-                                            }
-                                        for key, group in write_section_trace_df.groupby("finalsectionid")
-        }
+        write_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              
+                                           for key, group in write_section_trace_df.groupby("finalsectionid")
+        ]
 
 
 

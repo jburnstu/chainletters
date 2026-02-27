@@ -46,10 +46,10 @@ class SectionTraceSerializer(serializers.ModelSerializer):
                   ]
 
 class SectionTraceBySectionSerializer(serializers.ModelSerializer):
-    sectiontraces = SectionTraceSerializer(many=True,read_only=True)
+    sectiontrace = SectionTraceSerializer(many=True,read_only=True)
 
     class Meta:
         model = Section
         fields = ['id',
-                  'sectiontraces'
+                  'sectiontrace'
         ]
