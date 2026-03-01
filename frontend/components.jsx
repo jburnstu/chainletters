@@ -107,7 +107,7 @@ function Dashboard(props) {
 
             <nav className="tabs">
                 {arrayOfStoryIDs.map((storyID, index) =>
-                    <Link to={storyID} key={storyID}>
+                    <Link to={storyID + "/"} key={storyID}>
                         <button className="story-tab-button"
                             onClick={() => console.log("link button clicked", storyID)}
                         >{index}</button>
@@ -145,16 +145,17 @@ function Story(props) {
 
     const { storyID } = useParams();
 
-    console.log("Story function loaded");
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);
     }
+    console.log(props.dicts, storyID);
     let storyDict = getStoryByID(props.dicts, storyID);
 
+    console.log(storyDict);
     let readOrWrite = props.readOrWrite;
-    let storySoFar = storyDict.sectionTrace.slice(0, -1);
-    let presavedCurrentContent = storyDict.sectionTrace.slice(-1);
+    let storySoFar = storyDict.sectiontrace.slice(0, -1);
+    let presavedCurrentContent = storyDict.sectiontrace.slice(-1);
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earliersectioncontent);
 
@@ -162,9 +163,10 @@ function Story(props) {
         setCurrentContent(e.target.value);
     }
 
-    function removeCurrentStory() {
-        props.changeStoryDicts(storyDict, readOrWrite = readOrWrite, addOrRemove = "remove");
-    }
+    const removeCurrentStory = (storyDict) => props.changeStoryDicts(storyDict, readOrWrite, "remove");
+    // function removeCurrentStory() {
+    //     props.changeStoryDicts(storyDict, readOrWrite = readOrWrite, addOrRemove = "remove");
+    // }
 
     let storySoFarElement = storySoFar.map(sectionDict =>
         <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earlierseectioncontent}></ textarea>
@@ -173,7 +175,7 @@ function Story(props) {
     let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
-        <div className="writeStoryContainer" id={"writeStoryContainer" + { currentSection }}>
+        <div className="writeStoryContainer" id={"writeStoryContainer" + { storyID }}>
             Hello!
             {storySoFarElement}
             {currentSectionElement}
@@ -189,8 +191,8 @@ function SubmissionButtons(props) {
     return (
         <div className="submit-buttons-container">
             <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={removeCurrentStory} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
         </div>
     )
 }
