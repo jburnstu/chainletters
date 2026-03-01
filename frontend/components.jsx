@@ -1,23 +1,16 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
 import { NewButton, JoinButton, SubmissionButton, ModalButton, NewModerationButton } from './buttons.jsx';
 
 function AppByUser(props) {
-
+    useEffect(() => console.log("Rendered"));
     const userid = props.userid;
     const displayname = props.displayname;
 
-    // const [readAndWriteDicts, setReadAndWriteDicts] = useState({ "read": props.readDicts, "write": props.writeDicts });
-
-
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
-
-    // Structure of eg writeDicts is {"34":[{"earliersectionid":"56", "earliersectioncontent":"hi there"}, ...,{earliersectionid:"34", "earliersectioncontent":"what's your name"}]},...}
-
-    // OR 
 
     // Structure of eg writeDicts is [{"id":"34","sectiontrace":[{"earliersectionid":"56", "earliersectioncontent":"hi there"}, ...,{earliersectionid:"34", "earliersectioncontent":"what's your name"}] },...]
 
@@ -37,7 +30,7 @@ function AppByUser(props) {
             case "add":
             default:
                 newDictArray = dictArrayToChange.slice();
-                newDictArray.push(newStoryDict);
+                newDictArray.push(storyDict);
         }
         setFunction(newDictArray);
     }
@@ -99,12 +92,14 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
-    arrayOfStoryIDs = props.dicts.map(dict => dict.id);
-    console.log(arrayOfStoryIDs);
+    let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
 
-    function addNewStory(storyID) {
-        props.changeStoryDicts(storyID, readOrWrite = props.readOrWrite, addOrRemove = "add");
-    }
+
+    // let changeStoryDicts = props.changeStoryDicts;
+    const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
+
+    console.log(arrayOfStoryIDs);
+    arrayOfStoryIDs.map((storyID, index) => console.log(storyID, index));
 
     return (
         <div className={props.readOrWrite + "-dashboard-container"}>
@@ -114,12 +109,13 @@ function Dashboard(props) {
                 {arrayOfStoryIDs.map((storyID, index) =>
                     <Link to={storyID} key={storyID}>
                         <button className="story-tab-button"
+                            onClick={() => console.log("link button clicked", storyID)}
                         >{index}</button>
                     </Link>
                 )}
             </nav>
             <Outlet />
-        </div>
+        </div >
     )
 
 }
@@ -132,7 +128,7 @@ function Sidebar(props) {
                 <div className="sidebar">
                     <NewButton userid={props.userid} addNewStory={props.addNewStory} />
                     <JoinButton userid={props.userid} addNewStory={props.addNewStory} />
-                    <ModalButton addNewStory={props.addNewStory} />
+                    {/* <ModalButton userid={props.userid} addNewStory={props.addNewStory} /> */}
                 </div>
             )
         default:
@@ -149,6 +145,7 @@ function Story(props) {
 
     const { storyID } = useParams();
 
+    console.log("Story function loaded");
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);
@@ -177,6 +174,7 @@ function Story(props) {
 
     return (
         <div className="writeStoryContainer" id={"writeStoryContainer" + { currentSection }}>
+            Hello!
             {storySoFarElement}
             {currentSectionElement}
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} userid={props.userid} sectionid={storyID} removeCurrentStory={removeCurrentStory} />

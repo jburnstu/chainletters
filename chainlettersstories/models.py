@@ -129,7 +129,7 @@ class StoriesUser(models.Model):
             return self.displayname
 
 class SectionTrace(models.Model):
-    finalsectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='finalsectionid',related_name="sectiontraces")
+    finalsectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='finalsectionid',related_name="sectiontrace")
     earliersectionid = models.IntegerField()
     earliersectionorder = models.IntegerField()
     earliersectioncontent = models.CharField()
@@ -143,7 +143,7 @@ class SectionTrace(models.Model):
 
 class AvailableSectionByUser(models.Model):
     # id = models.IntegerField
-    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="availablesections")
+    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="availablesection")
     sectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='sectionid')
 
     class Meta:

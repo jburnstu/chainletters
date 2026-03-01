@@ -6,11 +6,11 @@ from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'sections',views.SectionViewSet)
-router.register(r'availablesectionsbyuser',views.AvailableSectionByUserViewSet)
-router.register(r'stories',views.StoryViewSet)
-router.register(r'usersincludingavailability',views.StoriesUserIncludingAvailabilityViewSet)
-router.register(r'sectiontraces', views.SectionTraceViewSet, basename='sectiontraces')
+router.register(r'section',views.SectionViewSet)
+router.register(r'availablesectionbyuser',views.AvailableSectionByUserViewSet)
+router.register(r'story',views.StoryViewSet)
+router.register(r'userincludingavailability',views.StoriesUserIncludingAvailabilityViewSet)
+router.register(r'sectiontrace', views.SectionTraceViewSet, basename='sectiontrace')
 
 app_name = "chainlettersstories"
 urlpatterns = [

@@ -5,10 +5,17 @@ export default { NewButton, JoinButton, SubmissionButton, NewModerationButton };
 
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
-    let newArray = array.slice();
+    console.log("started getRandomItem");
+    if ((numberOfResults == 1 || array.length == 1) && arrayOfOne) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
 
-
-    return newArray[Math.floor(Math.random() * newArray.length)]
+    let set = new Set();
+    while (set.size < numberOfResults && set.size < array.length) {
+        var randomIndex = Math.floor(Math.random() * array.length);
+    }
+    let randomIndexArray = Array.from(set);
+    return randomIndexArray.map(index => array[index]);
 }
 
 async function contactAPI(urlTarget, method, bodyDict = {}) {
@@ -33,18 +40,11 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
     }
 
     let response = await fetch(`${urlStub}${urlTarget}`,
-        {
-            method: method,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bodyDict)
-        }
+        fetchData
     )
 
     if ((method == "get" && response.status != 200) || !response.ok) {
-        console.log("HTTP Error:", response.status);
+        console.log("HTTP Error ", response.status, "at url ", `${urlStub}${urlTarget}`);
         return {};
     }
 
@@ -55,13 +55,13 @@ export function NewButton(props) {
 
     async function handleSubmit(e) {
 
-        let storyCreationData = await contactAPI("stories/", "post",
+        let storyCreationData = await contactAPI("story/", "post",
             {
                 'userid': props.userid
             }
         )
 
-        let sectionCreationData = await contactAPI("sections/", "post",
+        let sectionCreationData = await contactAPI("section/", "post",
             {
                 'storyid': storyCreationData.id,
                 'userid': props.userid,
@@ -90,17 +90,17 @@ export function JoinButton(props) {
 
     async function handleSubmit(e) {
 
-        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`,
+        let availabilityData = await contactAPI(`userincludingavailability/${props.userid}/`,
             "get");
 
-        let availableSections = availabilityData.availablesections;
+        let availableSections = availabilityData.availablesection;
         let randomSectionID = getRandomItem(availableSections);
-        let updatePreviousSectionData = await contactAPI(`sections/${randomSectionID}/`,
+        let updatePreviousSectionData = await contactAPI(`section/${randomSectionID}/`,
             "patch",
             { 'sectionstatusid': 5 }
         );
 
-        let createSectionData = await contactAPI("sections/",
+        let createSectionData = await contactAPI("section/",
             "post",
             {
                 'storyid': updatePreviousSectionData.storyid,
@@ -110,7 +110,7 @@ export function JoinButton(props) {
             }
         );
 
-        let getNewSectionTraceData = await contactAPI(`sectiontraces/${createSectionData.sectionid}`, "get");
+        let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.sectionid}`, "get");
         console.log(getNewSectionTraceData);
         props.addNewStory(getNewSectionTraceData);
     }
@@ -139,7 +139,7 @@ export function SubmissionButton(props) {
     async function handleSubmit(e) {
         let currentContent = props.currentContent;
         console.log(currentContent)
-        let updateSectionStatusData = await contactAPI(`sections/${props.sectionid}/`, "patch",
+        let updateSectionStatusData = await contactAPI(`section/${props.sectionid}/`, "patch",
             {
                 'sectionstatusid': sectionstatusid,
                 'content': currentContent
@@ -148,7 +148,7 @@ export function SubmissionButton(props) {
 
         console.log(updateSectionStatusData);
         if (props.submissionType == "ABANDON" && updateSectionStatusData.previoussectionid != null) {
-            contactAPI(`sections/${updateSectionStatusData.previoussectionid}/`, "patch",
+            contactAPI(`section/${updateSectionStatusData.previoussectionid}/`, "patch",
                 {
                     'sectionstatusid': 4
                 }
@@ -169,12 +169,10 @@ export function NewModerationButton(props) {
 export function ModalButton(props) {
     const storiesInModal = 3;
 
-
     async function getSectionsForModal() {
-        let availabilityData = await contactAPI(`usersincludingavailability/${props.userid}/`, "get")
-        let availableSections = availabilityData.availablesections;
-        let randomSectionIDArray = getRandomItem(availableSections, numberOfResults = storiesInModal);
-
+        let availabilityData = await contactAPI(`userincludingavailability/${props.userid}/`, "get")
+        let availableSections = availabilityData.availablesection;
+        let randomSectionIDArray = getRandomItem(availableSections, storiesInModal);
         let sectionTraceDataArray = [];
         let sectionTraceData;
         await Promise.all(randomSectionIDArray.map(async (sectionID) => {

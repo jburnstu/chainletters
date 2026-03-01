@@ -85,21 +85,22 @@ def home(request,userid):
                                                 .filter(isitclosed=False)\
                                                 .values_list("sectionid")
     if not section_ids_to_moderate:
-        read_separate_story_trace_dicts = {0:{"previous":["No stories currently being moderated."],
-                                              "current":[""]}}
+        read_separate_story_trace_dicts = []
     else:
         read_section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-                                                .values("earliersectionid","earliersectioncontent","finalsectionid")\
-                                                .order_by("earliersectionordering")
+                                    .values("earliersectionid","earliersectioncontent","finalsectionid")\
+                                    .order_by("earliersectionorder")
         read_section_trace_df = pd.DataFrame(read_section_trace_QS)
         read_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              
                                            for key, group in read_section_trace_df.groupby("finalsectionid")
         ]
 
-    write_section_trace_QS = SectionTrace.objects.filter(finaluserid=userid).filter(finalsectionstatusid=1).values("earliersectionorder","earliersectioncontent","finalsectionid")
+    write_section_trace_QS = SectionTrace.objects.filter(finaluserid=userid)\
+                                .filter(finalsectionstatusid=1)\
+                                .values("earliersectionid","earliersectioncontent","finalsectionid")\
+                                .order_by("earliersectionorder")
     if not write_section_trace_QS:
-        write_separate_story_trace_dicts = {0:{"previous":["No stories currently being written."],
-                                              "current":[""]}}
+        write_separate_story_trace_dicts = []
     else:
         write_section_trace_df = pd.DataFrame(write_section_trace_QS)
         write_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              

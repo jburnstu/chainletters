@@ -23,16 +23,16 @@ class AvailableSectionByUserSerializer(serializers.ModelSerializer):
         ] 
 
 class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    availablesections = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-    sections = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    availablesection = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    section = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
 
     class Meta:
         model = StoriesUser
         fields = [
             'id',
             'displayname',
-            'sections',
-            'availablesections'
+            'section',
+            'availablesection'
         ]
 
 class SectionTraceSerializer(serializers.ModelSerializer):
