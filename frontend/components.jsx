@@ -1,14 +1,16 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
 import { NewButton, JoinButton, SubmissionButton, ModalButton, NewModerationButton } from './buttons.jsx';
+import { UserContext } from "./context.jsx";
+
 
 function AppByUser(props) {
     useEffect(() => console.log("Rendered"));
-    const userid = props.userid;
-    const displayname = props.displayname;
 
+    const [userid, setUserID] = useState(props.userid);
+    const [displayname, setDisplayName] = useState(props.displayname);
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
@@ -44,21 +46,23 @@ function AppByUser(props) {
     return (
 
         <BrowserRouter>
-            <Routes>
-                <Route path={rootPath} element={<UniversalHeader displayname={displayname} />}>
-                    <Route index path="" relative element={<Home />} />
-                    <Route path="write/" element={<Dashboard readOrWrite="write" userid={userid} dicts={writeDicts} setDicts={changeStoryDicts} />}>
-                        <Route path=":storyID/"
-                            element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />} />
+            <UserContext.Provider value={userid}>
+                <Routes>
+                    <Route path={rootPath} element={<UniversalHeader displayname={displayname} />}>
+                        <Route index path="" relative element={<Home />} />
+                        <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
+                            <Route path=":storyID/"
+                                element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />} />
+                        </Route>
+                        <Route path="read/" element={<Dashboard readOrWrite="read" dicts={readDicts}
+                            setDicts={changeStoryDicts} />}>
+                            <Route path=":storyID/"
+                                element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />} />
+                        </Route>
                     </Route>
-                    <Route path="read/" element={<Dashboard readOrWrite="read" userid={userid} dicts={readDicts}
-                        setDicts={changeStoryDicts} />}>
-                        <Route path=":storyID/"
-                            element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />} />
-                    </Route>
-                </Route>
-                <Route path="*" element={<NoMatch />} />
-            </Routes>
+                    <Route path="*" element={<NoMatch />} />
+                </Routes>
+            </UserContext.Provider>
         </BrowserRouter>
     );
 }
@@ -109,7 +113,7 @@ function Dashboard(props) {
 
     return (
         <div className={props.readOrWrite + "-dashboard-container"}>
-            <Sidebar userid={props.userid} readOrWrite={props.readOrWrite} addNewStory={addNewStory} />
+            <Sidebar readOrWrite={props.readOrWrite} addNewStory={addNewStory} />
 
             <nav className="tabs">
                 {arrayOfStoryIDs.map((storyID, index) =>
@@ -132,15 +136,15 @@ function Sidebar(props) {
         case "write":
             return (
                 <div className="sidebar">
-                    <NewButton userid={props.userid} addNewStory={props.addNewStory} />
-                    <JoinButton userid={props.userid} addNewStory={props.addNewStory} />
+                    <NewButton addNewStory={props.addNewStory} />
+                    <JoinButton addNewStory={props.addNewStory} />
                     {/* <ModalButton userid={props.userid} addNewStory={props.addNewStory} /> */}
                 </div>
             )
         default:
             return (
                 <div className="sidebar">
-                    <NewModerationButton userid={props.userid} addNewStory={props.addNewStory} />
+                    <NewModerationButton addNewStory={props.addNewStory} />
                 </div>
             )
     }
@@ -183,7 +187,7 @@ function Story(props) {
             Hello!
             {storySoFarElement}
             {currentSectionElement}
-            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} userid={props.userid} sectionid={storyID} removeCurrentStory={removeCurrentStory} />
+            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} sectionid={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
         </div>
     )
@@ -194,9 +198,9 @@ function SubmissionButtons(props) {
     // console.log(props.passRef);
     return (
         <div className="submit-buttons-container">
-            <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
+            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
         </div>
     )
 }

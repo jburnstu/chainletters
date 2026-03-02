@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
 export default { NewButton, JoinButton, SubmissionButton, NewModerationButton };
-
+import { UserContext } from "./context.jsx";
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
     console.log("started getRandomItem");
@@ -52,19 +52,20 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 };
 
 export function NewButton(props) {
+    const userid = useContext(UserContext);
 
     async function handleSubmit(e) {
 
         let storyCreationData = await contactAPI("story/", "post",
             {
-                'userid': props.userid
+                'userid': userid
             }
         )
 
         let sectionCreationData = await contactAPI("section/", "post",
             {
                 'storyid': storyCreationData.id,
-                'userid': props.userid,
+                'userid': userid,
                 'sectionstatusid': 1,
             }
         )
@@ -86,12 +87,12 @@ export function NewButton(props) {
 
 
 export function JoinButton(props) {
-
+    const userid = useContext(UserContext);
 
 
     async function handleSubmit(e) {
 
-        let availabilityData = await contactAPI(`userincludingavailability/${props.userid}/`,
+        let availabilityData = await contactAPI(`userincludingavailability/${userid}/`,
             "get");
 
         let availableSections = availabilityData.availablesection;
@@ -105,7 +106,7 @@ export function JoinButton(props) {
             "post",
             {
                 'storyid': updatePreviousSectionData.storyid,
-                'userid': props.userid,
+                'userid': userid,
                 'sectionstatusid': 1,
                 'previoussectionid': randomSectionID
             }
@@ -123,6 +124,7 @@ export function JoinButton(props) {
 
 export function SubmissionButton(props) {
 
+    const userid = useContext(UserContext);
 
     let sectionstatusid;
     switch (props.submissionType) {
@@ -181,10 +183,12 @@ export function NewModerationButton(props) {
 }
 
 export function ModalButton(props) {
+    const userid = useContext(UserContext);
     const storiesInModal = 3;
 
+
     async function getSectionsForModal() {
-        let availabilityData = await contactAPI(`userincludingavailability/${props.userid}/`, "get")
+        let availabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get")
         let availableSections = availabilityData.availablesection;
         let randomSectionIDArray = getRandomItem(availableSections, storiesInModal);
         let sectionTraceDataArray = [];
