@@ -69,11 +69,12 @@ export function NewButton(props) {
             }
         )
 
-        let newSectionID = sectionCreationData.sectionid;
-        let newStoryDict = {
+        let newSectionID = await sectionCreationData.sectionid;
+        let newStoryDict = await {
             "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
         }
-        props.addNewStory(newStoryDict)
+        console.log("NEWSTORYDICT", newStoryDict);
+        props.addNewStory(newStoryDict);
     }
 
 
@@ -137,6 +138,14 @@ export function SubmissionButton(props) {
     }
 
     async function handleSubmit(e) {
+
+        let getNewSectionTraceData = await contactAPI(`sectiontrace/${props.sectionid}`, "get");
+
+        console.log(getNewSectionTraceData);
+        if (props.submissionType != "SAVE") {
+            props.removeCurrentStory(getNewSectionTraceData);
+        }
+
         let currentContent = props.currentContent;
         console.log(currentContent)
         let updateSectionStatusData = await contactAPI(`section/${props.sectionid}/`, "patch",
@@ -154,7 +163,12 @@ export function SubmissionButton(props) {
                 }
             )
         }
+
+
     }
+
+
+
 
     return (
         <button onClick={handleSubmit}>{props.submissionType}</button>

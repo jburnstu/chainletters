@@ -12,7 +12,6 @@ function AppByUser(props) {
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-    // Structure of eg writeDicts is [{"id":"34","sectiontrace":[{"earliersectionid":"56", "earliersectioncontent":"hi there"}, ...,{earliersectionid:"34", "earliersectioncontent":"what's your name"}] },...]
 
     const rootPath = `/chainlettersstories/${userid}/`;
 
@@ -23,14 +22,20 @@ function AppByUser(props) {
         let newDictArray;
         switch (addOrRemove) {
             case "remove":
-                newDictArray = dictArrayToChange.map(originalStoryDict =>
-                    (originalStoryDict.id == storyDict.id) ?
-                        null : originalStoryDict);
+                newDictArray = [];
+                dictArrayToChange.forEach(originalStoryDict => {
+                    if (originalStoryDict.id != storyDict.id) {
+                        newDictArray.push(originalStoryDict);
+                    }
+                }
+                )
                 break
             case "add":
             default:
+                console.log("adding story " + storyDict + " to " + dictArrayToChange);
                 newDictArray = dictArrayToChange.slice();
                 newDictArray.push(storyDict);
+                console.log(newDictArray)
         }
         setFunction(newDictArray);
     }
@@ -92,14 +97,15 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
+    // console.log(props.dicts);
     let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
 
 
     // let changeStoryDicts = props.changeStoryDicts;
     const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
 
-    console.log(arrayOfStoryIDs);
-    arrayOfStoryIDs.map((storyID, index) => console.log(storyID, index));
+    // console.log(arrayOfStoryIDs);
+    // arrayOfStoryIDs.map((storyID, index) => console.log(storyID, index));
 
     return (
         <div className={props.readOrWrite + "-dashboard-container"}>
@@ -107,7 +113,7 @@ function Dashboard(props) {
 
             <nav className="tabs">
                 {arrayOfStoryIDs.map((storyID, index) =>
-                    <Link to={storyID + "/"} key={storyID}>
+                    <Link to={storyID + "/"} key={index + storyID}>
                         <button className="story-tab-button"
                             onClick={() => console.log("link button clicked", storyID)}
                         >{index}</button>
@@ -163,10 +169,8 @@ function Story(props) {
         setCurrentContent(e.target.value);
     }
 
-    const removeCurrentStory = (storyDict) => props.changeStoryDicts(storyDict, readOrWrite, "remove");
-    // function removeCurrentStory() {
-    //     props.changeStoryDicts(storyDict, readOrWrite = readOrWrite, addOrRemove = "remove");
-    // }
+    const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
+
 
     let storySoFarElement = storySoFar.map(sectionDict =>
         <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earlierseectioncontent}></ textarea>
@@ -187,7 +191,7 @@ function Story(props) {
 
 function SubmissionButtons(props) {
 
-    console.log(props.passRef);
+    // console.log(props.passRef);
     return (
         <div className="submit-buttons-container">
             <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" userid={props.userid} sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
