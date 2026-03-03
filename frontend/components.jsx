@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, createContext, useContext } from "r
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
 import { NewButton, JoinButton, SubmissionButton, ModalButton, NewModerationButton } from './buttons.jsx';
-import { UserContext } from "./context.jsx";
+import { UserContext, DictsContext } from "./context.jsx";
 
 
 function AppByUser(props) {
@@ -44,7 +44,6 @@ function AppByUser(props) {
 
 
     return (
-
         <BrowserRouter>
             <UserContext.Provider value={userid}>
                 <Routes>

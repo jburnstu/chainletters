@@ -3,18 +3,23 @@ import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
 export default { NewButton, JoinButton, SubmissionButton, NewModerationButton };
 import { UserContext } from "./context.jsx";
+import { useNavigate, useLocation } from "react-router";
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
     console.log("started getRandomItem");
-    if ((numberOfResults == 1 || array.length == 1) && arrayOfOne) {
+    if ((numberOfResults == 1 || array.length == 1) && !(arrayOfOne)) {
         return array[Math.floor(Math.random() * array.length)];
     }
 
     let set = new Set();
     while (set.size < numberOfResults && set.size < array.length) {
+        console.log("Inside the while");
         var randomIndex = Math.floor(Math.random() * array.length);
+        set.add(randomIndex);
     }
     let randomIndexArray = Array.from(set);
+    console.log("finished getrandomitem");
+
     return randomIndexArray.map(index => array[index]);
 }
 
@@ -70,7 +75,8 @@ export function NewButton(props) {
             }
         )
 
-        let newSectionID = await sectionCreationData.sectionid;
+        let newSectionID = await sectionCreationData.id;
+        console.log(newSectionID);
         let newStoryDict = await {
             "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
         }
@@ -95,8 +101,7 @@ export function JoinButton(props) {
         let availabilityData = await contactAPI(`userincludingavailability/${userid}/`,
             "get");
 
-        let availableSections = availabilityData.availablesection;
-        let randomSectionID = getRandomItem(availableSections);
+        let randomSectionID = await getRandomItem(availabilityData.availablesection);
         let updatePreviousSectionData = await contactAPI(`section/${randomSectionID}/`,
             "patch",
             { 'sectionstatusid': 5 }
@@ -123,6 +128,8 @@ export function JoinButton(props) {
 }
 
 export function SubmissionButton(props) {
+    let navigate = useNavigate();
+    let location = useLocation();
 
     const userid = useContext(UserContext);
 
@@ -141,32 +148,43 @@ export function SubmissionButton(props) {
 
     async function handleSubmit(e) {
 
-        let getNewSectionTraceData = await contactAPI(`sectiontrace/${props.sectionid}`, "get");
+        let getNewSectionTraceData = await contactAPI(`sectiontrace/${props.sectionid}/`, "get");
 
         console.log(getNewSectionTraceData);
         if (props.submissionType != "SAVE") {
             props.removeCurrentStory(getNewSectionTraceData);
         }
 
-        let currentContent = props.currentContent;
-        console.log(currentContent)
-        let updateSectionStatusData = await contactAPI(`section/${props.sectionid}/`, "patch",
+        let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
+        console.log(currentContent);
+        console.log(`section/${props.sectionid}/`);
+
+        contactAPI(`section/${props.sectionid}/`, "patch",
             {
                 'sectionstatusid': sectionstatusid,
                 'content': currentContent
             }
         )
-
-        console.log(updateSectionStatusData);
-        if (props.submissionType == "ABANDON" && updateSectionStatusData.previoussectionid != null) {
-            contactAPI(`section/${updateSectionStatusData.previoussectionid}/`, "patch",
-                {
-                    'sectionstatusid': 4
-                }
-            )
-        }
-
-
+            .then(
+                function (value) {
+                    console.log("Is it getting here?");
+                    console.log(value);
+                    console.log(value.previoussectionid);
+                    if (props.submissionType == "ABANDON") {
+                        console.log("made it here!");
+                        if (value.previoussectionid != null) {
+                            console.log("second conditional!");
+                            contactAPI(`section/${value.previoussectionid}/`, "patch",
+                                {
+                                    'sectionstatusid': 4
+                                }
+                            )
+                        }
+                        console.log(location.pathname);
+                        navigate(`chainlettersstories/${userid}`)
+                        console.log(location.pathname);
+                    }
+                })
     }
 
 
