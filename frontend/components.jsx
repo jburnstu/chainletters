@@ -100,15 +100,9 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
-    // console.log(props.dicts);
     let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
 
-
-    // let changeStoryDicts = props.changeStoryDicts;
     const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
-
-    // console.log(arrayOfStoryIDs);
-    // arrayOfStoryIDs.map((storyID, index) => console.log(storyID, index));
 
     return (
         <div className={props.readOrWrite + "-dashboard-container"}>
@@ -176,7 +170,7 @@ function Story(props) {
 
 
     let storySoFarElement = storySoFar.map(sectionDict =>
-        <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earlierseectioncontent}></ textarea>
+        <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earliersectioncontent}></ textarea>
     )
 
     let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>

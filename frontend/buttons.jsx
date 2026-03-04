@@ -56,6 +56,28 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
     return response.json();
 };
 
+
+async function uploadNewSection(previousSectionID, userID) {
+    let updatePreviousSectionData = await contactAPI(`section/${previousSectionID}/`,
+        "patch",
+        { 'sectionstatusid': 5 }
+    );
+
+    let createSectionData = await contactAPI("section/",
+        "post",
+        {
+            'storyid': updatePreviousSectionData.storyid,
+            'userid': userID,
+            'sectionstatusid': 1,
+            'previoussectionid': previousSectionID
+        }
+    );
+
+    let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.id}`, "get");
+    console.log(getNewSectionTraceData);
+    return getNewSectionTraceData;
+}
+
 export function NewButton(props) {
     const userid = useContext(UserContext);
 
@@ -117,7 +139,7 @@ export function JoinButton(props) {
             }
         );
 
-        let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.sectionid}`, "get");
+        let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.id}`, "get");
         console.log(getNewSectionTraceData);
         props.addNewStory(getNewSectionTraceData);
     }
@@ -181,7 +203,7 @@ export function SubmissionButton(props) {
                             )
                         }
                         console.log(location.pathname);
-                        navigate(`chainlettersstories/${userid}`)
+                        navigate(`..`);
                         console.log(location.pathname);
                     }
                 })
@@ -203,7 +225,6 @@ export function NewModerationButton(props) {
 export function ModalButton(props) {
     const userid = useContext(UserContext);
     const storiesInModal = 3;
-
 
     async function getSectionsForModal() {
         let availabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get")
@@ -237,11 +258,10 @@ export function ModalButton(props) {
 
     }
 
-    function selectStory(storyDict) {
+    function selectStory(previoussectionid) {
         setIsOpen(false);
-        // console.log(e.target);
-        // console.log(e.target.storyDict);
-        props.addNewStory(storyDict);
+        uploadNewSection(previoussectionid, userid)
+            .then(function (value) { props.addNewStory(value) });
     }
 
     useEffect(() => console.log("STATESET"));
@@ -267,7 +287,9 @@ function StoryDisplayInModal(props) {
     let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
     finalSection = (finalSection == firstSection) ? null : finalSection
 
-    const selectStory = () => props.selectStory(props.storyDict);
+
+
+    const selectStory = () => props.selectStory(finalSection.earliersectionid);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
