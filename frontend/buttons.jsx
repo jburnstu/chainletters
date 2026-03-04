@@ -207,30 +207,40 @@ export function ModalButton(props) {
 
     async function getSectionsForModal() {
         let availabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get")
-        let availableSections = availabilityData.availablesection;
-        let randomSectionIDArray = getRandomItem(availableSections, storiesInModal);
+        let randomSectionIDArray = await getRandomItem(availabilityData.availablesection, storiesInModal);
         let sectionTraceDataArray = [];
         let sectionTraceData;
         await Promise.all(randomSectionIDArray.map(async (sectionID) => {
+            console.log("Setting up promise for sectionID", sectionID);
             sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
             sectionTraceDataArray.push(sectionTraceData);
+            console.log(sectionTraceDataArray);
         }
         )
         )
+        await setArrayOfAvailableStories(sectionTraceDataArray);
         return sectionTraceDataArray;
     }
 
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState(getSectionsForModal());
+    const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState([]);
+
+    console.log(arrayOfAvailableStories);
 
     function onModalClick() {
-        setIsOpen(true);
+        console.log("in modal click", arrayOfAvailableStories);
+        getSectionsForModal()
+            .then(function (value) {
+                console.log("in follow up then", value);
+                setIsOpen(true);
+            })
 
     }
 
     function onStoryDisplaySelect(storyKey) {
+        console.log("onStory clicked");
         setIsOpen(false);
         props.addNewStory(storyKey);
     }
@@ -253,15 +263,18 @@ export function ModalButton(props) {
 }
 
 function StoryDisplayInModal(props) {
-    let firstSection = props.storyArray[0]
-    let finalSection = props.storyArray[-1]
+    console.log("creating storyDisplay");
+    console.log(props.storyArray);
+    let firstSection = props.storyArray.sectiontrace[0]
+    let finalSection = props.storyArray.sectiontrace.slice(-1)[0]
+    console.log(finalSection);
     finalSection = (finalSection == firstSection) ? null : finalSection
-
+    console.log(finalSection);
 
     return (
         <button onClick={props.onClick} className="displayStoryContainer">
-            <textarea value={firstSection} readOnly />
-            {(finalSecion) ? <textarea value={props.storyArray[-1]} readOnly /> : null}
+            <textarea value={firstSection.earliersectioncontent} readOnly />
+            {(finalSection != null) ? <textarea value={finalSection.earliersectioncontent} readOnly /> : null}
         </button>
     )
 }
@@ -283,12 +296,12 @@ function ModalWindow(props) {
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
+                {props.children}
                 <div style={{
                     background: 'white',
                     padding: '20px',
                     borderRadius: '8px'
                 }}>
-
                     <button onClick={props.onClose}>Close</button>
                 </div>
             </div>,

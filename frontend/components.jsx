@@ -137,7 +137,7 @@ function Sidebar(props) {
                 <div className="sidebar">
                     <NewButton addNewStory={props.addNewStory} />
                     <JoinButton addNewStory={props.addNewStory} />
-                    {/* <ModalButton userid={props.userid} addNewStory={props.addNewStory} /> */}
+                    <ModalButton addNewStory={props.addNewStory} />
                 </div>
             )
         default:
