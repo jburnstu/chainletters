@@ -229,32 +229,31 @@ export function ModalButton(props) {
 
     console.log(arrayOfAvailableStories);
 
-    function onModalClick() {
-        console.log("in modal click", arrayOfAvailableStories);
+    function createModal() {
         getSectionsForModal()
             .then(function (value) {
-                console.log("in follow up then", value);
                 setIsOpen(true);
             })
 
     }
 
-    function onStoryDisplaySelect(storyKey) {
-        console.log("onStory clicked");
+    function selectStory(storyDict) {
         setIsOpen(false);
-        props.addNewStory(storyKey);
+        // console.log(e.target);
+        // console.log(e.target.storyDict);
+        props.addNewStory(storyDict);
     }
 
     useEffect(() => console.log("STATESET"));
 
     return (
         <>
-            <button onClick={onModalClick}> OpenMyModal
+            <button onClick={createModal}> OpenMyModal
             </ button >
-            <ModalWindow isOpen={isOpen} onClose={onStoryDisplaySelect} arrayOfStoryOptions={arrayOfAvailableStories}>
+            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfAvailableStories}>
                 <div className="allDisplayStoriesContainer">
                     {arrayOfAvailableStories.map(availableStory =>
-                        <StoryDisplayInModal key={availableStory.id} onClick={onStoryDisplaySelect} storyArray={availableStory} />
+                        <StoryDisplayInModal key={availableStory.id} selectStory={selectStory} storyDict={availableStory} />
                     )}
                 </div>
             </ModalWindow >
@@ -263,16 +262,15 @@ export function ModalButton(props) {
 }
 
 function StoryDisplayInModal(props) {
-    console.log("creating storyDisplay");
-    console.log(props.storyArray);
-    let firstSection = props.storyArray.sectiontrace[0]
-    let finalSection = props.storyArray.sectiontrace.slice(-1)[0]
-    console.log(finalSection);
+    console.log(props.storyDict);
+    let firstSection = props.storyDict.sectiontrace[0]
+    let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
     finalSection = (finalSection == firstSection) ? null : finalSection
-    console.log(finalSection);
+
+    const selectStory = () => props.selectStory(props.storyDict);
 
     return (
-        <button onClick={props.onClick} className="displayStoryContainer">
+        <button onClick={selectStory} className="displayStoryContainer">
             <textarea value={firstSection.earliersectioncontent} readOnly />
             {(finalSection != null) ? <textarea value={finalSection.earliersectioncontent} readOnly /> : null}
         </button>
