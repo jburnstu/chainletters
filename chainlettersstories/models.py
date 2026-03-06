@@ -71,16 +71,18 @@ class Sectionstatus(models.Model):
     description = models.CharField(max_length=20)
 
     class Meta:
-        db_table = 'sectionstatus'
+        db_table = 'sectionstatus' 
 
 
 class Story(models.Model):
     userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
     isitclosed = models.BooleanField(default=False)
     title = models.CharField(max_length=100, blank=True, null=True)
-    isitmature = models.BooleanField(default=False)
-    maxstorylength = models.SmallIntegerField(blank=True, null=True)
+    minsectionlength = models.SmallIntegerField(blank=True, null=True)
     maxsectionlength = models.SmallIntegerField(blank=True, null=True)
+    maxnumberofsections = models.SmallIntegerField(blank=True, null=True)
+    maxnumberofbranches = models.SmallIntegerField(blank=True, null=True)
+    isitmature = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'story'

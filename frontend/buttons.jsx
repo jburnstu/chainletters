@@ -189,11 +189,11 @@ export function NewStoryOptionspanel(props) {
     }
 
     function submitNewStoryAndSection() {
-        // uploadNewStoryAndSection(userid, storyParameters)
-        //     .then(function (value) {
-        //         props.addNewStory(value);
-        //     }
-        //     )
+        uploadNewStoryAndSection(userid, storyParameters)
+            .then(function (value) {
+                props.addNewStory(value);
+            }
+            )
         console.log("storyParameters:", storyParameters);
     }
 
