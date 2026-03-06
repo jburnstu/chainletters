@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
-export default { NewButton, JoinButton, SubmissionButton, NewModerationButton };
+export default { NewButton, SubmissionButton, ModalNewButton };
 import { UserContext } from "./context.jsx";
 import { useNavigate, useLocation } from "react-router";
 
@@ -78,6 +78,9 @@ async function uploadNewSection(previousSectionID, userID) {
     return getNewSectionTraceData;
 }
 
+
+
+
 export function NewButton(props) {
     const userid = useContext(UserContext);
 
@@ -113,41 +116,117 @@ export function NewButton(props) {
     )
 }
 
+async function uploadNewStoryAndSection(userid, storyParameters) {
 
-export function JoinButton(props) {
+    let storyCreationData = await contactAPI("story/", "post",
+        {
+            'userid': userid,
+            ...storyParameters
+        }
+    )
+
+    let sectionCreationData = await contactAPI("section/", "post",
+        {
+            'storyid': storyCreationData.id,
+            'userid': userid,
+            'sectionstatusid': 1,
+        }
+    )
+    return sectionCreationData;
+
+}
+
+export function ModalNewButton(props) {
     const userid = useContext(UserContext);
 
+    const [isOpen, setIsOpen] = useState(false);
+    function createModal() {
+        setIsOpen(true);
+    }
 
-    async function handleSubmit(e) {
-
-        let availabilityData = await contactAPI(`userincludingavailability/${userid}/`,
-            "get");
-
-        let randomSectionID = await getRandomItem(availabilityData.availablesection);
-        let updatePreviousSectionData = await contactAPI(`section/${randomSectionID}/`,
-            "patch",
-            { 'sectionstatusid': 5 }
-        );
-
-        let createSectionData = await contactAPI("section/",
-            "post",
-            {
-                'storyid': updatePreviousSectionData.storyid,
-                'userid': userid,
-                'sectionstatusid': 1,
-                'previoussectionid': randomSectionID
+    function submitNewStoryAndSection() {
+        uploadNewStoryAndSection(userid, storyParameters)
+            .then(function (value) {
+                props.addNewStory(value);
             }
-        );
-
-        let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.id}`, "get");
-        console.log(getNewSectionTraceData);
-        props.addNewStory(getNewSectionTraceData);
+            )
     }
 
     return (
-        <button onClick={handleSubmit}>JOIN</button>
+        <>
+            <button onClick={createModal}> ModalNew
+            </ button >
+            <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
+                <div className="allDisplayStoriesContainer">
+                    <NewStoryOptionsPanel submitnewStoryAndSection={submitNewStoryAndSection} />
+                </div>
+            </ModalWindow >
+        </>
     )
 }
+
+export function NewStoryOptionsPanel(props) {
+
+    const [storyParameters, setStoryParameters] = useState({});
+    const [parameterChecks, setParameterChecks] = useState({});
+
+    const handleValueChange = (e) => {
+        const name = e.target.name;
+        const value = e.target.value;
+        setStoryParameters(values => ({ ...values, [name]: value }))
+    }
+
+    const handleCheckChange = (e) => {
+        const name = e.target.name;
+        const checked = e.target.checked;
+        setParameterChecks(values => ({ ...values, [name]: checked }))
+    }
+
+
+    return (
+        <form>
+            <fieldset>
+                <input type="text" name="storyTitle"
+                    value={storyParameters.storyTitle}
+                    defaultValue="Title"
+                    onChange={handleValueChange}></input >
+                <input type="checkbox" name="checkMinSectionLength"
+                    checked={parameterChecks.checkMinSectionLength}
+                    onChange={handleCheckChange}></input>
+                <input type="number" name="minSectionLength"
+                    value={storyParameters.minSectionLength}
+                    disabled={parameterChecks.checkMinSectionLength}
+                    onChange={handleValueChange}></input>
+                <input type="checkbox" name="checkMaxSectionLength"
+                    checked={storyParameters.checkMaxSectionLength}
+                    onChange={handleCheckChange}></input>
+                <input type="number" name="maxSectionLength"
+                    value={storyParameters.maxSectionLength}
+                    disabled={parameterChecks.checkMaxSectionLength}
+                    onChange={handleValueChange}></input>
+                <input type="checkbox" name="checkMaxNumberOfSections"
+                    checked={storyParameters.checkMaxNumberOfSections}
+                    onChange={handleCheckChange}></input>
+                <input type="number" name="maxNumberOfSections"
+                    value={storyParameters.maxNumberOfSections}
+                    disabled={parameterChecks.checkMaxNumberOfSections}
+                    onChange={handleValueChange}></input>
+                <input type="checkbox" name="checkMaxNumberOfBranches"
+                    checked={storyParameters.checkMaxNumberOfBranches}
+                    onChange={handleCheckChange}></input>
+                <input type="number" name="maxNumberOfBranches"
+                    disabled={parameterChecks.checkMaxNumberOfBranches}
+                    value={storyParameters.maxNumberOfBranches}
+                    onChange={handleValueChange}></input>
+                <input type="checkbox"
+                    checked="isItMature"
+                    onChange={handleCheckChange}></input>
+            </fieldset>
+            <button type="submit" onSubmit={props.submitnewStoryAndSection}>CREATE NEW STORY</button>
+        </form >
+    )
+}
+
 
 export function SubmissionButton(props) {
     let navigate = useNavigate();
@@ -218,10 +297,6 @@ export function SubmissionButton(props) {
 }
 
 
-export function NewModerationButton(props) {
-    return null;
-}
-
 export function ModalButton(props) {
     const userid = useContext(UserContext);
     const storiesInModal = 3;
@@ -268,9 +343,9 @@ export function ModalButton(props) {
 
     return (
         <>
-            <button onClick={createModal}> OpenMyModal
+            <button onClick={createModal}> ModalJoin
             </ button >
-            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfAvailableStories}>
+            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfAvailableStories} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
                     {arrayOfAvailableStories.map(availableStory =>
                         <StoryDisplayInModal key={availableStory.id} selectStory={selectStory} storyDict={availableStory} />

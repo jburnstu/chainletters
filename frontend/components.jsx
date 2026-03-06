@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
-import { NewButton, JoinButton, SubmissionButton, ModalButton, NewModerationButton } from './buttons.jsx';
+import { SubmissionButton, ModalButton, ModalNewButton } from './buttons.jsx';
 import { UserContext, DictsContext } from "./context.jsx";
 
 
@@ -129,8 +129,9 @@ function Sidebar(props) {
         case "write":
             return (
                 <div className="sidebar">
-                    <NewButton addNewStory={props.addNewStory} />
-                    <JoinButton addNewStory={props.addNewStory} />
+                    {/* <NewButton addNewStory={props.addNewStory} />
+                    <JoinButton addNewStory={props.addNewStory} /> */}
+                    <ModalNewButton addNewStory={props.addNewStory} />
                     <ModalButton addNewStory={props.addNewStory} />
                 </div>
             )
