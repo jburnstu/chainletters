@@ -144,6 +144,9 @@ export function ModalNewButton(props) {
         setIsOpen(true);
     }
 
+
+
+
     function submitNewStoryAndSection() {
         uploadNewStoryAndSection(userid, storyParameters)
             .then(function (value) {
@@ -158,22 +161,25 @@ export function ModalNewButton(props) {
             </ button >
             <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
-                    <NewStoryOptionsPanel submitnewStoryAndSection={submitNewStoryAndSection} />
+                    <NewStoryOptionspanel submitnewStoryAndSection={submitNewStoryAndSection} />
                 </div>
             </ModalWindow >
         </>
     )
 }
 
-export function NewStoryOptionsPanel(props) {
+export function NewStoryOptionspanel(props) {
+    const userid = useContext(UserContext);
 
     const [storyParameters, setStoryParameters] = useState({});
     const [parameterChecks, setParameterChecks] = useState({});
 
     const handleValueChange = (e) => {
         const name = e.target.name;
-        const value = e.target.value;
+        const value = (e.target.type == "checkbox") ? e.target.checked : e.target.value;
+        console.log(name, value);
         setStoryParameters(values => ({ ...values, [name]: value }))
+        console.log("storyParameters:", storyParameters);
     }
 
     const handleCheckChange = (e) => {
@@ -182,6 +188,14 @@ export function NewStoryOptionsPanel(props) {
         setParameterChecks(values => ({ ...values, [name]: checked }))
     }
 
+    function submitNewStoryAndSection() {
+        // uploadNewStoryAndSection(userid, storyParameters)
+        //     .then(function (value) {
+        //         props.addNewStory(value);
+        //     }
+        //     )
+        console.log("storyParameters:", storyParameters);
+    }
 
     return (
         <form>
@@ -190,39 +204,47 @@ export function NewStoryOptionsPanel(props) {
                     value={storyParameters.storyTitle}
                     defaultValue="Title"
                     onChange={handleValueChange}></input >
-                <input type="checkbox" name="checkMinSectionLength"
-                    checked={parameterChecks.checkMinSectionLength}
-                    onChange={handleCheckChange}></input>
-                <input type="number" name="minSectionLength"
-                    value={storyParameters.minSectionLength}
-                    disabled={parameterChecks.checkMinSectionLength}
-                    onChange={handleValueChange}></input>
-                <input type="checkbox" name="checkMaxSectionLength"
+                <label>Min. Section Length
+                    <input label="Min. Section Length" type="checkbox" name="checkMinSectionLength"
+                        checked={parameterChecks.checkMinSectionLength}
+                        onChange={handleCheckChange}>
+                    </input>
+                    <input defaultValue="200" type="number" name="minSectionLength"
+                        disabled={!parameterChecks.checkMinSectionLength}
+                        value={storyParameters.minSectionLength}
+                        onChange={handleValueChange}>
+                    </input>Words
+                </label>
+                <label>Max. Section Length<input type="checkbox" name="checkMaxSectionLength"
                     checked={storyParameters.checkMaxSectionLength}
                     onChange={handleCheckChange}></input>
-                <input type="number" name="maxSectionLength"
-                    value={storyParameters.maxSectionLength}
-                    disabled={parameterChecks.checkMaxSectionLength}
-                    onChange={handleValueChange}></input>
-                <input type="checkbox" name="checkMaxNumberOfSections"
+                    <input defaultValue="200" type="number" name="maxSectionLength"
+                        value={storyParameters.maxSectionLength}
+                        disabled={!parameterChecks.checkMaxSectionLength}
+                        onChange={handleValueChange}></input>
+                    Words</label>
+                <label >Max. Number of Sections?<input type="checkbox" name="checkMaxNumberOfSections"
                     checked={storyParameters.checkMaxNumberOfSections}
                     onChange={handleCheckChange}></input>
-                <input type="number" name="maxNumberOfSections"
-                    value={storyParameters.maxNumberOfSections}
-                    disabled={parameterChecks.checkMaxNumberOfSections}
-                    onChange={handleValueChange}></input>
-                <input type="checkbox" name="checkMaxNumberOfBranches"
+                    <input defaultValue="200" type="number" name="maxNumberOfSections"
+                        value={storyParameters.maxNumberOfSections}
+                        disabled={!parameterChecks.checkMaxNumberOfSections}
+                        onChange={handleValueChange}></input>
+                    Sections</label>
+                <label>Max. Number of Branches?<input type="checkbox" name="checkMaxNumberOfBranches"
                     checked={storyParameters.checkMaxNumberOfBranches}
                     onChange={handleCheckChange}></input>
-                <input type="number" name="maxNumberOfBranches"
-                    disabled={parameterChecks.checkMaxNumberOfBranches}
-                    value={storyParameters.maxNumberOfBranches}
-                    onChange={handleValueChange}></input>
-                <input type="checkbox"
+                    <input defaultValue="200" type="number" name="maxNumberOfBranches"
+                        disabled={!parameterChecks.checkMaxNumberOfBranches}
+                        value={storyParameters.maxNumberOfBranches}
+                        onChange={handleValueChange}></input>
+                    Branches</label>
+                <label>Mature<input type="checkbox"
                     checked="isItMature"
-                    onChange={handleCheckChange}></input>
+                    onChange={handleValueChange}></input>
+                </label>
             </fieldset>
-            <button type="submit" onSubmit={props.submitnewStoryAndSection}>CREATE NEW STORY</button>
+            <button type="submit" onClick={submitNewStoryAndSection}>CREATE NEW STORY</button>
         </form >
     )
 }
