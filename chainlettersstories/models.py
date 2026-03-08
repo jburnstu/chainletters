@@ -153,3 +153,13 @@ class AvailableSectionByUser(models.Model):
         unique_together = ['userid','sectionid']
         managed = False
 
+
+class ModeratableSectionByUser(models.Model):
+    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="moderatablesection")
+    sectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='sectionid')
+
+    class Meta:
+        db_table = 'moderatablesectionbyuser'
+        unique_together = ['userid','sectionid']
+        managed = False
+

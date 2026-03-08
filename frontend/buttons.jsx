@@ -98,6 +98,22 @@ async function uploadNewStoryAndSection(userid, storyParameters) {
 
 }
 
+async function uploadNewModerationAssignment(previoussectionid, userid) {
+
+    let updateSectionStatusData = await contactAPI("section/", "patch",
+        { "sectionstatusid": 3 }
+    )
+
+    let moderationAssignmentCreationData = await contactAPI("moderationassignment/", "post",
+        {
+            'sectionid': previoussectionid,
+            'userid': userid
+        }
+    )
+    return moderationAssignmentCreationData;
+}
+
+
 export function ModalNewButton(props) {
     const userid = useContext(UserContext);
 
@@ -371,7 +387,7 @@ export function NewModerationModalButton(props) {
     const storiesInModal = 3;
 
     async function getSectionsForModal() {
-        let moderatabilityData = await contactAPI(`userincludingability/${userid}/`, "get")
+        let moderatabilityData = await contactAPI(`userincludingability/${userid}/`, "get");
         let randomSectionIDArray = await getRandomItem(moderatabilityData.moderatablesection, storiesInModal);
         let sectionTraceDataArray = [];
         let sectionTraceData;
@@ -402,7 +418,7 @@ export function NewModerationModalButton(props) {
 
     function selectStory(previoussectionid) {
         setIsOpen(false);
-        uploadNewSection(previoussectionid, userid)
+        uploadNewModerationAssignment(previoussectionid, userid)
             .then(function (value) { props.addNewStory(value) });
     }
 

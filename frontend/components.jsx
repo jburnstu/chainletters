@@ -129,8 +129,6 @@ function Sidebar(props) {
         case "write":
             return (
                 <div className="sidebar">
-                    {/* <NewButton addNewStory={props.addNewStory} />
-                    <JoinButton addNewStory={props.addNewStory} /> */}
                     <ModalNewButton addNewStory={props.addNewStory} />
                     <ModalJoinButton addNewStory={props.addNewStory} />
                 </div>

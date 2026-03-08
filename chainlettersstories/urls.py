@@ -20,7 +20,6 @@ urlpatterns = [
     path(r"<int:userid>/", views.home, name="home"),
     path(r"<int:userid>/write", views.home, name="home"),
     path(r"<int:userid>/read", views.home, name="home"),
-    path(r"^.*(P?userid[0-9]\/.*", views.home, name="home"),
     # path("<int:userid>/write/", views.home, name="home"),
     # path("<int:userid>/read/", views.home, name="home"),
     # path("<int:userid>/write/<int:sectionid>", views.home, name="home"),

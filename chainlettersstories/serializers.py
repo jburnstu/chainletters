@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace, ModerationAssignment
+from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace, ModerationAssignment, ModeratableSectionByUser
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +13,6 @@ class SectionSerializer(serializers.ModelSerializer):
 
 class AvailableSectionByUserSerializer(serializers.ModelSerializer):
     sectionid = serializers.PrimaryKeyRelatedField(read_only=True)
-    # sectionid = SectionSerializer(many=True)
 
     class Meta:
         model = AvailableSectionByUser
@@ -22,8 +21,19 @@ class AvailableSectionByUserSerializer(serializers.ModelSerializer):
                 'sectionid'
         ] 
 
+class ModeratableSectionByUserSerializer(serializers.ModelSerializer):
+    sectionid = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = ModeratableSectionByUser
+        fields = [
+                'userid',
+                'sectionid'
+        ] 
+
 class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    availablesection = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    availablesection = serializers.SlugRelatedField(many=True,read_only=True)
+    moderatablesection = serializers.SlugRelatedField(many=True,read_only=True)
     section = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
 
     class Meta:
@@ -32,7 +42,8 @@ class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
             'id',
             'displayname',
             'section',
-            'availablesection'
+            'availablesection',
+            'moderatablesection'
         ]
 
 class SectionTraceSerializer(serializers.ModelSerializer):
