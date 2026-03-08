@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
-export default { NewButton, SubmissionButton, ModalNewButton };
+export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationButton };
 import { UserContext } from "./context.jsx";
 import { useNavigate, useLocation } from "react-router";
 
@@ -78,44 +78,6 @@ async function uploadNewSection(previousSectionID, userID) {
     return getNewSectionTraceData;
 }
 
-
-
-
-export function NewButton(props) {
-    const userid = useContext(UserContext);
-
-    async function handleSubmit(e) {
-
-        let storyCreationData = await contactAPI("story/", "post",
-            {
-                'userid': userid
-            }
-        )
-
-        let sectionCreationData = await contactAPI("section/", "post",
-            {
-                'storyid': storyCreationData.id,
-                'userid': userid,
-                'sectionstatusid': 1,
-            }
-        )
-
-        let newSectionID = await sectionCreationData.id;
-        console.log(newSectionID);
-        let newStoryDict = await {
-            "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
-        }
-        console.log("NEWSTORYDICT", newStoryDict);
-        props.addNewStory(newStoryDict);
-    }
-
-
-
-    return (
-        <button onClick={handleSubmit}>NEW</button>
-    )
-}
-
 async function uploadNewStoryAndSection(userid, storyParameters) {
 
     let storyCreationData = await contactAPI("story/", "post",
@@ -144,24 +106,13 @@ export function ModalNewButton(props) {
         setIsOpen(true);
     }
 
-
-
-
-    function submitNewStoryAndSection() {
-        uploadNewStoryAndSection(userid, storyParameters)
-            .then(function (value) {
-                props.addNewStory(value);
-            }
-            )
-    }
-
     return (
         <>
             <button onClick={createModal}> ModalNew
             </ button >
             <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
-                    <NewStoryOptionspanel submitnewStoryAndSection={submitNewStoryAndSection} />
+                    <NewStoryOptionspanel addNewStory={props.addNewStory} />
                 </div>
             </ModalWindow >
         </>
@@ -177,9 +128,7 @@ export function NewStoryOptionspanel(props) {
     const handleValueChange = (e) => {
         const name = e.target.name;
         const value = (e.target.type == "checkbox") ? e.target.checked : e.target.value;
-        console.log(name, value);
         setStoryParameters(values => ({ ...values, [name]: value }))
-        console.log("storyParameters:", storyParameters);
     }
 
     const handleCheckChange = (e) => {
@@ -188,13 +137,12 @@ export function NewStoryOptionspanel(props) {
         setParameterChecks(values => ({ ...values, [name]: checked }))
     }
 
-    function submitNewStoryAndSection() {
+    function createNewStoryAndSection() {
         uploadNewStoryAndSection(userid, storyParameters)
             .then(function (value) {
                 props.addNewStory(value);
             }
             )
-        console.log("storyParameters:", storyParameters);
     }
 
     return (
@@ -244,7 +192,7 @@ export function NewStoryOptionspanel(props) {
                     onChange={handleValueChange}></input>
                 </label>
             </fieldset>
-            <button type="submit" onClick={submitNewStoryAndSection}>CREATE NEW STORY</button>
+            <button type="submit" onClick={createNewStoryAndSection}>CREATE NEW STORY</button>
         </form >
     )
 }
@@ -254,8 +202,6 @@ export function SubmissionButton(props) {
     let navigate = useNavigate();
     let location = useLocation();
 
-    const userid = useContext(UserContext);
-
     let sectionstatusid;
     switch (props.submissionType) {
         case "SAVE":
@@ -263,6 +209,9 @@ export function SubmissionButton(props) {
             break;
         case "SUBMIT":
             sectionstatusid = 2;
+            break;
+        case "APPROVE":
+            sectionstatusid = 4;
             break;
         case "ABANDON":
             sectionstatusid = 6;
@@ -279,8 +228,6 @@ export function SubmissionButton(props) {
         }
 
         let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
-        console.log(currentContent);
-        console.log(`section/${props.sectionid}/`);
 
         contactAPI(`section/${props.sectionid}/`, "patch",
             {
@@ -290,11 +237,7 @@ export function SubmissionButton(props) {
         )
             .then(
                 function (value) {
-                    console.log("Is it getting here?");
-                    console.log(value);
-                    console.log(value.previoussectionid);
                     if (props.submissionType == "ABANDON") {
-                        console.log("made it here!");
                         if (value.previoussectionid != null) {
                             console.log("second conditional!");
                             contactAPI(`section/${value.previoussectionid}/`, "patch",
@@ -310,16 +253,13 @@ export function SubmissionButton(props) {
                 })
     }
 
-
-
-
     return (
         <button onClick={handleSubmit}>{props.submissionType}</button>
     )
 }
 
 
-export function ModalButton(props) {
+export function ModalJoinButton(props) {
     const userid = useContext(UserContext);
     const storiesInModal = 3;
 
@@ -329,10 +269,8 @@ export function ModalButton(props) {
         let sectionTraceDataArray = [];
         let sectionTraceData;
         await Promise.all(randomSectionIDArray.map(async (sectionID) => {
-            console.log("Setting up promise for sectionID", sectionID);
             sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
             sectionTraceDataArray.push(sectionTraceData);
-            console.log(sectionTraceDataArray);
         }
         )
         )
@@ -424,5 +362,50 @@ function ModalWindow(props) {
             </div>,
             document.body
         )
+    )
+}
+
+
+export function NewModerationButton() {
+    const userid = useContext(UserContext);
+
+    const [isOpen, setIsOpen] = useState(false);
+    function createModal() {
+        setIsOpen(true);
+    }
+
+    return (
+        <>
+            <button onClick={createModal}> ModalNew
+            </ button >
+            <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
+                <div className="allDisplayStoriesContainer">
+                    <NewModerationOptionsPanel addNewStory={props.addNewStory} />
+                </div>
+            </ModalWindow >
+        </>
+    )
+}
+
+function NewModerationOptionsPanel(props) {
+    let firstSection = props.storyDict.sectiontrace[0]
+    let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
+    finalSection = (finalSection == firstSection) ? null : finalSection
+
+    const selectStory = () => props.submit();
+
+    function createNewModerationAssignment() {
+        uploadNewStoryAndSection(userid, storyParameters)
+            .then(function (value) {
+                props.addNewStory(value);
+            }
+            )
+    }
+
+    return (
+        <button onClick={selectStory} className="displayStoryContainer">
+            <textarea value={firstSection.earliersectioncontent} readOnly />
+            {(finalSection != null) ? <textarea value={finalSection.earliersectioncontent} readOnly /> : null}
+        </button>
     )
 }

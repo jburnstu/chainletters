@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
-import { SubmissionButton, ModalButton, ModalNewButton } from './buttons.jsx';
+import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationButton } from './buttons.jsx';
 import { UserContext, DictsContext } from "./context.jsx";
 
 
@@ -132,7 +132,7 @@ function Sidebar(props) {
                     {/* <NewButton addNewStory={props.addNewStory} />
                     <JoinButton addNewStory={props.addNewStory} /> */}
                     <ModalNewButton addNewStory={props.addNewStory} />
-                    <ModalButton addNewStory={props.addNewStory} />
+                    <ModalJoinButton addNewStory={props.addNewStory} />
                 </div>
             )
         default:
@@ -189,12 +189,23 @@ function Story(props) {
 
 function SubmissionButtons(props) {
 
-    // console.log(props.passRef);
+    let arrayofButtonTypes;
+    switch (props.readOrWrite == "write") {
+        case "read":
+            arrayofButtonTypes = ["APPROVE"];
+        case "write":
+        default:
+            arrayofButtonTypes = ["SAVE", "SUBMIT", "ABANDON"];
+    }
+
     return (
         <div className="submit-buttons-container">
-            <SubmissionButton currentContent={props.currentContent} submissionType="SAVE" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="SUBMIT" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
-            <SubmissionButton currentContent={props.currentContent} submissionType="ABANDON" sectionid={props.sectionid} removeCurrentStory={props.removeCurrentStory} />
+            {arrayofButtonTypes.map(buttonType =>
+                <SubmissionButton
+                    submissionType={buttonType}
+                    currentContent={props.currentContent}
+                    sectionid={props.sectionid}
+                    removeCurrentStory={props.removeCurrentStory} />)}
         </div>
     )
 }

@@ -32,3 +32,38 @@ export function JoinButton(props) {
         <button onClick={handleSubmit}>JOIN</button>
     )
 }
+
+export function NewButton(props) {
+    const userid = useContext(UserContext);
+
+    async function handleSubmit(e) {
+
+        let storyCreationData = await contactAPI("story/", "post",
+            {
+                'userid': userid
+            }
+        )
+
+        let sectionCreationData = await contactAPI("section/", "post",
+            {
+                'storyid': storyCreationData.id,
+                'userid': userid,
+                'sectionstatusid': 1,
+            }
+        )
+
+        let newSectionID = await sectionCreationData.id;
+        console.log(newSectionID);
+        let newStoryDict = await {
+            "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
+        }
+        console.log("NEWSTORYDICT", newStoryDict);
+        props.addNewStory(newStoryDict);
+    }
+
+
+
+    return (
+        <button onClick={handleSubmit}>NEW</button>
+    )
+}
