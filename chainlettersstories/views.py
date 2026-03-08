@@ -8,7 +8,7 @@ import random
 
 
 from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
-from .serializers import StorySerializer, SectionSerializer, AvailableSectionByUserSerializer, StoriesUserIncludingAvailabilitySerializer, SectionTraceBySectionSerializer
+from .serializers import StorySerializer, SectionSerializer, AvailableSectionByUserSerializer, StoriesUserIncludingAvailabilitySerializer, SectionTraceBySectionSerializer, ModerationAssignmentSerializer
 # Create your views here.
 
 
@@ -135,6 +135,10 @@ class AvailableSectionByUserViewSet(viewsets.ModelViewSet):
 class StoriesUserIncludingAvailabilityViewSet(viewsets.ModelViewSet):
     queryset = StoriesUser.objects.all()
     serializer_class = StoriesUserIncludingAvailabilitySerializer
+
+class ModerationAssignmentViewSet(viewsets.ModelViewSet):
+    queryset = ModerationAssignment.objects.all()
+    serializer_class = ModerationAssignmentSerializer
 
 class SectionTraceViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all()

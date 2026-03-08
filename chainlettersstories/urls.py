@@ -10,6 +10,7 @@ router.register(r'section',views.SectionViewSet)
 router.register(r'availablesectionbyuser',views.AvailableSectionByUserViewSet)
 router.register(r'story',views.StoryViewSet)
 router.register(r'userincludingavailability',views.StoriesUserIncludingAvailabilityViewSet)
+router.register(r'moderationassignment', views.ModerationAssignmentViewSet)
 router.register(r'sectiontrace', views.SectionTraceViewSet, basename='sectiontrace')
 
 app_name = "chainlettersstories"

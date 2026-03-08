@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace
+from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace, ModerationAssignment
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,3 +53,9 @@ class SectionTraceBySectionSerializer(serializers.ModelSerializer):
         fields = ['id',
                   'sectiontrace'
         ]
+
+class ModerationAssignmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ModerationAssignment
+        fields = '__all__'

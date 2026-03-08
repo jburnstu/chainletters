@@ -366,21 +366,55 @@ function ModalWindow(props) {
 }
 
 
-export function NewModerationButton() {
+export function NewModerationModalButton(props) {
     const userid = useContext(UserContext);
+    const storiesInModal = 3;
+
+    async function getSectionsForModal() {
+        let moderatabilityData = await contactAPI(`userincludingability/${userid}/`, "get")
+        let randomSectionIDArray = await getRandomItem(moderatabilityData.moderatablesection, storiesInModal);
+        let sectionTraceDataArray = [];
+        let sectionTraceData;
+        await Promise.all(randomSectionIDArray.map(async (sectionID) => {
+            sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
+            sectionTraceDataArray.push(sectionTraceData);
+        }
+        )
+        )
+        await setArrayOfModeratableStories(sectionTraceDataArray);
+        return sectionTraceDataArray;
+    }
+
 
     const [isOpen, setIsOpen] = useState(false);
+
+    const [arrayOfModeratableStories, setArrayOfModeratableStories] = useState([]);
+
+    console.log(arrayOfModeratableStories);
+
     function createModal() {
-        setIsOpen(true);
+        getSectionsForModal()
+            .then(function (value) {
+                setIsOpen(true);
+            })
+
+    }
+
+    function selectStory(previoussectionid) {
+        setIsOpen(false);
+        uploadNewSection(previoussectionid, userid)
+            .then(function (value) { props.addNewStory(value) });
     }
 
     return (
         <>
-            <button onClick={createModal}> ModalNew
+            <button onClick={createModal}> ModalNewModeration
             </ button >
-            <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
+            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfModeratableStories} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
-                    <NewModerationOptionsPanel addNewStory={props.addNewStory} />
+                    {arrayOfModeratableStories.map(moderatableStory =>
+                        <NewModerationOptionsPanel key={moderatableStory.id} selectStory={selectStory} storyDict={moderatableStory} />
+                    )}
                 </div>
             </ModalWindow >
         </>
@@ -392,15 +426,7 @@ function NewModerationOptionsPanel(props) {
     let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
     finalSection = (finalSection == firstSection) ? null : finalSection
 
-    const selectStory = () => props.submit();
-
-    function createNewModerationAssignment() {
-        uploadNewStoryAndSection(userid, storyParameters)
-            .then(function (value) {
-                props.addNewStory(value);
-            }
-            )
-    }
+    const selectStory = () => props.selectStory(finalSection.earliersectionid);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
