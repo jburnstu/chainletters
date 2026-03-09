@@ -40,7 +40,7 @@ def login(request):
                 myuser = StoriesUser.objects.get(email=username_or_email,password=password)
             except StoriesUser.DoesNotExist:
                 return render(request,
-                            "chainlettersstories/login_or_signup_page.html",
+                            template,
                             {
                                 "message":
                                 "No account found matching this username / email and password. Please try again or sign up."

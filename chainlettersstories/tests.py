@@ -20,9 +20,9 @@ import random
 import string
 from .models import Story, StoriesUser, Section, ModerationAssignment
 
-def create_user(username,password):
+def create_user(username):
     email = username + "@exmaple.com"
-    return StoriesUser.objects.create(displayname=username,email=email,password=password)
+    return StoriesUser.objects.create(displayname=username,email=email,password=username)
 
 
 def add_section_to_story_by_user(user,previoussection=None):
@@ -37,6 +37,10 @@ def add_section_to_story_by_user(user,previoussection=None):
 
 def update_section_content(section,content):
     section.content = content
+    section.save()
+
+def abandon_section(section,):
+    section.sectionstatusid_id = 6
     section.save()
 
 def move_to_moderation(section):
@@ -59,7 +63,7 @@ def approve_moderation(section):
     moderationassignment.isitclosed = True
     moderationassignment.save()
 
-def create_submit_and_approve_section(user_creator,content,user_moderator,previoussection=None):
+def create_submit_and_approve_section(content,user_creator,user_moderator,previoussection=None):
     section = add_section_to_story_by_user(user_creator,previoussectionid=previoussection)
     update_section_content(section,content)
     move_to_moderation(section)
@@ -106,63 +110,61 @@ class ReadDashboardDisplayTests(TestCase):
     def test_moderatable_story_will_be_accessed(self):
         pass
 
-class LoginTests(self):
 
 
+# class QuestionIndexViewTests(TestCase):
+#     def test_no_questions(self):
+#         """
+#         If no questions exist, an appropriate message is displayed.
+#         """
+#         response = self.client.get(reverse("polls:index"))
+#         self.assertEqual(response.status_code, 200)
+#         self.assertContains(response, "No polls are available.")
+#         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
-class QuestionIndexViewTests(TestCase):
-    def test_no_questions(self):
-        """
-        If no questions exist, an appropriate message is displayed.
-        """
-        response = self.client.get(reverse("polls:index"))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No polls are available.")
-        self.assertQuerySetEqual(response.context["latest_question_list"], [])
+#     def test_past_question(self):
+#         """
+#         Questions with a pub_date in the past are displayed on the
+#         index page.
+#         """
+#         question = create_question(question_text="Past question.", days=-30)
+#         response = self.client.get(reverse("polls:index"))
+#         self.assertQuerySetEqual(
+#             response.context["latest_question_list"],
+#             [question],
+#         )
 
-    def test_past_question(self):
-        """
-        Questions with a pub_date in the past are displayed on the
-        index page.
-        """
-        question = create_question(question_text="Past question.", days=-30)
-        response = self.client.get(reverse("polls:index"))
-        self.assertQuerySetEqual(
-            response.context["latest_question_list"],
-            [question],
-        )
+#     def test_future_question(self):
+#         """
+#         Questions with a pub_date in the future aren't displayed on
+#         the index page.
+#         """
+#         create_question(question_text="Future question.", days=30)
+#         response = self.client.get(reverse("polls:index"))
+#         self.assertContains(response, "No polls are available.")
+#         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
-    def test_future_question(self):
-        """
-        Questions with a pub_date in the future aren't displayed on
-        the index page.
-        """
-        create_question(question_text="Future question.", days=30)
-        response = self.client.get(reverse("polls:index"))
-        self.assertContains(response, "No polls are available.")
-        self.assertQuerySetEqual(response.context["latest_question_list"], [])
+#     def test_future_question_and_past_question(self):
+#         """
+#         Even if both past and future questions exist, only past questions
+#         are displayed.
+#         """
+#         question = create_question(question_text="Past question.", days=-30)
+#         create_question(question_text="Future question.", days=30)
+#         response = self.client.get(reverse("polls:index"))
+#         self.assertQuerySetEqual(
+#             response.context["latest_question_list"],
+#             [question],
+#         )
 
-    def test_future_question_and_past_question(self):
-        """
-        Even if both past and future questions exist, only past questions
-        are displayed.
-        """
-        question = create_question(question_text="Past question.", days=-30)
-        create_question(question_text="Future question.", days=30)
-        response = self.client.get(reverse("polls:index"))
-        self.assertQuerySetEqual(
-            response.context["latest_question_list"],
-            [question],
-        )
-
-    def test_two_past_questions(self):
-        """
-        The questions index page may display multiple questions.
-        """
-        question1 = create_question(question_text="Past question 1.", days=-30)
-        question2 = create_question(question_text="Past question 2.", days=-5)
-        response = self.client.get(reverse("polls:index"))
-        self.assertQuerySetEqual(
-            response.context["latest_question_list"],
-            [question2, question1],
-        )
+#     def test_two_past_questions(self):
+#         """
+#         The questions index page may display multiple questions.
+#         """
+#         question1 = create_question(question_text="Past question 1.", days=-30)
+#         question2 = create_question(question_text="Past question 2.", days=-5)
+#         response = self.client.get(reverse("polls:index"))
+#         self.assertQuerySetEqual(
+#             response.context["latest_question_list"],
+#             [question2, question1],
+#         )
