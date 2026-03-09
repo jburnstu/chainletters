@@ -77,7 +77,7 @@ function NoMatch() {
 }
 
 function Home(props) {
-    return (<></>);
+    return (<div className="container"></div>);
 }
 
 
@@ -147,17 +147,14 @@ function Sidebar(props) {
 
 function Story(props) {
 
+    let readOrWrite = props.readOrWrite;
     const { storyID } = useParams();
 
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);
     }
-    console.log(props.dicts, storyID);
     let storyDict = getStoryByID(props.dicts, storyID);
-
-    console.log(storyDict);
-    let readOrWrite = props.readOrWrite;
     let storySoFar = storyDict.sectiontrace.slice(0, -1);
     let presavedCurrentContent = storyDict.sectiontrace.slice(-1);
 

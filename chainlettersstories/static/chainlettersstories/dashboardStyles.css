@@ -1,5 +1,5 @@
 button {
-    color: green;
+    color: midnightblue;
 }
 
 div.container {
@@ -21,6 +21,7 @@ div.container {
     grid-area: header;
     background-color: indigo;
     display: flex;
+    flex-direction: column;
     align-items: center;
     max-height: 30px;
 }
