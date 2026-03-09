@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { UserContext, DictsContext } from "./context.jsx";
 // import './dashboardStyles.css';
@@ -101,30 +101,40 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
+    const outlet = useOutlet();
     let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
 
     const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
 
     return (
-        <div className={props.readOrWrite + "-dashboard-container"}>
+        <div className={props.readOrWrite + "DashboardContainer" + " dashboardContainer"}>
             <Sidebar readOrWrite={props.readOrWrite} addNewStory={addNewStory} />
 
-            <nav className="tabs">
+            <nav className="storyTabs">
                 {arrayOfStoryIDs.map((storyID, index) =>
                     <Link to={storyID + "/"} key={index + storyID}>
-                        <button className="story-tab-button"
+                        <button className="storyTabButton"
                             onClick={() => console.log("link button clicked", storyID)}
                         >{index}</button>
                     </Link>
                 )}
             </nav>
-            <Outlet />
+            {outlet || <PlaceHolder />}
         </div >
     )
+}
 
+function PlaceHolder() {
+    return (<div className="storyContainer">
+        <div className="storyContent"></div>
+        <div className="submissions"></div>
+        <div className="comments"></div>
+    </div>
+    )
 }
 
 function Sidebar(props) {
+
 
     switch (props.readOrWrite) {
         case "write":
@@ -168,16 +178,18 @@ function Story(props) {
 
 
     let storySoFarElement = storySoFar.map(sectionDict =>
-        <textarea readOnly key={sectionDict.earliersectionid} value={sectionDict.earliersectioncontent}></ textarea>
+        <textarea className="previousSectionText" readOnly key={sectionDict.earliersectionid} value={sectionDict.earliersectioncontent}></ textarea>
     )
 
-    let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>
+    let currentSectionElement = <input className="currentSectionText" type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
             <StoryHeader />
-            {storySoFarElement}
-            {currentSectionElement}
+            <div className="storyContent">
+                {storySoFarElement}
+                {currentSectionElement}
+            </div>
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} sectionid={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
         </div>
@@ -185,7 +197,8 @@ function Story(props) {
 }
 
 function StoryHeader() {
-    return (<div className="storyHeader" />)
+    return (<div className="storyHeader">THIS IS THE STORY HEADER
+    </div>)
 }
 
 function SubmissionButtons(props) {
@@ -200,9 +213,10 @@ function SubmissionButtons(props) {
     }
 
     return (
-        <div className="submit-buttons-container">
+        <div className="submissions">
             {arrayofButtonTypes.map(buttonType =>
                 <SubmissionButton
+                    key={buttonType}
                     submissionType={buttonType}
                     currentContent={props.currentContent}
                     sectionid={props.sectionid}
@@ -213,7 +227,7 @@ function SubmissionButtons(props) {
 
 function Comments() {
     return (
-        <></>
+        <div className="comments">THESE ARE THE COMMENTS</div>
     )
 }
 

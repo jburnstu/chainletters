@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
 export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
 import { UserContext } from "./context.jsx";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, redirect } from "react-router";
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
     console.log("started getRandomItem");
@@ -263,8 +263,7 @@ export function SubmissionButton(props) {
                             )
                         }
                         console.log(location.pathname);
-                        navigate(`..`);
-                        console.log(location.pathname);
+                        return redirect('/write');
                     }
                 })
     }
@@ -356,23 +355,9 @@ function ModalWindow(props) {
 
     return (
         createPortal(
-            <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
+            <div className="modalPortal">
                 {props.children}
-                <div style={{
-                    background: 'white',
-                    padding: '20px',
-                    borderRadius: '8px'
-                }}>
+                <div className="modalButtonContainer">
                     <button onClick={props.onClose}>Close</button>
                 </div>
             </div>,
