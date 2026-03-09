@@ -18,39 +18,96 @@ Checks on login details:
 '''
 import random
 import string
-from .models import Story, StoriesUser, Section
+from .models import Story, StoriesUser, Section, ModerationAssignment
 
 def create_user(username,password):
     email = username + "@exmaple.com"
     return StoriesUser.objects.create(displayname=username,email=email,password=password)
 
-def create_standard_story_by_user(user):
-    storyobject = Story.objects.create(userid=user)
-    sectionobject = Section.objects.create(storyid=storyobject,userid=user,previoussectionid=None)
 
-    return {"storyobject":storyobject,
-            "sectionobject":sectionobject}
+def add_section_to_story_by_user(user,previoussection=None):
+    if previoussection is None:
+        newstory = Story.objects.create(userid=user)
+        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None)
+    else:
+        newsection = Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection)
+        previoussection.sectionstatusid_id = 5
+        previoussection.save()
+    return newsection
 
+def update_section_content(section,content):
+    section.content = content
+    section.save()
 
-def add_section_to_story_by_user(user,previoussection):
+def move_to_moderation(section):
+    section.sectionstatusid_id = 2
+    section.save()
     
-    # if content == "":
-    #     k = random.randint(15,300)
-    #     content = random.choices(string.letters.append(" "),k=k)
-    return Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection)
 
-def submit_section_for_moderation(section):
-    pass
+def assign_a_moderator(section,user):
+    section.sectionstatusid_id = 3
+    section.save()
+    return ModerationAssignment.objects.create(section,user)
 
+def approve_moderation(section):
+    section.sectionstatusid_id = 4
+    section.save()
+    if section.previoussectionid is not None:
+        section.previoussectionid.sectionstatusid_id = 4
+        section.previoussectionid.save()
+    moderationassignment = ModerationAssignment.objects.get(sectionid=section,isitclosed=False)
+    moderationassignment.isitclosed = True
+    moderationassignment.save()
 
-def create_question(question_text, days):
-    """
-    Create a question with the given `question_text` and published the
-    given number of `days` offset to now (negative for questions published
-    in the past, positive for questions that have yet to be published).
-    """
-    time = timezone.now() + datetime.timedelta(days=days)
-    return Question.objects.create(question_text=question_text, pub_date=time)
+def create_submit_and_approve_section(user_creator,content,user_moderator,previoussection=None):
+    section = add_section_to_story_by_user(user_creator,previoussectionid=previoussection)
+    update_section_content(section,content)
+    move_to_moderation(section)
+    assign_a_moderator(section,user_moderator)
+    approve_moderation(section)
+    return section
+
+class SectionContentTests(TestCase):
+    def test_not_empty(self):
+        pass
+
+    def test_not_equivalent(self):
+        pass
+
+    def test_formatting_preserved(self):
+        pass
+
+    def test_length_preserved(self):
+        pass
+
+class WriteDashboardDisplayTests(TestCase):
+    def test_no_stories(self):
+        pass
+
+    def test_no_stories_to_join(self):
+        pass
+
+    def test_multiple_stories(self):
+        pass
+
+    def test_submitted_story_leaves_page(self):
+        pass
+
+    def test_saved_story_still_present(self):
+        pass
+
+class ReadDashboardDisplayTests(TestCase):
+    def test_no_stories(self):
+        pass
+
+    def test_no_stories_to_moderate(self):
+        pass
+
+    def test_moderatable_story_will_be_accessed(self):
+        pass
+
+class LoginTests(self):
+
 
 
 class QuestionIndexViewTests(TestCase):
