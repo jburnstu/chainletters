@@ -5,9 +5,10 @@ button {
 div.container {
     display: grid;
     grid-template-areas:
-        "header             header"
-        "sidebar           tabs"
-        "sidebar content-submissions-comments";
+        "universalHeader universalHeader"
+        "sidebar         tabs           "
+        "sidebar         storyContainer "
+    ;
     grid-template-columns: 1fr 9fr;
     grid-template-rows: min-content min-content auto;
     gap: 3px;
@@ -16,7 +17,7 @@ div.container {
     height: 100vh;
 }
 
-header {
+.universalHeader {
     grid-area: header;
     background-color: indigo;
     display: flex;
@@ -24,11 +25,18 @@ header {
     max-height: 30px;
 }
 
-header>h1,
+.universalHeader>h1,
 form {
     flex-grow: 1;
 }
 
+div.dashboard {
+    grid-area: dashboard;
+    display: grid;
+    grid-template-areas:
+        "dashboard "
+
+}
 
 div.sidebar {
     grid-area: sidebar;
@@ -54,12 +62,13 @@ div.tabs>button {
     margin-right: 2.5px;
 }
 
-div.content-submissions-comments {
+div.storyContainer {
+    grid-area: storyContainer;
     display: grid;
     grid-template-areas:
-        "read-only-content  comments"
-        "input-content      comments"
-        "submissions        comments";
+        "storyHeader      storyHeader"
+        "storyContent     comments"
+        "submissions      comments";
     grid-template-columns: 3fr 1fr;
     grid-template-rows: auto auto min-content;
     gap: 3px;
@@ -68,23 +77,12 @@ div.content-submissions-comments {
     height: 100%
 }
 
-input.read-only-content {
-    grid-area: read-only-content;
-    background-color: yellow;
-    min-height: 50px;
-    width: 90%;
-    padding: 5px;
-    margin: 5px;
-    overflow: auto;
+div.storyHeader {
+    grid-area: storyheader;
 }
 
-input.input-content {
-    grid-area: input-content;
-    background-color: pink;
-    min-height: 50px;
-    width: 90%;
-    padding: 5px;
-    margin: 5px;
+div.storyContent {
+    display: flex;
 }
 
 div.submissions {
@@ -97,3 +95,24 @@ div.comments {
     grid-area: comments;
     background-color: cyan;
 }
+
+
+
+/* input.readOnlyContent {
+    grid-area: read-only-content;
+    background-color: yellow;
+    min-height: 50px;
+    width: 90%;
+    padding: 5px;
+    margin: 5px;
+    overflow: auto;
+}
+
+input.inputContent {
+    grid-area: input-content;
+    background-color: pink;
+    min-height: 50px;
+    width: 90%;
+    padding: 5px;
+    margin: 5px;
+} */

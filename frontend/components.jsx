@@ -84,7 +84,7 @@ function UniversalHeader(props) {
 
     return (
         <>
-            <header>
+            <header className="universalHeader">
                 <h1>CHAIN MATES</h1>
                 <h1>Hi, {props.displayname}!</h1>
                 <nav>
@@ -176,14 +176,18 @@ function Story(props) {
     let currentSectionElement = <input type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
-        <div className="writeStoryContainer" id={"writeStoryContainer" + { storyID }}>
-            Hello!
+        <div className="storyContainer" id={"storyContainer" + { storyID }}>
+            <StoryHeader />
             {storySoFarElement}
             {currentSectionElement}
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} sectionid={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
         </div>
     )
+}
+
+function StoryHeader() {
+    return (<div className="storyHeader" />)
 }
 
 function SubmissionButtons(props) {
