@@ -1,0 +1,118 @@
+button {
+    color: green;
+}
+
+div.container {
+    display: grid;
+    grid-template-areas:
+        "universalHeader universalHeader"
+        "sidebar         tabs           "
+        "sidebar         storyContainer "
+    ;
+    grid-template-columns: 1fr 9fr;
+    grid-template-rows: min-content min-content auto;
+    gap: 3px;
+    background-color: dodgerblue;
+    padding: 5px;
+    height: 100vh;
+}
+
+.universalHeader {
+    grid-area: header;
+    background-color: indigo;
+    display: flex;
+    align-items: center;
+    max-height: 30px;
+}
+
+.universalHeader>h1,
+form {
+    flex-grow: 1;
+}
+
+div.dashboard {
+    grid-area: dashboard;
+    display: grid;
+    grid-template-areas:
+        "dashboard "
+
+}
+
+div.sidebar {
+    grid-area: sidebar;
+    background-color: grey;
+    display: flex;
+    flex-direction: column;
+}
+
+div.sidebar>button {
+    flex-grow: 1;
+}
+
+div.tabs {
+    grid-area: tabs;
+    display: flex;
+    background-color: magenta;
+    max-height: 30px;
+}
+
+div.tabs>button {
+    flex-grow: 1;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+}
+
+div.storyContainer {
+    grid-area: storyContainer;
+    display: grid;
+    grid-template-areas:
+        "storyHeader      storyHeader"
+        "storyContent     comments"
+        "submissions      comments";
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto auto min-content;
+    gap: 3px;
+    background-color: dodgerblue;
+    padding: 5px;
+    height: 100%
+}
+
+div.storyHeader {
+    grid-area: storyheader;
+}
+
+div.storyContent {
+    display: flex;
+}
+
+div.submissions {
+    grid-area: submissions;
+    display: flex;
+    background-color: red;
+}
+
+div.comments {
+    grid-area: comments;
+    background-color: cyan;
+}
+
+
+
+/* input.readOnlyContent {
+    grid-area: read-only-content;
+    background-color: yellow;
+    min-height: 50px;
+    width: 90%;
+    padding: 5px;
+    margin: 5px;
+    overflow: auto;
+}
+
+input.inputContent {
+    grid-area: input-content;
+    background-color: pink;
+    min-height: 50px;
+    width: 90%;
+    padding: 5px;
+    margin: 5px;
+} */

@@ -8,12 +8,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>writePage</title>
-    <link rel="stylesheet" href= "{% static 'chainlettersstories/styles.css' %}" />
+    <link rel="stylesheet" href= "{% static 'chainlettersstories/dashboardStyles.css' %}" />
     {% vite_hmr_client %}   
 </head>
 
 <body>
-    <div id="myappcontainer"></div>
+    <div class="myAppContainer" id="myAppContainer"></div>
     {{ userid|json_script:'userid' }}
     {{ displayname|json_script:'displayname' }}
     {{ read_dicts|json_script:'read-dicts' }}

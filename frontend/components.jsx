@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { UserContext, DictsContext } from "./context.jsx";
+// import './dashboardStyles.css';
 
 
 function AppByUser(props) {
@@ -223,6 +224,6 @@ const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent)
 const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
 const USERID = JSON.parse(document.getElementById('userid').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('displayname').textContent);
-createRoot(document.getElementById('myappcontainer')).render(
+createRoot(document.getElementById('myAppContainer')).render(
     <AppByUser userid={USERID} displayname={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
 );

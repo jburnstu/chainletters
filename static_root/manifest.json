@@ -1,0 +1,8 @@
+{
+  "frontend/components.jsx": {
+    "file": "js/components-bundle.js",
+    "name": "components",
+    "src": "frontend/components.jsx",
+    "isEntry": true
+  }
+}
