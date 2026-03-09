@@ -32,8 +32,8 @@ class ModeratableSectionByUserSerializer(serializers.ModelSerializer):
         ] 
 
 class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    availablesection = serializers.SlugRelatedField(many=True,read_only=True)
-    moderatablesection = serializers.SlugRelatedField(many=True,read_only=True)
+    availablesection = serializers.SlugRelatedField(many=True,read_only=True,slug_field="sectionid")
+    moderatablesection = serializers.SlugRelatedField(many=True,read_only=True,slug_field="sectionid")
     section = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
 
     class Meta:

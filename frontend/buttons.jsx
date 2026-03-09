@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
-export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationButton };
+export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
 import { UserContext } from "./context.jsx";
 import { useNavigate, useLocation } from "react-router";
 
@@ -387,7 +387,7 @@ export function NewModerationModalButton(props) {
     const storiesInModal = 3;
 
     async function getSectionsForModal() {
-        let moderatabilityData = await contactAPI(`userincludingability/${userid}/`, "get");
+        let moderatabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get");
         let randomSectionIDArray = await getRandomItem(moderatabilityData.moderatablesection, storiesInModal);
         let sectionTraceDataArray = [];
         let sectionTraceData;

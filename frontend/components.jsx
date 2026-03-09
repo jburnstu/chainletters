@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext } from 'react-router-dom';
-import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationButton } from './buttons.jsx';
+import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { UserContext, DictsContext } from "./context.jsx";
 
 
@@ -133,10 +133,11 @@ function Sidebar(props) {
                     <ModalJoinButton addNewStory={props.addNewStory} />
                 </div>
             )
+        case "read":
         default:
             return (
                 <div className="sidebar">
-                    <NewModerationButton addNewStory={props.addNewStory} />
+                    <NewModerationModalButton addNewStory={props.addNewStory} />
                 </div>
             )
     }
@@ -188,7 +189,7 @@ function Story(props) {
 function SubmissionButtons(props) {
 
     let arrayofButtonTypes;
-    switch (props.readOrWrite == "write") {
+    switch (props.readOrWrite) {
         case "read":
             arrayofButtonTypes = ["APPROVE"];
         case "write":
@@ -207,7 +208,6 @@ function SubmissionButtons(props) {
         </div>
     )
 }
-
 
 function Comments() {
     return (
