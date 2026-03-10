@@ -1,4 +1,8 @@
 from django.test import TestCase
+import random
+import string
+from .models import Story, StoriesUser, Section, ModerationAssignment, AvailableSectionByUser
+
 
 # Create your tests here.
 '''
@@ -16,60 +20,193 @@ Checks on login details:
 - assert an empty username / password will prompt a message
 
 '''
-import random
-import string
-from .models import Story, StoriesUser, Section, ModerationAssignment
+
+### UTILITY FUNCTIONS ###
+
+def create_random_string_of_length(string_length,up_to_this_length=False,lowest_length_allowed=1):
+    if up_to_this_length:
+        string_length = random.randint(lowest_length_allowed,string_length)
+    return "".join(random.choices(string.ascii_letters,k=string_length))
+
+def check_section_available_to_user(user,previoussection):
+    if previoussection:
+        try:
+            AvailableSectionByUser.objects.get(userid=user,sectionid=previoussection)
+        except AvailableSectionByUser.DoesNotExist:
+            raise KeyError
+    else: 
+        return
+
+def check_section_moderatable_to_user(user,previoussection):
+    if previoussection:
+        try:
+            Section.objects.filter(sectionstatusid_id=2)\
+                        .exclude(userid=user)\
+                        .get(pk=previoussection)
+        except Section.DoesNotExist:
+            raise KeyError
+    else: 
+        return
+    
+def check_previous_section_exists(previoussection, by_id=False):
+    if previoussection and by_id:
+        try:
+            previoussection = Section.objects.get(pk=previoussection)
+        except Section.DoesNotExist:
+            previoussection = None
+    return previoussection
+    
+
+
+### BASIC EXPERIENCE FLOW ###
 
 def create_user(username):
     email = username + "@exmaple.com"
     return StoriesUser.objects.create(displayname=username,email=email,password=username)
 
+def add_section_to_story_by_user(user,previoussection=None,by_id=False,valid_check=False):
+    if by_id:
+        user = StoriesUser.objects.get(pk=user)
+        if previoussection:
+            print(previoussection)
+            previoussection = Section.objects.get(pk=previoussection)
 
-def add_section_to_story_by_user(user,previoussection=None):
+    if valid_check:
+        check_section_available_to_user(user,previoussection)
+
     if previoussection is None:
         newstory = Story.objects.create(userid=user)
-        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None)
+        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None,sectionstatusid_id=1)
     else:
-        newsection = Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection)
+        newsection = Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection,sectionstatusid_id=1)
         previoussection.sectionstatusid_id = 5
         previoussection.save()
     return newsection
 
-def update_section_content(section,content):
+def update_section_content(section,content,by_id=False):
+    if by_id:
+        section = Section.objects.get(pk=section)
+
     section.content = content
     section.save()
 
-def abandon_section(section,):
+def abandon_section(section,default_if_empty=True,by_id=False):
+    if by_id:
+        section = Section.objects.get(pk=section)
+
+    if default_if_empty and str(section.content) == "":
+        section.content = "Default Empty Text"
     section.sectionstatusid_id = 6
     section.save()
 
-def move_to_moderation(section):
+def move_to_moderation(section,by_id=False):
+    if by_id:
+        section = Section.objects.get(pk=section)
+
     section.sectionstatusid_id = 2
     section.save()
     
+def assign_a_moderator(section,user,by_id=False,valid_check=False):
+    if by_id:
+        section = Section.objects.get(pk=section)
+        user = StoriesUser.objects.get(pk=user)
+    
+    if valid_check:
+        check_section_moderatable_to_user(user,section)
 
-def assign_a_moderator(section,user):
     section.sectionstatusid_id = 3
     section.save()
     return ModerationAssignment.objects.create(section,user)
 
-def approve_moderation(section):
+def approve_moderation(section,by_id=False):
+    if by_id:
+        section = Section.objects.get(sectionid_id=section)
+    
     section.sectionstatusid_id = 4
     section.save()
-    if section.previoussectionid is not None:
+    if section.previoussectionid:
         section.previoussectionid.sectionstatusid_id = 4
         section.previoussectionid.save()
     moderationassignment = ModerationAssignment.objects.get(sectionid=section,isitclosed=False)
     moderationassignment.isitclosed = True
     moderationassignment.save()
 
-def create_submit_and_approve_section(content,user_creator,user_moderator,previoussection=None):
-    section = add_section_to_story_by_user(user_creator,previoussectionid=previoussection)
-    update_section_content(section,content)
-    move_to_moderation(section)
-    assign_a_moderator(section,user_moderator)
-    approve_moderation(section)
+### OVERALL FUNCTION ###
+
+def create_submit_and_approve_section(content,
+                                      user_creator,
+                                      user_moderator,
+                                      previoussection=None,
+                                      by_id=False):
+    try:
+        previoussection = check_previous_section_exists(previoussection,by_id=by_id)
+        section = add_section_to_story_by_user(user_creator,previoussection=previoussection,by_id=by_id,valid_check=True)
+        update_section_content(section,content,by_id=by_id)
+        move_to_moderation(section,by_id=by_id)
+        assign_a_moderator(section,user_moderator,by_id=by_id,valid_check=True)
+        approve_moderation(section,by_id=by_id)
+    except KeyError:
+        return None
     return section
+
+
+def create_section_from_dict(dict):
+    section = create_submit_and_approve_section(dict["content"],
+                                                dict["user_creator"],
+                                                dict["user_moderator"],
+                                                dict["previoussection"],
+                                                by_id=True
+    )
+    return section
+
+
+def create_random_section_tree(number_of_users,number_of_sections, section_char_length=200):
+    username_length = 10
+    array_of_user_ids = []
+    for i in range(number_of_users):
+        print(i)
+        rng_name = create_random_string_of_length(username_length)
+        new_user = create_user(rng_name)
+        array_of_user_ids.append(new_user.id)
+
+    array_of_previous_section_ids = []
+    for i in range(number_of_sections):
+        random_earlier_id = random.randint(1,i+1)
+        if random_earlier_id == i:
+            random_earlier_id = None
+        array_of_previous_section_ids.append(random_earlier_id)
+
+    list_of_section_dicts = [{
+        "content" : create_random_string_of_length(section_char_length,up_to_this_length=True),
+        "user_creator" : random.choice(array_of_user_ids),
+        "user_moderator" : random.choice(array_of_user_ids),
+        "previoussection" : array_of_previous_section_ids[i]
+        } for i in range(number_of_sections)]
+
+    print(list_of_section_dicts)
+    for dict in list_of_section_dicts: 
+        create_section_from_dict(dict)
+
+
+# if __name__ == '__main__':
+#     create_random_section_tree
+
+"""
+previous section id: 
+between 1 and i
+
+"""
+
+
+
+
+
+
+
+
+
+
+
 
 class SectionContentTests(TestCase):
     def test_not_empty(self):
