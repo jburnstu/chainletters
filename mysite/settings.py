@@ -103,7 +103,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
-            'options': '-c search_path="storyschema"'
+            'options': '-c search_path="chainlettersstoriesschema"'
         },
         'NAME': 'postgres',
         'USER': 'postgres',

@@ -1,31 +1,31 @@
 export function JoinButton(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
 
 
     async function handleSubmit(e) {
 
-        let availabilityData = await contactAPI(`userincludingavailability/${userid}/`,
+        let availabilityData = await contactAPI(`authorincludingavailability/${authorid}/`,
             "get");
 
-        let randomSectionID = await getRandomItem(availabilityData.availablesection);
-        let updatePreviousSectionData = await contactAPI(`section/${randomSectionID}/`,
+        let randomSegmentID = await getRandomItem(availabilityData.availablesegment);
+        let updatePreviousSegmentData = await contactAPI(`segment/${randomSegmentID}/`,
             "patch",
-            { 'sectionstatusid': 5 }
+            { 'segmentstatusid': 5 }
         );
 
-        let createSectionData = await contactAPI("section/",
+        let createSegmentData = await contactAPI("segment/",
             "post",
             {
-                'storyid': updatePreviousSectionData.storyid,
-                'userid': userid,
-                'sectionstatusid': 1,
-                'previoussectionid': randomSectionID
+                'storyid': updatePreviousSegmentData.storyid,
+                'authorid': authorid,
+                'segmentstatusid': 1,
+                'previoussegmentid': randomSegmentID
             }
         );
 
-        let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.id}`, "get");
-        console.log(getNewSectionTraceData);
-        props.addNewStory(getNewSectionTraceData);
+        let getNewSegmentTraceData = await contactAPI(`segmenttrace/${createSegmentData.id}`, "get");
+        console.log(getNewSegmentTraceData);
+        props.addNewStory(getNewSegmentTraceData);
     }
 
     return (
@@ -34,28 +34,28 @@ export function JoinButton(props) {
 }
 
 export function NewButton(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
 
     async function handleSubmit(e) {
 
         let storyCreationData = await contactAPI("story/", "post",
             {
-                'userid': userid
+                'authorid': authorid
             }
         )
 
-        let sectionCreationData = await contactAPI("section/", "post",
+        let segmentCreationData = await contactAPI("segment/", "post",
             {
                 'storyid': storyCreationData.id,
-                'userid': userid,
-                'sectionstatusid': 1,
+                'authorid': authorid,
+                'segmentstatusid': 1,
             }
         )
 
-        let newSectionID = await sectionCreationData.id;
-        console.log(newSectionID);
+        let newSegmentID = await segmentCreationData.id;
+        console.log(newSegmentID);
         let newStoryDict = await {
-            "id": newSectionID, "sectiontrace": [{ newSectionID: "" }],
+            "id": newSegmentID, "segmenttrace": [{ newSegmentID: "" }],
         }
         console.log("NEWSTORYDICT", newStoryDict);
         props.addNewStory(newStoryDict);

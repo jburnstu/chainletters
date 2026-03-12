@@ -1,22 +1,22 @@
 
-import React, { useState, useRef, useEffect, createContext, useContext } from "react";
+import React, { useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
-import { UserContext, DictsContext } from "./context.jsx";
+import { AuthorContext, DictsContext } from "./context.jsx";
 // import './dashboardStyles.css';
 
 
-function AppByUser(props) {
+function AppByAuthor(props) {
     useEffect(() => console.log("Rendered"));
 
-    const [userid, setUserID] = useState(props.userid);
-    const [displayname, setDisplayName] = useState(props.displayname);
+    const [authorid, setAuthorID] = useState(props.authorid);
+    const [display_name, setDisplayName] = useState(props.display_name);
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
 
-    const rootPath = `/chainlettersstories/${userid}/`;
+    const rootPath = `/chainlettersstories/${authorid}/`;
 
 
     function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
@@ -46,9 +46,9 @@ function AppByUser(props) {
 
     return (
         <BrowserRouter>
-            <UserContext.Provider value={userid}>
+            <AuthorContext.Provider value={authorid}>
                 <Routes>
-                    <Route path={rootPath} element={<UniversalHeader displayname={displayname} />}>
+                    <Route path={rootPath} element={<UniversalHeader display_name={display_name} />}>
                         <Route index path="" relative element={<Home />} />
                         <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
                             <Route path=":storyID/"
@@ -62,7 +62,7 @@ function AppByUser(props) {
                     </Route>
                     <Route path="*" element={<NoMatch />} />
                 </Routes>
-            </UserContext.Provider>
+            </AuthorContext.Provider>
         </BrowserRouter>
     );
 }
@@ -87,7 +87,7 @@ function UniversalHeader(props) {
         <>
             <header className="universalHeader">
                 <h1>CHAIN MATES</h1>
-                <h1>Hi, {props.displayname}!</h1>
+                <h1>Hi, {props.display_name}!</h1>
                 <nav>
                     <Link to="" ><button type="button">HOME</button></Link>|{" "}
                     <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
@@ -165,10 +165,10 @@ function Story(props) {
         return storyDictArray.find(idMatch);
     }
     let storyDict = getStoryByID(props.dicts, storyID);
-    let storySoFar = storyDict.sectiontrace.slice(0, -1);
-    let presavedCurrentContent = storyDict.sectiontrace.slice(-1);
+    let storySoFar = storyDict.segmenttrace.slice(0, -1);
+    let presavedCurrentContent = storyDict.segmenttrace.slice(-1);
 
-    const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earliersectioncontent);
+    const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
 
     function handleChange(e) {
         setCurrentContent(e.target.value);
@@ -177,20 +177,20 @@ function Story(props) {
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
 
-    let storySoFarElement = storySoFar.map(sectionDict =>
-        <textarea className="previousSectionText" readOnly key={sectionDict.earliersectionid} value={sectionDict.earliersectioncontent}></ textarea>
+    let storySoFarElement = storySoFar.map(segmentDict =>
+        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segmentid} value={segmentDict.earlier_segment_content}></ textarea>
     )
 
-    let currentSectionElement = <input className="currentSectionText" type="text" value={currentContent} onChange={handleChange}></input>
+    let currentSegmentElement = <input className="currentSegmentText" type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
             <StoryHeader />
             <div className="storyContent">
                 {storySoFarElement}
-                {currentSectionElement}
+                {currentSegmentElement}
             </div>
-            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} sectionid={storyID} removeCurrentStory={removeCurrentStory} />
+            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentid={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
         </div>
     )
@@ -219,7 +219,7 @@ function SubmissionButtons(props) {
                     key={buttonType}
                     submissionType={buttonType}
                     currentContent={props.currentContent}
-                    sectionid={props.sectionid}
+                    segmentid={props.segmentid}
                     removeCurrentStory={props.removeCurrentStory} />)}
         </div>
     )
@@ -233,8 +233,8 @@ function Comments() {
 
 const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
 const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
-const USERID = JSON.parse(document.getElementById('userid').textContent);
-const DISPLAYNAME = JSON.parse(document.getElementById('displayname').textContent);
+const AUTHORID = JSON.parse(document.getElementById('authorid').textContent);
+const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
 createRoot(document.getElementById('myAppContainer')).render(
-    <AppByUser userid={USERID} displayname={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
+    <AppByAuthor authorid={AUTHORID} display_name={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
 );

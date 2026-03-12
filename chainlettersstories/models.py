@@ -7,159 +7,142 @@
 from django.db import models
 
 
-class Comment(models.Model):
-    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
-    commenttypeid = models.ForeignKey('Commenttype', models.DO_NOTHING, db_column='commenttypeid')
-    textcontent = models.TextField(default="")
 
-    class Meta:
-        db_table = 'comment'
-        unique_together = (('id', 'commenttypeid'),)
-
+class Author(models.Model):
+    display_name = models.CharField(max_length=30)
+    email = models.CharField(max_length=30)
+    password = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.textcontent
-
-
-class Commentcomment(models.Model):
-    commentid = models.ForeignKey(Comment, models.DO_NOTHING, db_column='commentid')
-    commenttypeid = models.IntegerField()
-    parentcommentid = models.ForeignKey(Comment, models.DO_NOTHING, db_column='parentcommentid', related_name='commentcomment_parentcommentid_set')
-
+        if self.display_name == "":
+            return self.email
+        else:
+            return self.display_name
+        
     class Meta:
-        db_table = 'commentcomment'
-
-
-class Commenttype(models.Model):
-    description = models.CharField(max_length=20)
-
-    class Meta:
-        db_table = 'commenttype'
-
-class ModerationAssignment(models.Model):
-    sectionid = models.ForeignKey('Section', models.DO_NOTHING,db_column='sectionid')
-    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING,db_column='userid')
-    isitclosed = models.BooleanField(default=False)
-
-
-    
-
-class Section(models.Model):
-    storyid = models.ForeignKey('Story', models.DO_NOTHING, db_column='storyid')
-    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid', related_name = "sections")
-    sectionstatusid = models.ForeignKey('Sectionstatus', models.DO_NOTHING, db_column='sectionstatusid')
-    content = models.TextField(default="")
-    previoussectionid = models.ForeignKey('Section',models.DO_NOTHING,db_column='previoussectionid', null=True)
-
-    class Meta:
-        db_table = 'section'
-
-    def __str__(self):
-        return self.content
-
-
-class Sectioncomment(models.Model):
-    commentid = models.ForeignKey(Comment, models.DO_NOTHING, db_column='commentid')
-    commenttypeid = models.IntegerField()
-    parentsectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='parentsectionid')
-
-    class Meta:
-        db_table = 'sectioncomment'
-
-
-class Sectionstatus(models.Model):
-    description = models.CharField(max_length=20)
-
-    class Meta:
-        db_table = 'sectionstatus' 
+        db_table = "author"
 
 
 class Story(models.Model):
-    userid = models.ForeignKey('StoriesUser', models.DO_NOTHING, db_column='userid')
-    isitclosed = models.BooleanField(default=False)
+    author = models.ForeignKey('Author', models.DO_NOTHING)
+    is_it_closed = models.BooleanField(default=False)
     title = models.CharField(max_length=100, blank=True, null=True)
-    minsectionlength = models.SmallIntegerField(blank=True, null=True)
-    maxsectionlength = models.SmallIntegerField(blank=True, null=True)
-    maxnumberofsections = models.SmallIntegerField(blank=True, null=True)
-    maxnumberofbranches = models.SmallIntegerField(blank=True, null=True)
-    isitmature = models.BooleanField(default=False)
+    min_segment_length = models.SmallIntegerField(blank=True, null=True)
+    max_segment_length = models.SmallIntegerField(blank=True, null=True)
+    max_number_of_segments = models.SmallIntegerField(blank=True, null=True)
+    max_number_of_branches = models.SmallIntegerField(blank=True, null=True)
+    is_it_mature = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'story'
+        db_table = "story"
 
 
-class Storycomment(models.Model):
-    commentid = models.ForeignKey(Comment, models.DO_NOTHING, db_column='commentid')
-    commenttypeid = models.IntegerField()
-    parentstoryid = models.ForeignKey(Story, models.DO_NOTHING, db_column='parentstoryid')
+class Segment(models.Model):
+    story = models.ForeignKey('Story', models.DO_NOTHING)
+    author = models.ForeignKey('Author', models.DO_NOTHING)
+    segment_status = models.ForeignKey('SegmentStatus', models.DO_NOTHING)
+    content = models.TextField(default="")
+    previous_segment = models.ForeignKey('Segment',models.DO_NOTHING,null=True)
+
+    def __str__(self):
+        return self.content
+    
+    class Meta:
+        db_table = "segment"
+
+
+class SegmentStatus(models.Model):
+    description = models.CharField(max_length=20)
 
     class Meta:
-        db_table = 'storycomment'
+        db_table = "segment_status"
 
 
 class Tag(models.Model):
     description = models.CharField(max_length=20, blank=True, null=True)
 
-    class Meta:
-        db_table = 'tag'
-
     def __str__(self):
         return self.description
+    
+    class Meta:
+        db_table = "tag"
 
 
 class Tagassingment(models.Model):
-    storyid = models.ForeignKey(Story, models.DO_NOTHING, db_column='storyid')
-    tagid = models.ForeignKey(Tag, models.DO_NOTHING, db_column='tagid')
+    story = models.ForeignKey('Story', models.DO_NOTHING)
+    tagid = models.ForeignKey('Tag', models.DO_NOTHING)
 
     class Meta:
-        db_table = 'tagassingment'
+        db_table = "tag_assignment"
 
 
-class StoriesUser(models.Model):
-    displayname = models.CharField(max_length=30)
-    email = models.CharField(max_length=30)
-    password = models.CharField(max_length=30)
+class ModerationAssignment(models.Model):
+    segment = models.ForeignKey('Segment', models.DO_NOTHING)
+    author = models.ForeignKey('Author', models.DO_NOTHING)
+    is_it_closed = models.BooleanField(default=False)
+
 
     class Meta:
-        db_table = 'user'
+        db_table = "moderation_assignment"
 
 
-    def __str__(self):
-        if self.displayname is "":
-            return self.email
-        else:
-            return self.displayname
 
-class SectionTrace(models.Model):
-    finalsectionid = models.ForeignKey(Section, models.DO_NOTHING, db_column='finalsectionid',related_name="sectiontrace")
-    earliersectionid = models.IntegerField()
-    earliersectionorder = models.IntegerField()
-    earliersectioncontent = models.CharField()
-    finaluserid = models.IntegerField()
-    finalsectionstatusid = models.IntegerField()
+class SegmentTrace(models.Model):
+    final_segment = models.ForeignKey(Segment, models.DO_NOTHING, related_name="segmenttrace")
+    earlier_segment = models.IntegerField()
+    earlier_segment_order = models.IntegerField()
+    earlier_segment_content = models.CharField()
+    final_author = models.IntegerField()
+    final_segment_status = models.IntegerField()
 
     class Meta:
-        db_table = 'sectiontrace'
         managed = False
+        
 
 
-class AvailableSectionByUser(models.Model):
+class AvailableSegmentByAuthor(models.Model):
     # id = models.IntegerField
-    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="availablesection")
-    sectionid = models.IntegerField()
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="availablesegment")
+    segment = models.IntegerField()
 
     class Meta:
-        db_table = 'availablesectionbyuser'
-        unique_together = ['userid','sectionid']
         managed = False
 
 
-class ModeratableSectionByUser(models.Model):
-    userid = models.ForeignKey(StoriesUser, models.DO_NOTHING, db_column='userid',related_name="moderatablesection")
-    sectionid = models.IntegerField()
+class ModeratableSegmentByAuthor(models.Model):
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatablesegment")
+    segment = models.IntegerField()
 
     class Meta:
-        db_table = 'moderatablesectionbyuser'
-        unique_together = ['userid','sectionid']
         managed = False
 
+
+
+
+# class Comment(models.Model):
+#     author = models.ForeignKey('Author', models.DO_NOTHING)
+#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+#     text_content = models.TextField(default="")
+
+
+#     def __str__(self):
+#         return self.text_content
+
+# class CommentType(models.Model):
+#     description = models.CharField(max_length=20)
+
+# class CommentComment(models.Model):
+#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
+#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+#     parent_comment = models.ForeignKey('Comment', models.DO_NOTHING)
+
+
+# class SegmentComment(models.Model):
+#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
+#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+#     parent_segment = models.ForeignKey('Segment', models.DO_NOTHING)
+
+# class StoryComment(models.Model):
+#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
+#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+#     parent_story = models.ForeignKey('Story', models.DO_NOTHING)

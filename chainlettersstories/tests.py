@@ -11,63 +11,63 @@ Checks on status:
 
 '''
 Checks on login details:
-- assert an existing username will prompt login
+- assert an existing authorname will prompt login
 - assert an existing login will login
-- assert an empty username / password will prompt a message
+- assert an empty authorname / password will prompt a message
 
 '''
 import random
 import string
-from .models import Story, StoriesUser, Section, ModerationAssignment
+from .models import Story, Author, Segment, ModerationAssignment
 
-def create_user(username,password):
-    email = username + "@exmaple.com"
-    return StoriesUser.objects.create(displayname=username,email=email,password=password)
+def create_author(authorname,password):
+    email = authorname + "@exmaple.com"
+    return Author.objects.create(display_name=authorname,email=email,password=password)
 
 
-def add_section_to_story_by_user(user,previoussection=None):
-    if previoussection is None:
-        newstory = Story.objects.create(userid=user)
-        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None)
+def add_segment_to_story_by_author(author,previous_segment=None):
+    if previous_segment is None:
+        newstory = Story.objects.create(author=author)
+        newsegment = Segment.objects.create(story=newstory,author=author,previous_segment=None)
     else:
-        newsection = Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection)
-        previoussection.sectionstatusid_id = 5
-        previoussection.save()
-    return newsection
+        newsegment = Segment.objects.create(story=previous_segment.story,author=author,previous_segment=previous_segment)
+        previous_segment.segment_status_id = 5
+        previous_segment.save()
+    return newsegment
 
-def update_section_content(section,content):
-    section.content = content
-    section.save()
+def update_segment_content(segment,content):
+    segment.content = content
+    segment.save()
 
-def move_to_moderation(section):
-    section.sectionstatusid_id = 2
-    section.save()
+def move_to_moderation(segment):
+    segment.segment_status_id = 2
+    segment.save()
     
 
-def assign_a_moderator(section,user):
-    section.sectionstatusid_id = 3
-    section.save()
-    return ModerationAssignment.objects.create(section,user)
+def assign_a_moderator(segment,author):
+    segment.segment_status_id = 3
+    segment.save()
+    return ModerationAssignment.objects.create(segment,author)
 
-def approve_moderation(section):
-    section.sectionstatusid_id = 4
-    section.save()
-    if section.previoussectionid is not None:
-        section.previoussectionid.sectionstatusid_id = 4
-        section.previoussectionid.save()
-    moderationassignment = ModerationAssignment.objects.get(sectionid=section,isitclosed=False)
-    moderationassignment.isitclosed = True
+def approve_moderation(segment):
+    segment.segment_status_id = 4
+    segment.save()
+    if segment.previous_segment is not None:
+        segment.previous_segment.segment_status_id = 4
+        segment.previous_segment.save()
+    moderationassignment = ModerationAssignment.objects.get(segment=segment,is_it_closed=False)
+    moderationassignment.is_it_closed = True
     moderationassignment.save()
 
-def create_submit_and_approve_section(user_creator,content,user_moderator,previoussection=None):
-    section = add_section_to_story_by_user(user_creator,previoussectionid=previoussection)
-    update_section_content(section,content)
-    move_to_moderation(section)
-    assign_a_moderator(section,user_moderator)
-    approve_moderation(section)
-    return section
+def create_submit_and_approve_segment(author_creator,content,author_moderator,previous_segment=None):
+    segment = add_segment_to_story_by_author(author_creator,previous_segment=previous_segment)
+    update_segment_content(segment,content)
+    move_to_moderation(segment)
+    assign_a_moderator(segment,author_moderator)
+    approve_moderation(segment)
+    return segment
 
-class SectionContentTests(TestCase):
+class SegmentContentTests(TestCase):
     def test_not_empty(self):
         pass
 

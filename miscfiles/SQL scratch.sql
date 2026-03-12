@@ -1,133 +1,133 @@
--- create or replace view sectiontrace as 
-with recursive sectionTrace (finalsectionid, sectionid, previoussectionid, recursiondepth) as (
+-- create or replace view segmenttrace as 
+with recursive segmentTrace (final_segmentid, segmentid, previoussegmentid, recursiondepth) as (
 	select
 		s.id,
 		s.id,
-		s.previoussectionid,
+		s.previoussegmentid,
 		1
-	from section s
+	from segment s
 	union 
 	select
-		st.finalsectionid,
-		st.previoussectionid,
-		s2.previoussectionid,
+		st.final_segmentid,
+		st.previoussegmentid,
+		s2.previoussegmentid,
 		st.recursiondepth + 1
-	from section s2
-	join sectionTrace st on st.previoussectionid = s2.id
+	from segment s2
+	join segmentTrace st on st.previoussegmentid = s2.id
 )
 select  
-		st.finalsectionid,
-		st.sectionid,
-		1 + (select max(st2.recursiondepth) from sectionTrace st2 where st2.finalsectionid = st.finalsectionid) - st.recursiondepth as sectionorder,
-		s.content as sectioncontent,
-		s2.userid as userid,
-		s2.sectionstatusid
-		from sectionTrace st
-		join section s on st.sectionid = s.id
-		join section s2 on st.finalsectionid = s2.id
-order by st.finalsectionid, sectionorder;
+		st.final_segmentid,
+		st.segmentid,
+		1 + (select max(st2.recursiondepth) from segmentTrace st2 where st2.final_segmentid = st.final_segmentid) - st.recursiondepth as segmentorder,
+		s.content as segmentcontent,
+		s2.authorid as authorid,
+		s2.segmentstatusid
+		from segmentTrace st
+		join segment s on st.segmentid = s.id
+		join segment s2 on st.final_segmentid = s2.id
+order by st.final_segmentid, segmentorder;
 
 
-alter view sectiontrace
-rename column "content" to "sectioncontent"
+alter view segmenttrace
+rename column "content" to "segmentcontent"
 
-select * from sectiontrace
+select * from segmenttrace
 
-select * from section
+select * from segment
 
 select * from story
 
-select * from storyschema.user
+select * from storyschema.author
 
 delete from storysc
-delete from section
+delete from segment
 
 set search_path = "storyschema"
 
 
-insert into sectionstatus
+insert into segmentstatus
 values (3,'available'),(4,'lockedForAddition'),(5,'deleted')
 
 select s.id
-from section s 
-where userid = 1
-and sectionstatusid = 1
+from segment s 
+where authorid = 1
+and segmentstatusid = 1
 
-select s.id as "sectionid",
+select s.id as "segmentid",
 concat()
 
 
 
-insert into section (storyid,userid,sectionstatusid,content, previoussectionid)
+insert into segment (storyid,authorid,segmentstatusid,content, previoussegmentid)
 values (5, 1, 1, 'Nobody could sleep.',2)
 
 
-select * from section
+select * from segment
 
-select * from availablesectionbyuser
-
-
-SELECT nextval('section_id_seq');
-
-insert into section ()
+select * from availablesegmentbyauthor
 
 
-select * from section s
-join sectiontrace st on st.sectionid = s.id
-where s.sectionstatusid = 3
+SELECT nextval('segment_id_seq');
+
+insert into segment ()
+
+
+select * from segment s
+join segmenttrace st on st.segmentid = s.id
+where s.segmentstatusid = 3
 
 
 select u.id
-from storyschema.user u
-join sectiontrace st o
+from storyschema.author u
+join segmenttrace st o
 
 
-select * from sectionstatus
+select * from segmentstatus
 
 
-create or replace view availablesectionbyuser as 
-select distinct u.id as userid, st.finalsectionid as sectionid
+create or replace view availablesegmentbyauthor as 
+select distinct u.id as authorid, st.final_segmentid as segmentid
 from 
-sectiontrace st
+segmenttrace st
 cross join
-storyschema.user u
-where st.sectionstatusid = 4
-and ( select count (*) from sectiontrace st2
-		join section s on st2.sectionid = s.id
-		where st.finalsectionid = st2.finalsectionid and u.id = s.userid ) = 0
-and ( select count (*) from sectiontrace st2
-		join section s on st2.finalsectionid = s.id
-		where st.finalsectionid = st2.sectionid and u.id = s.userid ) = 0
-order by userid, finalsectionid
+storyschema.author u
+where st.segmentstatusid = 4
+and ( select count (*) from segmenttrace st2
+		join segment s on st2.segmentid = s.id
+		where st.final_segmentid = st2.final_segmentid and u.id = s.authorid ) = 0
+and ( select count (*) from segmenttrace st2
+		join segment s on st2.final_segmentid = s.id
+		where st.final_segmentid = st2.segmentid and u.id = s.authorid ) = 0
+order by authorid, final_segmentid
 
--- include no id from finalsectionid that has this userid anywhere in its past
--- include no id from the past of a finalsectionid that matches this userid
+-- include no id from final_segmentid that has this authorid anywhere in its past
+-- include no id from the past of a final_segmentid that matches this authorid
 
 and not exists (select count(*) from )
 
-select * from section s
-where (select count(*) from sectiontrace st
-	where st.finalsectionid = s.id) = 0
+select * from segment s
+where (select count(*) from segmenttrace st
+	where st.final_segmentid = s.id) = 0
 
--- create or replace view availablesectionbymoderator as
-select distinct st.finalsectionid, u.id 
-from sectiontrace st
-cross join storyschema.user u
-where st.sectionstatusid = 2
-and (select count(distinct st2.finalsectionid, st2.userid )
-		from sectiontrace st2
-		where st.sectionstatusid = 2
-		and st2.finalsectionid = st.finalsectionid
-		and st2.userid = u.userid) = 0
-
-
-
-select distinct finalsectionid, userid 
-from sectiontrace st
-where st.sectionstatusid = 2
+-- create or replace view availablesegmentbymoderator as
+select distinct st.final_segmentid, u.id 
+from segmenttrace st
+cross join storyschema.author u
+where st.segmentstatusid = 2
+and (select count(distinct st2.final_segmentid, st2.authorid )
+		from segmenttrace st2
+		where st.segmentstatusid = 2
+		and st2.final_segmentid = st.final_segmentid
+		and st2.authorid = u.authorid) = 0
 
 
 
+select distinct final_segmentid, authorid 
+from segmenttrace st
+where st.segmentstatusid = 2
 
-select * from sectionstatus
+
+
+
+select * from segmentstatus
 

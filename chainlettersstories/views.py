@@ -7,8 +7,8 @@ import pandas as pd
 import random
 
 
-from .models import Story, StoriesUser, Section, SectionTrace, AvailableSectionByUser, Sectionstatus, ModerationAssignment
-from .serializers import StorySerializer, SectionSerializer, AvailableSectionByUserSerializer, StoriesUserIncludingAvailabilitySerializer, SectionTraceBySectionSerializer, ModerationAssignmentSerializer
+from .models import Story, Author, Segment, SegmentTrace, AvailableSegmentByAuthor, SegmentStatus, ModerationAssignment
+from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer
 # Create your views here.
 
 
@@ -22,9 +22,9 @@ def login(request):
     template = "chainlettersstories/login_or_signup_page.html"
     try:
         login = request.POST["login-or-signup"]
-        username_or_email = request.POST["username-or-email"]
+        authorname_or_email = request.POST["authorname-or-email"]
         password = request.POST["password"]
-        if "" in {username_or_email, password}:
+        if "" in {authorname_or_email, password}:
             raise KeyError("neither field may be blank.")
     except KeyError as e:
         print(e)
@@ -32,62 +32,62 @@ def login(request):
     if bool(int(login)):
         print("login true")
         try:
-            myuser = StoriesUser.objects.get(displayname=username_or_email,password=password)
-            print(myuser.__dict__)
-            userid = myuser.id
-        except StoriesUser.DoesNotExist:
+            myauthor = Author.objects.get(display_name=authorname_or_email,password=password)
+            print(myauthor.__dict__)
+            author = myauthor.id
+        except Author.DoesNotExist:
             try:
-                myuser = StoriesUser.objects.get(email=username_or_email,password=password)
-            except StoriesUser.DoesNotExist:
+                myauthor = Author.objects.get(email=authorname_or_email,password=password)
+            except Author.DoesNotExist:
                 return render(request,
                             "chainlettersstories/login_or_signup_page.html",
                             {
                                 "message":
-                                "No account found matching this username / email and password. Please try again or sign up."
+                                "No account found matching this authorname / email and password. Please try again or sign up."
                             })
-        return HttpResponseRedirect(reverse("chainlettersstories:home", args=(userid,)))
+        return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author,)))
     else:
         print("login false")
         try:
-            myuser = StoriesUser.objects.get(displayname=username_or_email)
-        except StoriesUser.DoesNotExist:
-            newStoriesUser = StoriesUser(displayname=username_or_email,email=username_or_email+"@example.com",password=password)
-            newStoriesUser.save()
+            myauthor = Author.objects.get(display_name=authorname_or_email)
+        except Author.DoesNotExist:
+            newAuthor = Author(display_name=authorname_or_email,email=authorname_or_email+"@example.com",password=password)
+            newAuthor.save()
             return render(request,template,{"message": "Login successfully added! Please now login."})
         return render (request,template,{"message":"Account already exists. Please log in instead."})
 
-def home(request,userid):
+def home(request,author):
     template = "chainlettersstories/dashboard.html"
-    myuser = StoriesUser.objects.get(pk=userid)
-    print("MYUSER",myuser)
-    myusername = myuser.displayname
-    print(myusername)
+    myauthor = Author.objects.get(pk=author)
+    print("MYAUTHOR",myauthor)
+    myauthorname = myauthor.display_name
+    print(myauthorname)
 
-    section_ids_to_moderate = ModerationAssignment.objects\
-                                                .filter(userid_id=userid)\
-                                                .filter(isitclosed=False)\
-                                                .values_list("sectionid")
-    if not section_ids_to_moderate:
+    segment_ids_to_moderate = ModerationAssignment.objects\
+                                                .filter(author_id=author)\
+                                                .filter(is_it_closed=False)\
+                                                .values_list("segment")
+    if not segment_ids_to_moderate:
         read_separate_story_trace_dicts = []
     else:
-        read_section_trace_QS = SectionTrace.objects.filter(finalsectionid__in = section_ids_to_moderate)\
-                                    .values("earliersectionid","earliersectioncontent","finalsectionid")\
-                                    .order_by("earliersectionorder")
-        read_section_trace_df = pd.DataFrame(read_section_trace_QS)
-        read_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              
-                                           for key, group in read_section_trace_df.groupby("finalsectionid")
+        read_segment_trace_QS = SegmentTrace.objects.filter(final_segment__in = segment_ids_to_moderate)\
+                                    .values("earlier_segment","earlier_segment_content","final_segment")\
+                                    .order_by("earlier_segment_order")
+        read_segment_trace_df = pd.DataFrame(read_segment_trace_QS)
+        read_separate_story_trace_dicts = [{"id":key,"segmenttrace":[{"earlier_segment":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment"],group["earlier_segment_content"])]}                              
+                                           for key, group in read_segment_trace_df.groupby("final_segment")
         ]
 
-    write_section_trace_QS = SectionTrace.objects.filter(finaluserid=userid)\
-                                .filter(finalsectionstatusid=1)\
-                                .values("earliersectionid","earliersectioncontent","finalsectionid")\
-                                .order_by("earliersectionorder")
-    if not write_section_trace_QS:
+    write_segment_trace_QS = SegmentTrace.objects.filter(final_author=author)\
+                                .filter(final_segment_status=1)\
+                                .values("earlier_segment","earlier_segment_content","final_segment")\
+                                .order_by("earlier_segment_order")
+    if not write_segment_trace_QS:
         write_separate_story_trace_dicts = []
     else:
-        write_section_trace_df = pd.DataFrame(write_section_trace_QS)
-        write_separate_story_trace_dicts = [{"id":key,"sectiontrace":[{"earliersectionid":id,"earliersectioncontent":content} for id,content in zip(group["earliersectionid"],group["earliersectioncontent"])]}                              
-                                           for key, group in write_section_trace_df.groupby("finalsectionid")
+        write_segment_trace_df = pd.DataFrame(write_segment_trace_QS)
+        write_separate_story_trace_dicts = [{"id":key,"segmenttrace":[{"earlier_segment":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment"],group["earlier_segment_content"])]}                              
+                                           for key, group in write_segment_trace_df.groupby("final_segment")
         ]
 
 
@@ -96,33 +96,33 @@ def home(request,userid):
 
     return render(request,template, 
                   {
-                      "userid": userid,
-                      "displayname": myusername,
+                      "author": author,
+                      "display_name": myauthorname,
                       "read_dicts":read_separate_story_trace_dicts,
                       "write_dicts":write_separate_story_trace_dicts})
 
-class SectionViewSet(viewsets.ModelViewSet):
-    queryset = Section.objects.all()
+class SegmentViewSet(viewsets.ModelViewSet):
+    queryset = Segment.objects.all()
 
-    serializer_class = SectionSerializer
+    serializer_class = SegmentSerializer
 
 class StoryViewSet(viewsets.ModelViewSet):
     queryset = Story.objects.all()
 
     serializer_class = StorySerializer
 
-class AvailableSectionByUserViewSet(viewsets.ModelViewSet):
-    queryset = AvailableSectionByUser.objects.all()
-    serializer_class = AvailableSectionByUserSerializer
+class AvailableSegmentByAuthorViewSet(viewsets.ModelViewSet):
+    queryset = AvailableSegmentByAuthor.objects.all()
+    serializer_class = AvailableSegmentByAuthorSerializer
 
-class StoriesUserIncludingAvailabilityViewSet(viewsets.ModelViewSet):
-    queryset = StoriesUser.objects.all()
-    serializer_class = StoriesUserIncludingAvailabilitySerializer
+class AuthorIncludingAvailabilityViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorIncludingAvailabilitySerializer
 
 class ModerationAssignmentViewSet(viewsets.ModelViewSet):
     queryset = ModerationAssignment.objects.all()
     serializer_class = ModerationAssignmentSerializer
 
-class SectionTraceViewSet(viewsets.ModelViewSet):
-    queryset = Section.objects.all()
-    serializer_class = SectionTraceBySectionSerializer
+class SegmentTraceViewSet(viewsets.ModelViewSet):
+    queryset = Segment.objects.all()
+    serializer_class = SegmentTraceBySegmentSerializer

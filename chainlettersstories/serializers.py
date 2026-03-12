@@ -1,68 +1,68 @@
 from rest_framework import serializers
-from .models import Story, Section, AvailableSectionByUser, StoriesUser, SectionTrace, ModerationAssignment, ModeratableSectionByUser
+from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
-        fields = ['id', 'userid']
+        fields = ['id', 'author']
 
-class SectionSerializer(serializers.ModelSerializer):
+class SegmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Section
+        model = Segment
         fields = '__all__'
 
-class AvailableSectionByUserSerializer(serializers.ModelSerializer):
-    sectionid = serializers.PrimaryKeyRelatedField(read_only=True)
+class AvailableSegmentByAuthorSerializer(serializers.ModelSerializer):
+    segment = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        model = AvailableSectionByUser
+        model = AvailableSegmentByAuthor
         fields = [
-                'userid',
-                'sectionid'
+                'author',
+                'segment'
         ] 
 
-class ModeratableSectionByUserSerializer(serializers.ModelSerializer):
-    sectionid = serializers.PrimaryKeyRelatedField(read_only=True)
+class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
+    segment = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        model = ModeratableSectionByUser
+        model = ModeratableSegmentByAuthor
         fields = [
-                'userid',
-                'sectionid'
+                'author',
+                'segment'
         ] 
 
-class StoriesUserIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    availablesection = serializers.SlugRelatedField(many=True,read_only=True,slug_field="sectionid")
-    moderatablesection = serializers.SlugRelatedField(many=True,read_only=True,slug_field="sectionid")
-    section = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
+    availablesegment = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
+    moderatablesegment = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
+    segment = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
 
     class Meta:
-        model = StoriesUser
+        model = Author
         fields = [
             'id',
-            'displayname',
-            'section',
-            'availablesection',
-            'moderatablesection'
+            'display_name',
+            'segment',
+            'availablesegment',
+            'moderatablesegment'
         ]
 
-class SectionTraceSerializer(serializers.ModelSerializer):
+class SegmentTraceSerializer(serializers.ModelSerializer):
 
     class Meta: 
-        model = SectionTrace
+        model = SegmentTrace
         fields = [
-                    # 'earliersectionordering'
-                    'earliersectionid',
-                  'earliersectioncontent'
+                    # 'earlier_segment_ordering'
+                    'earlier_segment',
+                  'earlier_segment_content'
                   ]
 
-class SectionTraceBySectionSerializer(serializers.ModelSerializer):
-    sectiontrace = SectionTraceSerializer(many=True,read_only=True)
+class SegmentTraceBySegmentSerializer(serializers.ModelSerializer):
+    segmenttrace = SegmentTraceSerializer(many=True,read_only=True)
 
     class Meta:
-        model = Section
+        model = Segment
         fields = ['id',
-                  'sectiontrace'
+                  'segmenttrace'
         ]
 
 class ModerationAssignmentSerializer(serializers.ModelSerializer):

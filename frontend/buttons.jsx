@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
 export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
-import { UserContext } from "./context.jsx";
+import { AuthorContext } from "./context.jsx";
 import { useNavigate, useLocation, redirect } from "react-router";
 
 function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
@@ -57,57 +57,57 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 };
 
 
-async function uploadNewSection(previousSectionID, userID) {
-    let updatePreviousSectionData = await contactAPI(`section/${previousSectionID}/`,
+async function uploadNewSegment(previousSegmentID, authorID) {
+    let updatePreviousSegmentData = await contactAPI(`segment/${previousSegmentID}/`,
         "patch",
-        { 'sectionstatusid': 5 }
+        { 'segmentstatusid': 5 }
     );
 
-    let createSectionData = await contactAPI("section/",
+    let createSegmentData = await contactAPI("segment/",
         "post",
         {
-            'storyid': updatePreviousSectionData.storyid,
-            'userid': userID,
-            'sectionstatusid': 1,
-            'previoussectionid': previousSectionID
+            'storyid': updatePreviousSegmentData.storyid,
+            'authorid': authorID,
+            'segmentstatusid': 1,
+            'previoussegmentid': previousSegmentID
         }
     );
 
-    let getNewSectionTraceData = await contactAPI(`sectiontrace/${createSectionData.id}`, "get");
-    console.log(getNewSectionTraceData);
-    return getNewSectionTraceData;
+    let getNewSegmentTraceData = await contactAPI(`segmenttrace/${createSegmentData.id}`, "get");
+    console.log(getNewSegmentTraceData);
+    return getNewSegmentTraceData;
 }
 
-async function uploadNewStoryAndSection(userid, storyParameters) {
+async function uploadNewStoryAndSegment(authorid, storyParameters) {
 
     let storyCreationData = await contactAPI("story/", "post",
         {
-            'userid': userid,
+            'authorid': authorid,
             ...storyParameters
         }
     )
 
-    let sectionCreationData = await contactAPI("section/", "post",
+    let segmentCreationData = await contactAPI("segment/", "post",
         {
             'storyid': storyCreationData.id,
-            'userid': userid,
-            'sectionstatusid': 1,
+            'authorid': authorid,
+            'segmentstatusid': 1,
         }
     )
-    return sectionCreationData;
+    return segmentCreationData;
 
 }
 
-async function uploadNewModerationAssignment(previoussectionid, userid) {
+async function uploadNewModerationAssignment(previoussegmentid, authorid) {
 
-    let updateSectionStatusData = await contactAPI("section/", "patch",
-        { "sectionstatusid": 3 }
+    let updateSegmentStatusData = await contactAPI("segment/", "patch",
+        { "segmentstatusid": 3 }
     )
 
     let moderationAssignmentCreationData = await contactAPI("moderationassignment/", "post",
         {
-            'sectionid': previoussectionid,
-            'userid': userid
+            'segmentid': previoussegmentid,
+            'authorid': authorid
         }
     )
     return moderationAssignmentCreationData;
@@ -115,7 +115,7 @@ async function uploadNewModerationAssignment(previoussectionid, userid) {
 
 
 export function ModalNewButton(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
 
     const [isOpen, setIsOpen] = useState(false);
     function createModal() {
@@ -136,7 +136,7 @@ export function ModalNewButton(props) {
 }
 
 export function NewStoryOptionspanel(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
 
     const [storyParameters, setStoryParameters] = useState({});
     const [parameterChecks, setParameterChecks] = useState({});
@@ -153,8 +153,8 @@ export function NewStoryOptionspanel(props) {
         setParameterChecks(values => ({ ...values, [name]: checked }))
     }
 
-    function createNewStoryAndSection() {
-        uploadNewStoryAndSection(userid, storyParameters)
+    function createNewStoryAndSegment() {
+        uploadNewStoryAndSegment(authorid, storyParameters)
             .then(function (value) {
                 props.addNewStory(value);
             }
@@ -168,33 +168,33 @@ export function NewStoryOptionspanel(props) {
                     value={storyParameters.storyTitle}
                     defaultValue="Title"
                     onChange={handleValueChange}></input >
-                <label>Min. Section Length
-                    <input label="Min. Section Length" type="checkbox" name="checkMinSectionLength"
-                        checked={parameterChecks.checkMinSectionLength}
+                <label>Min. Segment Length
+                    <input label="Min. Segment Length" type="checkbox" name="checkMinSegmentLength"
+                        checked={parameterChecks.checkMinSegmentLength}
                         onChange={handleCheckChange}>
                     </input>
-                    <input defaultValue="200" type="number" name="minSectionLength"
-                        disabled={!parameterChecks.checkMinSectionLength}
-                        value={storyParameters.minSectionLength}
+                    <input defaultValue="200" type="number" name="minSegmentLength"
+                        disabled={!parameterChecks.checkMinSegmentLength}
+                        value={storyParameters.minSegmentLength}
                         onChange={handleValueChange}>
                     </input>Words
                 </label>
-                <label>Max. Section Length<input type="checkbox" name="checkMaxSectionLength"
-                    checked={storyParameters.checkMaxSectionLength}
+                <label>Max. Segment Length<input type="checkbox" name="checkMaxSegmentLength"
+                    checked={storyParameters.checkMaxSegmentLength}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="maxSectionLength"
-                        value={storyParameters.maxSectionLength}
-                        disabled={!parameterChecks.checkMaxSectionLength}
+                    <input defaultValue="200" type="number" name="maxSegmentLength"
+                        value={storyParameters.maxSegmentLength}
+                        disabled={!parameterChecks.checkMaxSegmentLength}
                         onChange={handleValueChange}></input>
                     Words</label>
-                <label >Max. Number of Sections?<input type="checkbox" name="checkMaxNumberOfSections"
-                    checked={storyParameters.checkMaxNumberOfSections}
+                <label >Max. Number of Segments?<input type="checkbox" name="checkMaxNumberOfSegments"
+                    checked={storyParameters.checkMaxNumberOfSegments}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="maxNumberOfSections"
-                        value={storyParameters.maxNumberOfSections}
-                        disabled={!parameterChecks.checkMaxNumberOfSections}
+                    <input defaultValue="200" type="number" name="maxNumberOfSegments"
+                        value={storyParameters.maxNumberOfSegments}
+                        disabled={!parameterChecks.checkMaxNumberOfSegments}
                         onChange={handleValueChange}></input>
-                    Sections</label>
+                    Segments</label>
                 <label>Max. Number of Branches?<input type="checkbox" name="checkMaxNumberOfBranches"
                     checked={storyParameters.checkMaxNumberOfBranches}
                     onChange={handleCheckChange}></input>
@@ -208,7 +208,7 @@ export function NewStoryOptionspanel(props) {
                     onChange={handleValueChange}></input>
                 </label>
             </fieldset>
-            <button type="submit" onClick={createNewStoryAndSection}>CREATE NEW STORY</button>
+            <button type="submit" onClick={createNewStoryAndSegment}>CREATE NEW STORY</button>
         </form >
     )
 }
@@ -218,47 +218,47 @@ export function SubmissionButton(props) {
     let navigate = useNavigate();
     let location = useLocation();
 
-    let sectionstatusid;
+    let segmentstatusid;
     switch (props.submissionType) {
         case "SAVE":
-            sectionstatusid = 1;
+            segmentstatusid = 1;
             break;
         case "SUBMIT":
-            sectionstatusid = 2;
+            segmentstatusid = 2;
             break;
         case "APPROVE":
-            sectionstatusid = 4;
+            segmentstatusid = 4;
             break;
         case "ABANDON":
-            sectionstatusid = 6;
+            segmentstatusid = 6;
             break;
     }
 
     async function handleSubmit(e) {
 
-        let getNewSectionTraceData = await contactAPI(`sectiontrace/${props.sectionid}/`, "get");
+        let getNewSegmentTraceData = await contactAPI(`segmenttrace/${props.segmentid}/`, "get");
 
-        console.log(getNewSectionTraceData);
+        console.log(getNewSegmentTraceData);
         if (props.submissionType != "SAVE") {
-            props.removeCurrentStory(getNewSectionTraceData);
+            props.removeCurrentStory(getNewSegmentTraceData);
         }
 
         let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
 
-        contactAPI(`section/${props.sectionid}/`, "patch",
+        contactAPI(`segment/${props.segmentid}/`, "patch",
             {
-                'sectionstatusid': sectionstatusid,
+                'segmentstatusid': segmentstatusid,
                 'content': currentContent
             }
         )
             .then(
                 function (value) {
                     if (props.submissionType == "ABANDON") {
-                        if (value.previoussectionid != null) {
+                        if (value.previoussegmentid != null) {
                             console.log("second conditional!");
-                            contactAPI(`section/${value.previoussectionid}/`, "patch",
+                            contactAPI(`segment/${value.previoussegmentid}/`, "patch",
                                 {
-                                    'sectionstatusid': 4
+                                    'segmentstatusid': 4
                                 }
                             )
                         }
@@ -275,22 +275,22 @@ export function SubmissionButton(props) {
 
 
 export function ModalJoinButton(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
     const storiesInModal = 3;
 
-    async function getSectionsForModal() {
-        let availabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get")
-        let randomSectionIDArray = await getRandomItem(availabilityData.availablesection, storiesInModal);
-        let sectionTraceDataArray = [];
-        let sectionTraceData;
-        await Promise.all(randomSectionIDArray.map(async (sectionID) => {
-            sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
-            sectionTraceDataArray.push(sectionTraceData);
+    async function getSegmentsForModal() {
+        let availabilityData = await contactAPI(`authorincludingavailability/${authorid}/`, "get")
+        let randomSegmentIDArray = await getRandomItem(availabilityData.availablesegment, storiesInModal);
+        let segmentTraceDataArray = [];
+        let segmentTraceData;
+        await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
+            segmentTraceData = await contactAPI(`segmenttrace/${segmentID}`, "get");
+            segmentTraceDataArray.push(segmentTraceData);
         }
         )
         )
-        await setArrayOfAvailableStories(sectionTraceDataArray);
-        return sectionTraceDataArray;
+        await setArrayOfAvailableStories(segmentTraceDataArray);
+        return segmentTraceDataArray;
     }
 
 
@@ -301,16 +301,16 @@ export function ModalJoinButton(props) {
     console.log(arrayOfAvailableStories);
 
     function createModal() {
-        getSectionsForModal()
+        getSegmentsForModal()
             .then(function (value) {
                 setIsOpen(true);
             })
 
     }
 
-    function selectStory(previoussectionid) {
+    function selectStory(previoussegmentid) {
         setIsOpen(false);
-        uploadNewSection(previoussectionid, userid)
+        uploadNewSegment(previoussegmentid, authorid)
             .then(function (value) { props.addNewStory(value) });
     }
 
@@ -333,18 +333,18 @@ export function ModalJoinButton(props) {
 
 function StoryDisplayInModal(props) {
     console.log(props.storyDict);
-    let firstSection = props.storyDict.sectiontrace[0]
-    let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
-    finalSection = (finalSection == firstSection) ? null : finalSection
+    let firstSegment = props.storyDict.segmenttrace[0]
+    let finalSegment = props.storyDict.segmenttrace.slice(-1)[0]
+    finalSegment = (finalSegment == firstSegment) ? null : finalSegment
 
 
 
-    const selectStory = () => props.selectStory(finalSection.earliersectionid);
+    const selectStory = () => props.selectStory(finalSegment.earlier_segmentid);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
-            <textarea value={firstSection.earliersectioncontent} readOnly />
-            {(finalSection != null) ? <textarea value={finalSection.earliersectioncontent} readOnly /> : null}
+            <textarea value={firstSegment.earlier_segment_content} readOnly />
+            {(finalSegment != null) ? <textarea value={finalSegment.earlier_segment_content} readOnly /> : null}
         </button>
     )
 }
@@ -368,22 +368,22 @@ function ModalWindow(props) {
 
 
 export function NewModerationModalButton(props) {
-    const userid = useContext(UserContext);
+    const authorid = useContext(AuthorContext);
     const storiesInModal = 3;
 
-    async function getSectionsForModal() {
-        let moderatabilityData = await contactAPI(`userincludingavailability/${userid}/`, "get");
-        let randomSectionIDArray = await getRandomItem(moderatabilityData.moderatablesection, storiesInModal);
-        let sectionTraceDataArray = [];
-        let sectionTraceData;
-        await Promise.all(randomSectionIDArray.map(async (sectionID) => {
-            sectionTraceData = await contactAPI(`sectiontrace/${sectionID}`, "get");
-            sectionTraceDataArray.push(sectionTraceData);
+    async function getSegmentsForModal() {
+        let moderatabilityData = await contactAPI(`authorincludingavailability/${authorid}/`, "get");
+        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatablesegment, storiesInModal);
+        let segmentTraceDataArray = [];
+        let segmentTraceData;
+        await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
+            segmentTraceData = await contactAPI(`segmenttrace/${segmentID}`, "get");
+            segmentTraceDataArray.push(segmentTraceData);
         }
         )
         )
-        await setArrayOfModeratableStories(sectionTraceDataArray);
-        return sectionTraceDataArray;
+        await setArrayOfModeratableStories(segmentTraceDataArray);
+        return segmentTraceDataArray;
     }
 
 
@@ -394,16 +394,16 @@ export function NewModerationModalButton(props) {
     console.log(arrayOfModeratableStories);
 
     function createModal() {
-        getSectionsForModal()
+        getSegmentsForModal()
             .then(function (value) {
                 setIsOpen(true);
             })
 
     }
 
-    function selectStory(previoussectionid) {
+    function selectStory(previoussegmentid) {
         setIsOpen(false);
-        uploadNewModerationAssignment(previoussectionid, userid)
+        uploadNewModerationAssignment(previoussegmentid, authorid)
             .then(function (value) { props.addNewStory(value) });
     }
 
@@ -423,16 +423,16 @@ export function NewModerationModalButton(props) {
 }
 
 function NewModerationOptionsPanel(props) {
-    let firstSection = props.storyDict.sectiontrace[0]
-    let finalSection = props.storyDict.sectiontrace.slice(-1)[0]
-    finalSection = (finalSection == firstSection) ? null : finalSection
+    let firstSegment = props.storyDict.segmenttrace[0]
+    let finalSegment = props.storyDict.segmenttrace.slice(-1)[0]
+    finalSegment = (finalSegment == firstSegment) ? null : finalSegment
 
-    const selectStory = () => props.selectStory(finalSection.earliersectionid);
+    const selectStory = () => props.selectStory(finalSegment.earlier_segmentid);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
-            <textarea value={firstSection.earliersectioncontent} readOnly />
-            {(finalSection != null) ? <textarea value={finalSection.earliersectioncontent} readOnly /> : null}
+            <textarea value={firstSegment.earlier_segment_content} readOnly />
+            {(finalSegment != null) ? <textarea value={finalSegment.earlier_segment_content} readOnly /> : null}
         </button>
     )
 }

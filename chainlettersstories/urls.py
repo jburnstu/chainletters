@@ -6,24 +6,24 @@ from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'section',views.SectionViewSet)
-router.register(r'availablesectionbyuser',views.AvailableSectionByUserViewSet)
+router.register(r'segment',views.SegmentViewSet)
+router.register(r'availablesegmentbyauthor',views.AvailableSegmentByAuthorViewSet)
 router.register(r'story',views.StoryViewSet)
-router.register(r'userincludingavailability',views.StoriesUserIncludingAvailabilityViewSet)
+router.register(r'authorincludingavailability',views.AuthorIncludingAvailabilityViewSet)
 router.register(r'moderationassignment', views.ModerationAssignmentViewSet)
-router.register(r'sectiontrace', views.SectionTraceViewSet, basename='sectiontrace')
+router.register(r'segmenttrace', views.SegmentTraceViewSet, basename='segmenttrace')
 
 app_name = "chainlettersstories"
 urlpatterns = [
     path("", views.login_or_signup_page, name="login_or_signup_page"),
     path("login", views.login, name="login"),
-    path(r"<int:userid>/", views.home, name="home"),
-    path(r"<int:userid>/write", views.home, name="home"),
-    path(r"<int:userid>/read", views.home, name="home"),
-    # path("<int:userid>/write/", views.home, name="home"),
-    # path("<int:userid>/read/", views.home, name="home"),
-    # path("<int:userid>/write/<int:sectionid>", views.home, name="home"),
-    #     path("<int:userid>/read/<int:sedctionid>", views.home, name="home"),
+    path(r"<int:author>/", views.home, name="home"),
+    path(r"<int:author>/write", views.home, name="home"),
+    path(r"<int:author>/read", views.home, name="home"),
+    # path("<int:author>/write/", views.home, name="home"),
+    # path("<int:author>/read/", views.home, name="home"),
+    # path("<int:author>/write/<int:segment>", views.home, name="home"),
+    #     path("<int:author>/read/<int:sedctionid>", views.home, name="home"),
 
 
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -39,24 +39,24 @@ urlpatterns = [
 # sdsds
 
 
-#     path("<int:userid>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
-#     path("<int:userid>/write_dashboard/create_new_story", 
+#     path("<int:author>/write_dashboard/",views.write_dashboard, name="write_dashboard"),
+#     path("<int:author>/write_dashboard/create_new_story", 
 #          views.create_new_story,
 #          name="create_new_story"),
-#     path("<int:userid>/write_dashboard/get_random_available_section/", 
-#          views.get_random_available_section,  
-#          name="get_random_available_section"),
-#     path("<int:userid>/write_dashboard/submit_section_to_story/<int:sectionid>", 
-#          views.submit_section_to_story,   
-#          name="submit_section_to_story"),
+#     path("<int:author>/write_dashboard/get_random_available_segment/", 
+#          views.get_random_available_segment,  
+#          name="get_random_available_segment"),
+#     path("<int:author>/write_dashboard/submit_segment_to_story/<int:segment>", 
+#          views.submit_segment_to_story,   
+#          name="submit_segment_to_story"),
 
-#     path("<int:userid>/read_dashboard/",views.read_dashboard, name="read_dashboard"),
-#     path("<int:userid>/read_dashboard/get_random_moderatable_section", 
-#          views.get_random_moderatable_section,
-#          name="get_random_moderatable_section"),
-#     path("<int:userid>/read_dashboard/approve_new_section/<int:finalsectionid>", 
-#          views.approve_new_section,
-#          name="approve_new_section"),
+#     path("<int:author>/read_dashboard/",views.read_dashboard, name="read_dashboard"),
+#     path("<int:author>/read_dashboard/get_random_moderatable_segment", 
+#          views.get_random_moderatable_segment,
+#          name="get_random_moderatable_segment"),
+#     path("<int:author>/read_dashboard/approve_new_segment/<int:final_segment>", 
+#          views.approve_new_segment,
+#          name="approve_new_segment"),
     
 
-#     path("sectiontrace<int:sectionid>",views.sectiontrace,name="sectiontrace")
+#     path("segmenttrace<int:segment>",views.segmenttrace,name="segmenttrace")

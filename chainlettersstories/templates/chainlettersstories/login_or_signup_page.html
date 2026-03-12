@@ -13,7 +13,7 @@
   <form action="{% url 'chainlettersstories:login'  %}" method="post">
     {% csrf_token %}
     <fieldset>
-      <label>Username<input type="text" name="username-or-email" placeholder="YourUsernameHere"></label>
+      <label>Authorname<input type="text" name="authorname-or-email" placeholder="YourAuthornameHere"></label>
       <label>Password<input type="text" name="password" placeholder="YourPasswordHere"></label>
       <br>
       <label>Log In<input type="radio" name="login-or-signup" value=1></label>
