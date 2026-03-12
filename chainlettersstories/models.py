@@ -86,7 +86,6 @@ class ModerationAssignment(models.Model):
         db_table = "moderation_assignment"
 
 
-
 class SegmentTrace(models.Model):
     final_segment = models.ForeignKey(Segment, models.DO_NOTHING, related_name="segmenttrace")
     earlier_segment = models.IntegerField()

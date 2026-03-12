@@ -58,19 +58,17 @@ def login(request):
 
 def home(request,author):
     template = "chainlettersstories/dashboard.html"
-    myauthor = Author.objects.get(pk=author)
-    print("MYAUTHOR",myauthor)
+    myauthor = Author.objects.get(pk=author.id)
     myauthorname = myauthor.display_name
-    print(myauthorname)
 
     segment_ids_to_moderate = ModerationAssignment.objects\
-                                                .filter(author_id=author)\
+                                                .filter(author=author)\
                                                 .filter(is_it_closed=False)\
                                                 .values_list("segment")
     if not segment_ids_to_moderate:
         read_separate_story_trace_dicts = []
     else:
-        read_segment_trace_QS = SegmentTrace.objects.filter(final_segment__in = segment_ids_to_moderate)\
+        read_segment_trace_QS = SegmentTrace.objects.filter(final_segment_id__in = segment_ids_to_moderate)\
                                     .values("earlier_segment","earlier_segment_content","final_segment")\
                                     .order_by("earlier_segment_order")
         read_segment_trace_df = pd.DataFrame(read_segment_trace_QS)
@@ -78,8 +76,8 @@ def home(request,author):
                                            for key, group in read_segment_trace_df.groupby("final_segment")
         ]
 
-    write_segment_trace_QS = SegmentTrace.objects.filter(final_author=author)\
-                                .filter(final_segment_status=1)\
+    write_segment_trace_QS = SegmentTrace.objects.filter(final_author_id=author.id)\
+                                .filter(final_segment_status_id=1)\
                                 .values("earlier_segment","earlier_segment_content","final_segment")\
                                 .order_by("earlier_segment_order")
     if not write_segment_trace_QS:
