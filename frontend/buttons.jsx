@@ -172,7 +172,7 @@ export function NewStoryOptionspanel(props) {
     return (
         <form>
             <fieldset>
-                <input type="text" name="storyTitle"
+                <input type="text" name="title"
                     value={storyParameters.storyTitle}
                     defaultValue="Title"
                     onChange={handleValueChange}></input >
@@ -181,13 +181,13 @@ export function NewStoryOptionspanel(props) {
                         checked={parameterChecks.checkMinSegmentLength}
                         onChange={handleCheckChange}>
                     </input>
-                    <input defaultValue="200" type="number" name="minSegmentLength"
+                    <input defaultValue="200" type="number" name="min_segment_length"
                         disabled={!parameterChecks.checkMinSegmentLength}
                         value={storyParameters.minSegmentLength}
                         onChange={handleValueChange}>
                     </input>Words
                 </label>
-                <label>Max. Segment Length<input type="checkbox" name="checkMaxSegmentLength"
+                <label>Max. Segment Length<input type="checkbox" name="check_max_segment_length"
                     checked={storyParameters.checkMaxSegmentLength}
                     onChange={handleCheckChange}></input>
                     <input defaultValue="200" type="number" name="maxSegmentLength"
@@ -287,7 +287,7 @@ export function ModalJoinButton(props) {
     const storiesInModal = 3;
 
     async function getSegmentsForModal() {
-        let availabilityData = await contactAPI(`authorincludingavailability/${authorID}/`, "get")
+        let availabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get")
         let randomSegmentIDArray = await getRandomItem(availabilityData.available_segment, storiesInModal);
         let segmentTraceDataArray = [];
         let segmentTraceData;

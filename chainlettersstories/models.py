@@ -101,24 +101,24 @@ class SegmentTrace(models.Model):
 
 class AvailableSegmentByAuthor(models.Model):
     # id = models.IntegerField
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segment_id")
-    segment = models.IntegerField()
+    pk = models.CompositePrimaryKey("author","segment_id")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segment")
+    segment_id = models.IntegerField()
 
 
     class Meta:
-        db_table = "available_segment_by_user"
+        db_table = "available_segment_by_author"
         managed = False
 
 
-class ModeratableSegmentByAuthor(models.Model):
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatable_segment_id")
-    segment = models.IntegerField()
+class ModeratableSegmentByAuthor(models.Model):    # id = models.IntegerField
+    pk = models.CompositePrimaryKey("author","segment_id")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatable_segment")
+    segment_id = models.IntegerField()
 
     class Meta:
-        db_table = "moderatable_segment_by_user"
+        db_table = "moderatable_segment_by_author"
         managed = False
-
-
 
 
 # class Comment(models.Model):

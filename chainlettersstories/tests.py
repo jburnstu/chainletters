@@ -1,13 +1,14 @@
 from django.test import TestCase
 import random
 import string
-from .models import Story, StoriesUser, Section, ModerationAssignment, AvailableSectionByUser, ModeratableSectionByUser
+from .models import Story, Author, Segment, ModerationAssignment,\
+AvailableSegmentByAuthor, ModeratableSegmentByAuthor
 
 """
 import random
 import string
-from chainlettersstories.models import Story, StoriesUser, Section, ModerationAssignment, AvailableSectionByUser, ModeratableSectionByUser
-from chainlettersstories.tests import create_random_section_tree
+from chainlettersstories.models import Story, Author, Segment, ModerationAssignment, AvailableSegmentByAuthor, ModeratableSegmentByAuthor
+from chainlettersstories.tests import create_random_segment_tree
 """
 
 # Create your tests here.
@@ -34,263 +35,153 @@ def create_random_string_of_length(string_length,up_to_this_length=False,lowest_
         string_length = random.randint(lowest_length_allowed,string_length)
     return "".join(random.choices(string.ascii_letters,k=string_length))
 
-def create_random_user_array(array_length,name_length):
-    array_of_user_ids = []
+def create_random_author_array(array_length,name_length):
+    array_of_author_ids = []
     for i in range(array_length):
         rng_name = create_random_string_of_length(name_length)
-        new_user = create_user(rng_name)
-        array_of_user_ids.append(new_user) 
-    return array_of_user_ids
+        new_author = create_author(rng_name)
+        array_of_author_ids.append(new_author) 
+    return array_of_author_ids
 
-def create_user(username):
-    email = username + "@exmaple.com"
-    return StoriesUser.objects.create(displayname=username,email=email,password=username)
-
-'''
-def create_array_of_previous_section_ids(number_of_sections):
-    array_of_previous_section_ids = []
-    for i in range(number_of_sections):
-        random_earlier_id = random.randint(1,i+1)
-        if (random_earlier_id == i+1):
-            random_earlier_id = None
-        array_of_previous_section_ids.append(random_earlier_id)
-    print(array_of_previous_section_ids)
-
-    
-    return array_of_previous_section_ids
-
-def check_section_available_to_user(user,previoussection):
-    print("entered availablecheck",type(user),previoussection)
-    if previoussection is not None:
-        print("ID",previoussection.id)
-        query = AvailableSectionByUser.objects.all().query
-        print(query)
-        try:
-            print("INTO TRY BRANCH")
-            AvailableSectionByUser.objects.filter(userid=user)\
-                                        .get(sectionid=previoussection.id)
-        except AvailableSectionByUser.DoesNotExist:
-            print("ERROR IN AVAILABLE")
-            raise KeyError
-    else: 
-        print("previoussection is None",previoussection)
-        return None
-
-def check_section_moderatable_to_user(user,previoussection):
-    if previoussection is not None:
-        print("past if not none")
-        try:
-            Section.objects.filter(sectionstatusid_id=2)\
-                        .exclude(userid=user)\
-                        .get(pk=previoussection.id)
-        except Section.DoesNotExist:
-            print("ERROR IN MODERATABLE")
-            raise KeyError
-    else: 
-        return None   
-
-
-### BASIC EXPERIENCE FLOW ###
-
-
-def get_previous_section_if_exists(previoussectionid):
-    print("prevID",previoussectionid)
-    if previoussectionid is not None:
-        try:
-            previoussection = Section.objects.get(pk=previoussectionid)
-        except Section.DoesNotExist:
-            print("exception in prev check")
-            previoussection = None
-    else:
-        previoussection = None
-    print("leaving prev check",type(previoussection),previoussection)
-    return previoussection
-
-def add_section_to_story_by_user(user,previoussection=None,valid_check=None):
-    if valid_check is not None:
-        check_section_available_to_user(user,previoussection)
-
-    if previoussection is None:
-        newstory = Story.objects.create(userid=user)
-        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None,sectionstatusid_id=1)
-    else:
-        newsection = Section.objects.create(storyid=previoussection.storyid,userid=user,previoussectionid=previoussection,sectionstatusid_id=1)
-        previoussection.sectionstatusid_id = 5
-        previoussection.save()
-    return newsection
-
-    
-def assign_a_moderator(section,user,valid_check=None):
-    if valid_check is not None:
-        check_section_moderatable_to_user(user,section)
-
-def assign_a_moderator(segment,author):
-    segment.segment_status_id = 3
-    segment.save()
-    return ModerationAssignment.objects.create(segment,author)
-
-def approve_moderation(segment):
-    segment.segment_status_id = 4
-    segment.save()
-    if segment.previous_segment is not None:
-        segment.previous_segment.segment_status_id = 4
-        segment.previous_segment.save()
-    moderationassignment = ModerationAssignment.objects.get(segment=segment,is_it_closed=False)
-    moderationassignment.is_it_closed = True
-    moderationassignment.save()
-
-def create_submit_and_approve_segment(author_creator,content,author_moderator,previous_segment=None):
-    segment = add_segment_to_story_by_author(author_creator,previous_segment=previous_segment)
-    update_segment_content(segment,content)
-    move_to_moderation(segment)
-    assign_a_moderator(segment,author_moderator)
-    approve_moderation(segment)
-    return segment
-
-class SegmentContentTests(TestCase):
-=======
-    section.sectionstatusid_id = 3
-    section.save()
-    return ModerationAssignment.objects.create(sectionid=section,userid=user)
-
-def approve_moderation(section):
-    section.sectionstatusid_id = 4
-    section.save()
-    if section.previoussectionid:
-        section.previoussectionid.sectionstatusid_id = 4
-        section.previoussectionid.save()
-    moderationassignment = ModerationAssignment.objects.get(sectionid=section,isitclosed=False)
-    moderationassignment.isitclosed = True
-    moderationassignment.save()
-
-'''
+def create_author(author_name):
+    email = author_name + "@example.com"
+    return Author.objects.create(display_name=author_name,email=email,password=author_name)
 
 ### UPDATED FLOW
 
-def create_new_story_and_section(user):
-        newstory = Story.objects.create(userid=user)
-        newsection = Section.objects.create(storyid=newstory,userid=user,previoussectionid=None,sectionstatusid_id=1)
-        return {"story":newstory,"section":newsection}
+def create_new_story_and_segment(author):
+        new_story = Story.objects.create(author=author)
+        new_segment = Segment.objects.create(story=new_story,author=author,previous_segment=None,segment_status_id=1)
+        return {"story":new_story,"segment":new_segment}
 
-def join_to_random_open_section(user):
+def join_to_random_open_segment(author):
     try:
-        possible_existing_sections = AvailableSectionByUser.objects.filter(userid=user)
-        random_existing_section = random.choice(list(possible_existing_sections))
-        new_section = Section.objects.create(storyid=random_existing_section.storyid,userid=user,previoussectionid=random_existing_section,sectionstatusid_id=1)
-        random_existing_section.sectionstatusid_id = 5
-        random_existing_section.save()
-        return {"story":None, "section": new_section}
-    except AvailableSectionByUser.DoesNotExist:
-        story_and_section = create_new_story_and_section(user)
-        return story_and_section
+        possible_existing_segments = AvailableSegmentByAuthor.objects.filter(author=author)
+        if not possible_existing_segments:
+            raise AvailableSegmentByAuthor.DoesNotExist
+        random_existing_segment = Segment.objects.get(pk=\
+                                    random.choice(list(possible_existing_segments)).segment_id)
+        new_segment = Segment.objects.create(story=random_existing_segment.story,author=author,previous_segment=random_existing_segment,segment_status_id=1)
+        random_existing_segment.segment_status_id = 5
+        random_existing_segment.save()
+        return {"story":None, "segment": new_segment}
+    except AvailableSegmentByAuthor.DoesNotExist:
+        story_and_segment = create_new_story_and_segment(author)
+        return story_and_segment
 
-def update_section_content(section,content):
-    section.content = content
-    section.save()
+def update_segment_content(segment,content):
+    segment.content = content
+    segment.save()
 
-def abandon_section(section,default_if_empty=True,):
-    if default_if_empty and str(section.content) == "":
-        section.content = "Default Empty Text"
-    section.sectionstatusid_id = 6
-    section.save()
+def abandon_segment(segment,default_if_empty=True,):
+    if default_if_empty and str(segment.content) == "":
+        segment.content = "Default Empty Text"
+    segment.segment_status_id = 6
+    segment.save()
 
-def move_to_moderation(section):
-    section.sectionstatusid_id = 2
-    section.save()
+def move_to_moderation(segment):
+    segment.segment_status_id = 2
+    segment.save()
 
-def find_and_assign_moderator(section):
+def find_and_assign_moderator(segment):
     try:
-        possible_users = ModeratableSectionByUser.filter(sectionid=section.id)
-        random_user = random.choice(list(possible_users))
-        new_moderation_assignment = ModerationAssignment.objcets.create(userid=random_user,sectionid=section)
-        section.sectionstatusid_id = 3
-        section.save()
-        return {"user_moderator":random_user,"assignment":new_moderation_assignment}
-    except ModeratableSectionByUser.DoesNotExist:
+        possible_authors = ModeratableSegmentByAuthor.objects.filter(segment_id=segment.id)
+        random_author = random.choice(list(possible_authors)).author
+        new_moderation_assignment = ModerationAssignment.objects.create(author=random_author,segment=segment)
+        segment.segment_status_id = 3
+        segment.save()
+        return {"author_moderator":random_author,"assignment":new_moderation_assignment}
+    except ModeratableSegmentByAuthor.DoesNotExist:
         print("No moderators available")
-        return {"user_moderator":None,"assignment":None}
+        return {"author_moderator":None,"assignment":None}
 
-def approve_moderation(section,moderation_assignment):
-    section.section_statusid_id = 4
-    section.save()
-    if section.previoussectionid:
-        section.previoussectionid.sectionstatusid_id = 4
-        section.previoussectionid.save()
+def approve_moderation(segment,moderation_assignment):
+    segment.segment_status_id = 4
+    segment.save()
+    if segment.previous_segment:
+        segment.previous_segment.segment_status_id = 4
+        segment.previous_segment.save()
+    print("MA pre update:",moderation_assignment.__dict__)
     moderation_assignment.isitclosed = True
     moderation_assignment.save()
+    print("MA post update:",moderation_assignment.__dict__)
 
 ### OVERALL FUNCTION ###
  
 '''
-def create_submit_and_approve_section(content,
-                                      user_creator,
-                                      user_moderator,
-                                      previoussectionid=None,
+def create_submit_and_approve_segment(content,
+                                      author_creator,
+                                      author_moderator,
+                                      previous_segment_id=None,
                                       ):
     try:
-        previoussection = get_previous_section_if_exists(previoussectionid)
-        section = add_section_to_story_by_user(user_creator,previoussection=previoussection,valid_check=previoussectionid)
-        update_section_content(section,content)
-        move_to_moderation(section)
-        assign_a_moderator(section,user_moderator,valid_check=previoussectionid)
-        approve_moderation(section)
+        previoussegment = get_previous_segment_if_exists(previous_segment_id)
+        segment = add_segment_to_story_by_author(author_creator,previoussegment=previoussegment,valid_check=previous_segment_id)
+        update_segment_content(segment,content)
+        move_to_moderation(segment)
+        assign_a_moderator(segment,author_moderator,valid_check=previous_segment_id)
+        approve_moderation(segment)
     except KeyError:
-        section = create_submit_and_approve_section(content,user_creator,user_moderator,None)
-    return section
+        segment = create_submit_and_approve_segment(content,author_creator,author_moderator,None)
+    return segment
 
-def create_section_from_dict(dict,offset=0):
-    section = create_submit_and_approve_section(dict["content"],
-                                                dict["user_creator"],
-                                                dict["user_moderator"],
-                                                dict["previoussectionid"] if dict["previoussectionid"] is None else dict["previoussectionid"]+offset,
+def create_segment_from_dict(dict,offset=0):
+    segment = create_submit_and_approve_segment(dict["content"],
+                                                dict["author_creator"],
+                                                dict["author_moderator"],
+                                                dict["previous_segment_id"] if dict["previous_segment_id"] is None else dict["previous_segment_id"]+offset,
                                                 
     )
-    return section
+    return segment
 '''
 
-def new_create_submit_and_approve_section(user,content):    
+def new_create_submit_and_approve_segment(author,content):    
     print(1)
-    section = join_to_random_open_section(user)["section"]
-    print(2)
-    update_section_content(section,content)
-    print(3)
-    move_to_moderation(section)
+    segment = join_to_random_open_segment(author)["segment"]
+    print(2, " segment " + segment + " created")
+    update_segment_content(segment,content)
+    print(3, segment + "updated")
+    move_to_moderation(segment)
     print(4)
-    user_and_assignment = find_and_assign_moderator(section)
+    author_and_assignment = find_and_assign_moderator(segment)
     print(5)
-    approve_moderation(section,user_and_assignment["assignment"])
+    approve_moderation(segment,author_and_assignment["assignment"])
     print(6)
-    return section
+    print(segment.__dict__)
+    return segment
 
-def new_create_section_from_dict(dict):
-    new_create_submit_and_approve_section(dict["user_creator"],dict["content"])
+def new_create_segment_from_dict(dict):
+    new_create_submit_and_approve_segment(dict["author_creator"],dict["content"])
 
-def create_random_section_tree(number_of_users,number_of_sections, section_char_length=200):
-    user_array = create_random_user_array(number_of_users,10)
+def create_random_segment_tree(number_of_authors,number_of_segments, segment_char_length=200):
 
-    # array_of_previous_section_ids = create_array_of_previous_section_ids(number_of_sections)
+    if number_of_authors is None:
+        author_array = list(Author.objects.all())
+    else:
+        author_array = create_random_author_array(number_of_authors,10)
 
-    list_of_section_dicts = [{
-        "content" : create_random_string_of_length(section_char_length,up_to_this_length=True),
-        "user_creator" : random.choice(user_array),
-        # "user_moderator" : random.choice(user_array),
-        # "previoussectionid" : array_of_previous_section_ids[i]
-        } for i in range(number_of_sections)]
+    print("AUTHOR ARRAY",author_array)
+    # array_of_previous_segment_ids = create_array_of_previous_segment_ids(number_of_segments)
 
+    list_of_segment_dicts = [{
+        "author_creator" : random.choice(author_array),
+        "content" : create_random_string_of_length(segment_char_length,up_to_this_length=True),
+        } for i in range(number_of_segments)]
+
+
+    print("LIST OF SEGMENT  DICTS",list_of_segment_dicts)
     count = 0
-    for dict in list_of_section_dicts: 
+    for dict in list_of_segment_dicts: 
         count += 1
         print(count,dict)
-        section = new_create_section_from_dict(dict)
-            
-        print("Compare to count / ", count,  section.id)
+        segment = new_create_segment_from_dict(dict)
+        
+        if segment:
+            print("SEGMENT:",segment)
+            print("Compare to count / ", count,  segment.id)
+        else: print ("Compare to count / ",count, "None")
 
-"""
-previous section id: 
-between 1 and i
-
-"""
-
+#########################################################################################
 
 
 
@@ -302,7 +193,8 @@ between 1 and i
 
 
 
-class SectionContentTests(TestCase):
+
+class SegmentContentTests(TestCase):
     def test_not_empty(self):
         pass
 
@@ -399,3 +291,125 @@ class ReadDashboardDisplayTests(TestCase):
 #             response.context["latest_question_list"],
 #             [question2, question1],
 #         )
+
+
+
+
+'''
+def create_array_of_previous_segment_ids(number_of_segments):
+    array_of_previous_segment_ids = []
+    for i in range(number_of_segments):
+        random_earlier_id = random.randint(1,i+1)
+        if (random_earlier_id == i+1):
+            random_earlier_id = None
+        array_of_previous_segment_ids.append(random_earlier_id)
+    print(array_of_previous_segment_ids)
+
+    
+    return array_of_previous_segment_ids
+
+def check_segment_available_to_author(author,previoussegment):
+    print("entered availablecheck",type(author),previoussegment)
+    if previoussegment is not None:
+        print("ID",previoussegment.id)
+        query = AvailableSegmentByauthor.objects.all().query
+        print(query)
+        try:
+            print("INTO TRY BRANCH")
+            AvailableSegmentByauthor.objects.filter(author_id=author)\
+                                        .get(segmentid=previoussegment.id)
+        except AvailableSegmentByauthor.DoesNotExist:
+            print("ERROR IN AVAILABLE")
+            raise KeyError
+    else: 
+        print("previoussegment is None",previoussegment)
+        return None
+
+def check_segment_moderatable_to_author(author,previoussegment):
+    if previoussegment is not None:
+        print("past if not none")
+        try:
+            Segment.objects.filter(segment_status_id=2)\
+                        .exclude(author_id=author)\
+                        .get(pk=previoussegment.id)
+        except Segment.DoesNotExist:
+            print("ERROR IN MODERATABLE")
+            raise KeyError
+    else: 
+        return None   
+
+
+### BASIC EXPERIENCE FLOW ###
+
+
+def get_previous_segment_if_exists(previous_segment_id):
+    print("prevID",previous_segment_id)
+    if previous_segment_id is not None:
+        try:
+            previoussegment = Segment.objects.get(pk=previous_segment_id)
+        except Segment.DoesNotExist:
+            print("exception in prev check")
+            previoussegment = None
+    else:
+        previoussegment = None
+    print("leaving prev check",type(previoussegment),previoussegment)
+    return previoussegment
+
+def add_segment_to_story_by_author(author,previoussegment=None,valid_check=None):
+    if valid_check is not None:
+        check_segment_available_to_author(author,previoussegment)
+
+    if previoussegment is None:
+        new_story = Story.objects.create(author_id=author)
+        new_segment = Segment.objects.create(story_id=new_story,author_id=author,previous_segment_id=None,segment_status_id=1)
+    else:
+        new_segment = Segment.objects.create(story_id=previoussegment.story_id,author_id=author,previous_segment_id=previoussegment,segment_status_id=1)
+        previoussegment.segment_status_id = 5
+        previoussegment.save()
+    return new_segment
+
+    
+def assign_a_moderator(segment,author,valid_check=None):
+    if valid_check is not None:
+        check_segment_moderatable_to_author(author,segment)
+
+def assign_a_moderator(segment,author):
+    segment.segment_status_id = 3
+    segment.save()
+    return ModerationAssignment.objects.create(segment,author)
+
+def approve_moderation(segment):
+    segment.segment_status_id = 4
+    segment.save()
+    if segment.previous_segment is not None:
+        segment.previous_segment.segment_status_id = 4
+        segment.previous_segment.save()
+    moderationassignment = ModerationAssignment.objects.get(segment=segment,is_it_closed=False)
+    moderationassignment.is_it_closed = True
+    moderationassignment.save()
+
+def create_submit_and_approve_segment(author_creator,content,author_moderator,previous_segment=None):
+    segment = add_segment_to_story_by_author(author_creator,previous_segment=previous_segment)
+    update_segment_content(segment,content)
+    move_to_moderation(segment)
+    assign_a_moderator(segment,author_moderator)
+    approve_moderation(segment)
+    return segment
+
+class SegmentContentTests(TestCase):
+=======
+    segment.segment_status_id = 3
+    segment.save()
+    return ModerationAssignment.objects.create(segmentid=segment,author_id=author)
+
+def approve_moderation(segment):
+    segment.segment_status_id = 4
+    segment.save()
+    if segment.previous_segment_id:
+        segment.previous_segment_id.segment_status_id = 4
+        segment.previous_segment_id.save()
+    moderationassignment = ModerationAssignment.objects.get(segmentid=segment,isitclosed=False)
+    moderationassignment.isitclosed = True
+    moderationassignment.save()
+
+'''

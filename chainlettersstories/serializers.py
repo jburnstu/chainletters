@@ -12,7 +12,7 @@ class SegmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailableSegmentByAuthorSerializer(serializers.ModelSerializer):
-    segment = serializers.PrimaryKeyRelatedField(read_only=True)
+    segment_id = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = AvailableSegmentByAuthor
@@ -22,7 +22,7 @@ class AvailableSegmentByAuthorSerializer(serializers.ModelSerializer):
         ] 
 
 class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
-    segment = serializers.PrimaryKeyRelatedField(read_only=True)
+    segment_id = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = ModeratableSegmentByAuthor
@@ -32,16 +32,14 @@ class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
         ] 
 
 class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    available_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
-    moderatable_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
-    segment = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    available_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
+    moderatable_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
 
     class Meta:
         model = Author
         fields = [
             'id',
             'display_name',
-            'segment_id',
             'available_segment_id',
             'moderatable_segment_id'
         ]
