@@ -99,11 +99,11 @@ class SegmentTrace(models.Model):
         managed = False
         
 
-
 class AvailableSegmentByAuthor(models.Model):
     # id = models.IntegerField
     author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segment_id")
     segment = models.IntegerField()
+
 
     class Meta:
         db_table = "available_segment_by_user"

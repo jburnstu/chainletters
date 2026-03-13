@@ -40,7 +40,7 @@ def login(request):
                 my_author = Author.objects.get(email=author_name_or_email,password=password)
             except Author.DoesNotExist:
                 return render(request,
-                            "chainlettersstories/login_or_signup_page.html",
+                            template,
                             {
                                 "message":
                                 "No account found matching this author_name / email and password. Please try again or sign up."
