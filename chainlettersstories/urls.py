@@ -7,10 +7,10 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'segment',views.SegmentViewSet)
-router.register(r'availablesegmentbyauthor',views.AvailableSegmentByAuthorViewSet)
+router.register(r'available_segment_by_author',views.AvailableSegmentByAuthorViewSet)
 router.register(r'story',views.StoryViewSet)
-router.register(r'authorincludingavailability',views.AuthorIncludingAvailabilityViewSet)
-router.register(r'moderationassignment', views.ModerationAssignmentViewSet)
+router.register(r'author_including_availability',views.AuthorIncludingAvailabilityViewSet)
+router.register(r'moderation_assignment', views.ModerationAssignmentViewSet)
 router.register(r'segment_trace', views.SegmentTraceViewSet, basename='segment_trace')
 
 app_name = "chainlettersstories"

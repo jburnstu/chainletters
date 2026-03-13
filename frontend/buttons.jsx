@@ -108,7 +108,7 @@ async function uploadNewModerationAssignment(previousSegmentID, authorID) {
         { "segment_status_id": 3 }
     )
 
-    let moderationAssignmentCreationData = await contactAPI("moderationassignment/", "post",
+    let moderationAssignmentCreationData = await contactAPI("moderation_assignment/", "post",
         {
             'segmentID': previousSegmentID,
             'author_id': authorID
@@ -119,7 +119,7 @@ async function uploadNewModerationAssignment(previousSegmentID, authorID) {
 
 
 export function ModalNewButton(props) {
-    const author_id = useContext(AuthorContext);
+
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -380,7 +380,7 @@ export function NewModerationModalButton(props) {
     const storiesInModal = 3;
 
     async function getSegmentsForModal() {
-        let moderatabilityData = await contactAPI(`authorincludingavailability/${authorID}/`, "get");
+        let moderatabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get");
         let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatable_segment, storiesInModal);
         let segmentTraceDataArray = [];
         let segmentTraceData;

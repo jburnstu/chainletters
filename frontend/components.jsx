@@ -15,6 +15,8 @@ function AppByAuthor(props) {
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
+
+
     console.log(authorID);
     const rootPath = `/chainlettersstories/${authorID}/`;
 
@@ -125,7 +127,7 @@ function Dashboard(props) {
 }
 
 function PlaceHolder() {
-    return (<div className="storyContainer">
+    return (<div className="storyContainer">PLACEHOLDER
         <div className="storyContent"></div>
         <div className="submissions"></div>
         <div className="comments"></div>
