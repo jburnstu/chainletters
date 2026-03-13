@@ -11,15 +11,15 @@ router.register(r'availablesegmentbyauthor',views.AvailableSegmentByAuthorViewSe
 router.register(r'story',views.StoryViewSet)
 router.register(r'authorincludingavailability',views.AuthorIncludingAvailabilityViewSet)
 router.register(r'moderationassignment', views.ModerationAssignmentViewSet)
-router.register(r'segmenttrace', views.SegmentTraceViewSet, basename='segmenttrace')
+router.register(r'segment_trace', views.SegmentTraceViewSet, basename='segment_trace')
 
 app_name = "chainlettersstories"
 urlpatterns = [
     path("", views.login_or_signup_page, name="login_or_signup_page"),
     path("login", views.login, name="login"),
-    path(r"<int:author>/", views.home, name="home"),
-    path(r"<int:author>/write", views.home, name="home"),
-    path(r"<int:author>/read", views.home, name="home"),
+    path(r"<int:author_id>/", views.home, name="home"),
+    path(r"<int:author_id>/write", views.home, name="home"),
+    path(r"<int:author_id>/read", views.home, name="home"),
     # path("<int:author>/write/", views.home, name="home"),
     # path("<int:author>/read/", views.home, name="home"),
     # path("<int:author>/write/<int:segment>", views.home, name="home"),
@@ -59,4 +59,4 @@ urlpatterns = [
 #          name="approve_new_segment"),
     
 
-#     path("segmenttrace<int:segment>",views.segmenttrace,name="segmenttrace")
+#     path("segment_trace<int:segment>",views.segment_trace,name="segment_trace")

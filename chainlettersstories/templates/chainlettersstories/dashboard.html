@@ -14,10 +14,10 @@
 
 <body>
     <div class="myAppContainer" id="myAppContainer"></div>
-    {{ authorid|json_script:'authorid' }}
+    {{ author_id|json_script:'author_id' }}
     {{ display_name|json_script:'display_name' }}
-    {{ read_dicts|json_script:'read-dicts' }}
-    {{ write_dicts|json_script:'write-dicts' }}
+    {{ read_dicts|json_script:'read_dicts' }}
+    {{ write_dicts|json_script:'write_dicts' }}
     {% vite_asset 'frontend/components.jsx' %}
 </body>
 </html> 

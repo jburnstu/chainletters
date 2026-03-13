@@ -11,18 +11,18 @@ Checks on status:
 
 '''
 Checks on login details:
-- assert an existing authorname will prompt login
+- assert an existing author_name will prompt login
 - assert an existing login will login
-- assert an empty authorname / password will prompt a message
+- assert an empty author_name / password will prompt a message
 
 '''
 import random
 import string
 from .models import Story, Author, Segment, ModerationAssignment
 
-def create_author(authorname,password):
-    email = authorname + "@exmaple.com"
-    return Author.objects.create(display_name=authorname,email=email,password=password)
+def create_author(author_name,password):
+    email = author_name + "@exmaple.com"
+    return Author.objects.create(display_name=author_name,email=email,password=password)
 
 
 def add_segment_to_story_by_author(author,previous_segment=None):

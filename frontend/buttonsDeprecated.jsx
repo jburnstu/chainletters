@@ -1,10 +1,10 @@
 export function JoinButton(props) {
-    const authorid = useContext(AuthorContext);
+    const author_id = useContext(AuthorContext);
 
 
     async function handleSubmit(e) {
 
-        let availabilityData = await contactAPI(`authorincludingavailability/${authorid}/`,
+        let availabilityData = await contactAPI(`authorincludingavailability/${author_id}/`,
             "get");
 
         let randomSegmentID = await getRandomItem(availabilityData.availablesegment);
@@ -17,13 +17,13 @@ export function JoinButton(props) {
             "post",
             {
                 'storyid': updatePreviousSegmentData.storyid,
-                'authorid': authorid,
+                'author_id': author_id,
                 'segmentstatusid': 1,
                 'previoussegmentid': randomSegmentID
             }
         );
 
-        let getNewSegmentTraceData = await contactAPI(`segmenttrace/${createSegmentData.id}`, "get");
+        let getNewSegmentTraceData = await contactAPI(`segment_trace/${createSegmentData.id}`, "get");
         console.log(getNewSegmentTraceData);
         props.addNewStory(getNewSegmentTraceData);
     }
@@ -34,20 +34,20 @@ export function JoinButton(props) {
 }
 
 export function NewButton(props) {
-    const authorid = useContext(AuthorContext);
+    const author_id = useContext(AuthorContext);
 
     async function handleSubmit(e) {
 
         let storyCreationData = await contactAPI("story/", "post",
             {
-                'authorid': authorid
+                'author_id': author_id
             }
         )
 
         let segmentCreationData = await contactAPI("segment/", "post",
             {
                 'storyid': storyCreationData.id,
-                'authorid': authorid,
+                'author_id': author_id,
                 'segmentstatusid': 1,
             }
         )
@@ -55,7 +55,7 @@ export function NewButton(props) {
         let newSegmentID = await segmentCreationData.id;
         console.log(newSegmentID);
         let newStoryDict = await {
-            "id": newSegmentID, "segmenttrace": [{ newSegmentID: "" }],
+            "id": newSegmentID, "segment_trace": [{ newSegmentID: "" }],
         }
         console.log("NEWSTORYDICT", newStoryDict);
         props.addNewStory(newStoryDict);

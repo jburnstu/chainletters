@@ -22,9 +22,9 @@ def login(request):
     template = "chainlettersstories/login_or_signup_page.html"
     try:
         login = request.POST["login-or-signup"]
-        authorname_or_email = request.POST["authorname-or-email"]
+        author_name_or_email = request.POST["author_name-or-email"]
         password = request.POST["password"]
-        if "" in {authorname_or_email, password}:
+        if "" in {author_name_or_email, password}:
             raise KeyError("neither field may be blank.")
     except KeyError as e:
         print(e)
@@ -32,59 +32,59 @@ def login(request):
     if bool(int(login)):
         print("login true")
         try:
-            myauthor = Author.objects.get(display_name=authorname_or_email,password=password)
-            print(myauthor.__dict__)
-            author = myauthor.id
+            my_author = Author.objects.get(display_name=author_name_or_email,password=password)
+            print(my_author.__dict__)
+            author = my_author.id
         except Author.DoesNotExist:
             try:
-                myauthor = Author.objects.get(email=authorname_or_email,password=password)
+                my_author = Author.objects.get(email=author_name_or_email,password=password)
             except Author.DoesNotExist:
                 return render(request,
                             "chainlettersstories/login_or_signup_page.html",
                             {
                                 "message":
-                                "No account found matching this authorname / email and password. Please try again or sign up."
+                                "No account found matching this author_name / email and password. Please try again or sign up."
                             })
         return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author,)))
     else:
         print("login false")
         try:
-            myauthor = Author.objects.get(display_name=authorname_or_email)
+            my_author = Author.objects.get(display_name=author_name_or_email)
         except Author.DoesNotExist:
-            newAuthor = Author(display_name=authorname_or_email,email=authorname_or_email+"@example.com",password=password)
-            newAuthor.save()
+            new_author = Author(display_name=author_name_or_email,email=author_name_or_email+"@example.com",password=password)
+            new_author.save()
             return render(request,template,{"message": "Login successfully added! Please now login."})
         return render (request,template,{"message":"Account already exists. Please log in instead."})
 
-def home(request,author):
+def home(request,author_id):
     template = "chainlettersstories/dashboard.html"
-    myauthor = Author.objects.get(pk=author.id)
-    myauthorname = myauthor.display_name
+    my_author = Author.objects.get(pk=author_id)
+    my_author_name = my_author.display_name
 
     segment_ids_to_moderate = ModerationAssignment.objects\
-                                                .filter(author=author)\
+                                                .filter(author=author_id)\
                                                 .filter(is_it_closed=False)\
                                                 .values_list("segment")
     if not segment_ids_to_moderate:
         read_separate_story_trace_dicts = []
     else:
         read_segment_trace_QS = SegmentTrace.objects.filter(final_segment_id__in = segment_ids_to_moderate)\
-                                    .values("earlier_segment","earlier_segment_content","final_segment")\
+                                    .values("earlier_segment_id","earlier_segment_content","final_segment_id")\
                                     .order_by("earlier_segment_order")
         read_segment_trace_df = pd.DataFrame(read_segment_trace_QS)
-        read_separate_story_trace_dicts = [{"id":key,"segmenttrace":[{"earlier_segment":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment"],group["earlier_segment_content"])]}                              
+        read_separate_story_trace_dicts = [{"id":key,"segment_trace":[{"earlier_segment_id":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment_id"],group["earlier_segment_content"])]}                              
                                            for key, group in read_segment_trace_df.groupby("final_segment")
         ]
 
-    write_segment_trace_QS = SegmentTrace.objects.filter(final_author_id=author.id)\
+    write_segment_trace_QS = SegmentTrace.objects.filter(final_author_id=author_id)\
                                 .filter(final_segment_status_id=1)\
-                                .values("earlier_segment","earlier_segment_content","final_segment")\
+                                .values("earlier_segment_id","earlier_segment_content","final_segment")\
                                 .order_by("earlier_segment_order")
     if not write_segment_trace_QS:
         write_separate_story_trace_dicts = []
     else:
         write_segment_trace_df = pd.DataFrame(write_segment_trace_QS)
-        write_separate_story_trace_dicts = [{"id":key,"segmenttrace":[{"earlier_segment":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment"],group["earlier_segment_content"])]}                              
+        write_separate_story_trace_dicts = [{"id":key,"segment_trace":[{"earlier_segment_id":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment_id"],group["earlier_segment_content"])]}                              
                                            for key, group in write_segment_trace_df.groupby("final_segment")
         ]
 
@@ -94,8 +94,8 @@ def home(request,author):
 
     return render(request,template, 
                   {
-                      "author": author,
-                      "display_name": myauthorname,
+                      "author_id": author_id,
+                      "display_name": my_author_name,
                       "read_dicts":read_separate_story_trace_dicts,
                       "write_dicts":write_separate_story_trace_dicts})
 

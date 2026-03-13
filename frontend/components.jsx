@@ -10,13 +10,13 @@ import { AuthorContext, DictsContext } from "./context.jsx";
 function AppByAuthor(props) {
     useEffect(() => console.log("Rendered"));
 
-    const [authorid, setAuthorID] = useState(props.authorid);
-    const [display_name, setDisplayName] = useState(props.display_name);
+    const [authorID, setAuthorID] = useState(props.authorID);
+    const [displayName, setDisplayName] = useState(props.displayName);
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-
-    const rootPath = `/chainlettersstories/${authorid}/`;
+    console.log(authorID);
+    const rootPath = `/chainlettersstories/${authorID}/`;
 
 
     function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
@@ -46,9 +46,9 @@ function AppByAuthor(props) {
 
     return (
         <BrowserRouter>
-            <AuthorContext.Provider value={authorid}>
+            <AuthorContext.Provider value={authorID}>
                 <Routes>
-                    <Route path={rootPath} element={<UniversalHeader display_name={display_name} />}>
+                    <Route path={rootPath} element={<UniversalHeader displayName={displayName} />}>
                         <Route index path="" relative element={<Home />} />
                         <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
                             <Route path=":storyID/"
@@ -87,7 +87,7 @@ function UniversalHeader(props) {
         <>
             <header className="universalHeader">
                 <h1>CHAIN MATES</h1>
-                <h1>Hi, {props.display_name}!</h1>
+                <h1>Hi, {props.displayName}!</h1>
                 <nav>
                     <Link to="" ><button type="button">HOME</button></Link>|{" "}
                     <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
@@ -159,14 +159,15 @@ function Story(props) {
 
     let readOrWrite = props.readOrWrite;
     const { storyID } = useParams();
+    console.log("Story loading", storyID)
 
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);
     }
     let storyDict = getStoryByID(props.dicts, storyID);
-    let storySoFar = storyDict.segmenttrace.slice(0, -1);
-    let presavedCurrentContent = storyDict.segmenttrace.slice(-1);
+    let storySoFar = storyDict.segment_trace.slice(0, -1);
+    let presavedCurrentContent = storyDict.segment_trace.slice(-1);
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
 
@@ -178,7 +179,7 @@ function Story(props) {
 
 
     let storySoFarElement = storySoFar.map(segmentDict =>
-        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segmentid} value={segmentDict.earlier_segment_content}></ textarea>
+        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segment_id} value={segmentDict.earlier_segment_content}></ textarea>
     )
 
     let currentSegmentElement = <input className="currentSegmentText" type="text" value={currentContent} onChange={handleChange}></input>
@@ -190,7 +191,7 @@ function Story(props) {
                 {storySoFarElement}
                 {currentSegmentElement}
             </div>
-            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentid={storyID} removeCurrentStory={removeCurrentStory} />
+            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentID={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
         </div>
     )
@@ -203,23 +204,23 @@ function StoryHeader() {
 
 function SubmissionButtons(props) {
 
-    let arrayofButtonTypes;
+    let arrayOfButtonTypes;
     switch (props.readOrWrite) {
         case "read":
-            arrayofButtonTypes = ["APPROVE"];
+            arrayOfButtonTypes = ["APPROVE"];
         case "write":
         default:
-            arrayofButtonTypes = ["SAVE", "SUBMIT", "ABANDON"];
+            arrayOfButtonTypes = ["SAVE", "SUBMIT", "ABANDON"];
     }
 
     return (
         <div className="submissions">
-            {arrayofButtonTypes.map(buttonType =>
+            {arrayOfButtonTypes.map(buttonType =>
                 <SubmissionButton
                     key={buttonType}
                     submissionType={buttonType}
                     currentContent={props.currentContent}
-                    segmentid={props.segmentid}
+                    segment={props.segmentID}
                     removeCurrentStory={props.removeCurrentStory} />)}
         </div>
     )
@@ -231,10 +232,11 @@ function Comments() {
     )
 }
 
-const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
-const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
-const AUTHORID = JSON.parse(document.getElementById('authorid').textContent);
+
+const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
+const READDICTS = JSON.parse(document.getElementById('read_dicts').textContent);
+const WRITEDICTS = JSON.parse(document.getElementById('write_dicts').textContent);
 createRoot(document.getElementById('myAppContainer')).render(
-    <AppByAuthor authorid={AUTHORID} display_name={DISPLAYNAME} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} />
+    <AppByAuthor authorID={AUTHORID} displayName={DISPLAYNAME} readDicts={READDICTS} writeDicts={WRITEDICTS} />
 );

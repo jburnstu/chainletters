@@ -1,4 +1,4 @@
--- create or replace view segmenttrace as 
+-- create or replace view segment_trace as 
 with recursive segmentTrace (final_segmentid, segmentid, previoussegmentid, recursiondepth) as (
 	select
 		s.id,
@@ -20,7 +20,7 @@ select
 		st.segmentid,
 		1 + (select max(st2.recursiondepth) from segmentTrace st2 where st2.final_segmentid = st.final_segmentid) - st.recursiondepth as segmentorder,
 		s.content as segmentcontent,
-		s2.authorid as authorid,
+		s2.author_id as author_id,
 		s2.segmentstatusid
 		from segmentTrace st
 		join segment s on st.segmentid = s.id
@@ -28,10 +28,10 @@ select
 order by st.final_segmentid, segmentorder;
 
 
-alter view segmenttrace
+alter view segment_trace
 rename column "content" to "segmentcontent"
 
-select * from segmenttrace
+select * from segment_trace
 
 select * from segment
 
@@ -50,7 +50,7 @@ values (3,'available'),(4,'lockedForAddition'),(5,'deleted')
 
 select s.id
 from segment s 
-where authorid = 1
+where author_id = 1
 and segmentstatusid = 1
 
 select s.id as "segmentid",
@@ -58,7 +58,7 @@ concat()
 
 
 
-insert into segment (storyid,authorid,segmentstatusid,content, previoussegmentid)
+insert into segment (storyid,author_id,segmentstatusid,content, previoussegmentid)
 values (5, 1, 1, 'Nobody could sleep.',2)
 
 
@@ -73,57 +73,57 @@ insert into segment ()
 
 
 select * from segment s
-join segmenttrace st on st.segmentid = s.id
+join segment_trace st on st.segmentid = s.id
 where s.segmentstatusid = 3
 
 
 select u.id
 from storyschema.author u
-join segmenttrace st o
+join segment_trace st o
 
 
 select * from segmentstatus
 
 
 create or replace view availablesegmentbyauthor as 
-select distinct u.id as authorid, st.final_segmentid as segmentid
+select distinct u.id as author_id, st.final_segmentid as segmentid
 from 
-segmenttrace st
+segment_trace st
 cross join
 storyschema.author u
 where st.segmentstatusid = 4
-and ( select count (*) from segmenttrace st2
+and ( select count (*) from segment_trace st2
 		join segment s on st2.segmentid = s.id
-		where st.final_segmentid = st2.final_segmentid and u.id = s.authorid ) = 0
-and ( select count (*) from segmenttrace st2
+		where st.final_segmentid = st2.final_segmentid and u.id = s.author_id ) = 0
+and ( select count (*) from segment_trace st2
 		join segment s on st2.final_segmentid = s.id
-		where st.final_segmentid = st2.segmentid and u.id = s.authorid ) = 0
-order by authorid, final_segmentid
+		where st.final_segmentid = st2.segmentid and u.id = s.author_id ) = 0
+order by author_id, final_segmentid
 
--- include no id from final_segmentid that has this authorid anywhere in its past
--- include no id from the past of a final_segmentid that matches this authorid
+-- include no id from final_segmentid that has this author_id anywhere in its past
+-- include no id from the past of a final_segmentid that matches this author_id
 
 and not exists (select count(*) from )
 
 select * from segment s
-where (select count(*) from segmenttrace st
+where (select count(*) from segment_trace st
 	where st.final_segmentid = s.id) = 0
 
 -- create or replace view availablesegmentbymoderator as
 select distinct st.final_segmentid, u.id 
-from segmenttrace st
+from segment_trace st
 cross join storyschema.author u
 where st.segmentstatusid = 2
-and (select count(distinct st2.final_segmentid, st2.authorid )
-		from segmenttrace st2
+and (select count(distinct st2.final_segmentid, st2.author_id )
+		from segment_trace st2
 		where st.segmentstatusid = 2
 		and st2.final_segmentid = st.final_segmentid
-		and st2.authorid = u.authorid) = 0
+		and st2.author_id = u.author_id) = 0
 
 
 
-select distinct final_segmentid, authorid 
-from segmenttrace st
+select distinct final_segmentid, author_id 
+from segment_trace st
 where st.segmentstatusid = 2
 
 

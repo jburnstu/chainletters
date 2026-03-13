@@ -4,7 +4,7 @@ from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTra
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
-        fields = ['id', 'author']
+        fields = ['id', 'author_id']
 
 class SegmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,8 +17,8 @@ class AvailableSegmentByAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = AvailableSegmentByAuthor
         fields = [
-                'author',
-                'segment'
+                'author_id',
+                'segment_id'
         ] 
 
 class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
@@ -27,13 +27,13 @@ class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModeratableSegmentByAuthor
         fields = [
-                'author',
-                'segment'
+                'author_id',
+                'segment_id'
         ] 
 
 class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    availablesegment = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
-    moderatablesegment = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
+    available_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
+    moderatable_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment")
     segment = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
 
     class Meta:
@@ -41,9 +41,9 @@ class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'display_name',
-            'segment',
-            'availablesegment',
-            'moderatablesegment'
+            'segment_id',
+            'available_segment_id',
+            'moderatable_segment_id'
         ]
 
 class SegmentTraceSerializer(serializers.ModelSerializer):
@@ -52,17 +52,17 @@ class SegmentTraceSerializer(serializers.ModelSerializer):
         model = SegmentTrace
         fields = [
                     # 'earlier_segment_ordering'
-                    'earlier_segment',
+                    'earlier_segment_id',
                   'earlier_segment_content'
                   ]
 
 class SegmentTraceBySegmentSerializer(serializers.ModelSerializer):
-    segmenttrace = SegmentTraceSerializer(many=True,read_only=True)
+    segment_trace = SegmentTraceSerializer(many=True,read_only=True)
 
     class Meta:
         model = Segment
         fields = ['id',
-                  'segmenttrace'
+                  'segment_trace'
         ]
 
 class ModerationAssignmentSerializer(serializers.ModelSerializer):

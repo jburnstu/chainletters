@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
 
 
-function AppByAuthor(authorid, display_name, writeDicts, readDicts) {
+function AppByAuthor(author_id, display_name, writeDicts, readDicts) {
 
     console.log(writeDicts);
 
@@ -11,7 +11,7 @@ function AppByAuthor(authorid, display_name, writeDicts, readDicts) {
 
         <BrowserRouter>
             {/* Navigation */}
-            <UniversalHeader authorid={authorid} display_name={display_name} />
+            <UniversalHeader author_id={author_id} display_name={display_name} />
 
             {/* Routes */}
             <Routes>
@@ -33,10 +33,10 @@ function UniversalHeader(props) {
         <header>
             <h1>CHAIN MATES</h1>
             <h1>Hi, {props.display_name}!</h1>
-            <LinkButton authorid={props.authorid} link='chainlettersstories:dashboard' name="DASHBOARD" />
-            <LinkButton authorid={props.authorid} link='chainlettersstories:write_dashboard' name="WRITE" />
-            <LinkButton authorid={props.authorid} link='chainlettersstories:read_dashboard' name="READ" />
-            <LinkButton authorid={props.authorid} link='chainlettersstories:login_or_signup_page' name="LOG OUT" />
+            <LinkButton author_id={props.author_id} link='chainlettersstories:dashboard' name="DASHBOARD" />
+            <LinkButton author_id={props.author_id} link='chainlettersstories:write_dashboard' name="WRITE" />
+            <LinkButton author_id={props.author_id} link='chainlettersstories:read_dashboard' name="READ" />
+            <LinkButton author_id={props.author_id} link='chainlettersstories:login_or_signup_page' name="LOG OUT" />
         </header >
     )
 }
@@ -49,7 +49,7 @@ function WriteDashboard(writeDicts) {
 
     return (
         <div className="write-dashboard-container">
-            {/* <UniversalHeader authorid={props.authorid} display_name={props.display_name} /> */}
+            {/* <UniversalHeader author_id={props.author_id} display_name={props.display_name} /> */}
             <WriteSidebar />
             <Tabs />
             <Outlet />
@@ -76,7 +76,7 @@ function StorySoFarSplitOut() {
 
 function LinkButton(props) {
     return (
-        <form action="{props.link} {props.authorid}">
+        <form action="{props.link} {props.author_id}">
             <button type="submit">{props.name}</button>
         </form>
     )
@@ -84,7 +84,7 @@ function LinkButton(props) {
 
 function GetButton(props) {
     return (
-        <form action="{props.link} {props.authorid}">
+        <form action="{props.link} {props.author_id}">
             <button type="submit">{props.name}</button>
         </form>
     )
@@ -94,8 +94,8 @@ function GetButton(props) {
 function WriteSidebar() {
     return (
         <div class="sidebar">
-            <GetButton authorid={props.authorid} link='chainlettersstories:create_new_story' name="NEW" />
-            <GetButton authorid={props.authorid} link='chainlettersstories:get_random_available_segment' name="JOIN" />
+            <GetButton author_id={props.author_id} link='chainlettersstories:create_new_story' name="NEW" />
+            <GetButton author_id={props.author_id} link='chainlettersstories:get_random_available_segment' name="JOIN" />
         </div>
     )
 }
@@ -135,10 +135,10 @@ function StoryInProgress(props) {
 
 const READ_DICTS = JSON.parse(document.getElementById('read-dicts').textContent);
 const WRITE_DICTS = JSON.parse(document.getElementById('write-dicts').textContent);
-const AUTHORID = JSON.parse(document.getElementById('author').textContent);
-const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
+const AUTHOR_ID = JSON.parse(document.getElementById('author').textContent);
+const DISPLAY_NAME = JSON.parse(document.getElementById('display_name').textContent);
 createRoot(document.getElementById('myappcontainer')).render(
-    <AppByAuthor authorid={AUTHORID} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} display_name={DISPLAYNAME} />
+    <AppByAuthor author_id={AUTHOR_ID} readDicts={READ_DICTS} writeDicts={WRITE_DICTS} display_name={DISPLAY_NAME} />
 );
 
 
@@ -147,13 +147,13 @@ createRoot(document.getElementById('myappcontainer')).render(
 //     <header>
 //         <h1>CHAIN MATES</h1>
 //         <h1>Hi, {{ display_name }}!</h1>
-//         <form action="{% url 'chainlettersstories:dashboard' authorid %}">
+//         <form action="{% url 'chainlettersstories:dashboard' author_id %}">
 //             <button type="submit">DASHBOARD</button>
 //         </form>
-//         <form action="{% url 'chainlettersstories:write_dashboard' authorid %}">
+//         <form action="{% url 'chainlettersstories:write_dashboard' author_id %}">
 //             <button type="submit">WRITE</button>
 //         </form>
-//         <form action="{% url 'chainlettersstories:read_dashboard' authorid %}">
+//         <form action="{% url 'chainlettersstories:read_dashboard' author_id %}">
 //             <button type="submit">READ</button>
 //         </form>
 //         <form action="{% url 'chainlettersstories:login_or_signup_page'%}">
@@ -162,10 +162,10 @@ createRoot(document.getElementById('myappcontainer')).render(
 //     </header>
 
 //     <div class="sidebar">
-//         <form action="{% url 'chainlettersstories:create_new_story' authorid %}">
+//         <form action="{% url 'chainlettersstories:create_new_story' author_id %}">
 //             <button type="submit">New</button>
 //         </form>
-//         <form action="{% url 'chainlettersstories:get_random_available_segment' authorid %}">
+//         <form action="{% url 'chainlettersstories:get_random_available_segment' author_id %}">
 //             <button type="submit">Join</button>
 //         </form>
 //     </div>
@@ -182,7 +182,7 @@ createRoot(document.getElementById('myappcontainer')).render(
 //         id="content-submissions-comments-{{forloop.counter}}">
 //         <form class="content-submissions"
 //             id="content-submissions-{{forloop.counter}}"
-//             action="{% url 'chainlettersstories:submit_segment_to_story' authorid segmentid %}" method="post">
+//             action="{% url 'chainlettersstories:submit_segment_to_story' author_id segmentid %}" method="post">
 //             {% csrf_token %}
 //             <input class="read-only-content"
 //                 id="read-only-content-{{forloop.counter}}"

@@ -87,32 +87,35 @@ class ModerationAssignment(models.Model):
 
 
 class SegmentTrace(models.Model):
-    final_segment = models.ForeignKey(Segment, models.DO_NOTHING, related_name="segmenttrace")
-    earlier_segment = models.IntegerField()
+    final_segment = models.ForeignKey(Segment, models.DO_NOTHING, related_name="segment_trace")
+    earlier_segment_id = models.IntegerField()
     earlier_segment_order = models.IntegerField()
     earlier_segment_content = models.CharField()
-    final_author = models.IntegerField()
-    final_segment_status = models.IntegerField()
+    final_author_id = models.IntegerField()
+    final_segment_status_id = models.IntegerField()
 
     class Meta:
+        db_table = "segment_trace"
         managed = False
         
 
 
 class AvailableSegmentByAuthor(models.Model):
     # id = models.IntegerField
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="availablesegment")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segment_id")
     segment = models.IntegerField()
 
     class Meta:
+        db_table = "available_segment_by_user"
         managed = False
 
 
 class ModeratableSegmentByAuthor(models.Model):
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatablesegment")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatable_segment_id")
     segment = models.IntegerField()
 
     class Meta:
+        db_table = "moderatable_segment_by_user"
         managed = False
 
 

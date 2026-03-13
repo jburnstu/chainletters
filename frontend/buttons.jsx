@@ -52,6 +52,9 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
         console.log("HTTP Error ", response.status, "at url ", `${urlStub}${urlTarget}`);
         return {};
     }
+    else {
+        console.log("SUCCESS at url ", `${urlStub}${urlTarget}`);
+    }
 
     return response.json();
 };
@@ -60,54 +63,55 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 async function uploadNewSegment(previousSegmentID, authorID) {
     let updatePreviousSegmentData = await contactAPI(`segment/${previousSegmentID}/`,
         "patch",
-        { 'segmentstatusid': 5 }
+        { 'segment_status_id': 5 }
     );
 
     let createSegmentData = await contactAPI("segment/",
         "post",
         {
-            'storyid': updatePreviousSegmentData.storyid,
-            'authorid': authorID,
-            'segmentstatusid': 1,
-            'previoussegmentid': previousSegmentID
+            'story_id': updatePreviousSegmentData.storyid,
+            'author_id': authorID,
+            'segment_status_id': 1,
+            'previous_segment_id': previousSegmentID
         }
     );
 
-    let getNewSegmentTraceData = await contactAPI(`segmenttrace/${createSegmentData.id}`, "get");
+    let getNewSegmentTraceData = await contactAPI(`segment_trace/${createSegmentData.id}`, "get");
     console.log(getNewSegmentTraceData);
     return getNewSegmentTraceData;
 }
 
-async function uploadNewStoryAndSegment(authorid, storyParameters) {
+async function uploadNewStoryAndSegment(authorID, storyParameters) {
 
+    console.log("calling uploadNewStoryAndSegment")
     let storyCreationData = await contactAPI("story/", "post",
         {
-            'authorid': authorid,
+            'author_id': authorID,
             ...storyParameters
         }
     )
 
     let segmentCreationData = await contactAPI("segment/", "post",
         {
-            'storyid': storyCreationData.id,
-            'authorid': authorid,
-            'segmentstatusid': 1,
+            'story_id': storyCreationData.id,
+            'author_id': authorID,
+            'segment_status_id': 1,
         }
     )
     return segmentCreationData;
 
 }
 
-async function uploadNewModerationAssignment(previoussegmentid, authorid) {
+async function uploadNewModerationAssignment(previousSegmentID, authorID) {
 
     let updateSegmentStatusData = await contactAPI("segment/", "patch",
-        { "segmentstatusid": 3 }
+        { "segment_status_id": 3 }
     )
 
     let moderationAssignmentCreationData = await contactAPI("moderationassignment/", "post",
         {
-            'segmentid': previoussegmentid,
-            'authorid': authorid
+            'segmentID': previousSegmentID,
+            'author_id': authorID
         }
     )
     return moderationAssignmentCreationData;
@@ -115,11 +119,13 @@ async function uploadNewModerationAssignment(previoussegmentid, authorid) {
 
 
 export function ModalNewButton(props) {
-    const authorid = useContext(AuthorContext);
+    const author_id = useContext(AuthorContext);
 
     const [isOpen, setIsOpen] = useState(false);
+
     function createModal() {
         setIsOpen(true);
+        console.log("modal clicked")
     }
 
     return (
@@ -136,7 +142,7 @@ export function ModalNewButton(props) {
 }
 
 export function NewStoryOptionspanel(props) {
-    const authorid = useContext(AuthorContext);
+    const authorID = useContext(AuthorContext);
 
     const [storyParameters, setStoryParameters] = useState({});
     const [parameterChecks, setParameterChecks] = useState({});
@@ -154,8 +160,10 @@ export function NewStoryOptionspanel(props) {
     }
 
     function createNewStoryAndSegment() {
-        uploadNewStoryAndSegment(authorid, storyParameters)
+        console.log("Creating new story/seg");
+        uploadNewStoryAndSegment(authorID, storyParameters)
             .then(function (value) {
+                console.log("inside then function", value)
                 props.addNewStory(value);
             }
             )
@@ -218,25 +226,25 @@ export function SubmissionButton(props) {
     let navigate = useNavigate();
     let location = useLocation();
 
-    let segmentstatusid;
+    let segmentStatusID;
     switch (props.submissionType) {
         case "SAVE":
-            segmentstatusid = 1;
+            segmentStatusID = 1;
             break;
         case "SUBMIT":
-            segmentstatusid = 2;
+            segmentStatusID = 2;
             break;
         case "APPROVE":
-            segmentstatusid = 4;
+            segmentStatusID = 4;
             break;
         case "ABANDON":
-            segmentstatusid = 6;
+            segmentStatusID = 6;
             break;
     }
 
     async function handleSubmit(e) {
 
-        let getNewSegmentTraceData = await contactAPI(`segmenttrace/${props.segmentid}/`, "get");
+        let getNewSegmentTraceData = await contactAPI(`segment_trace/${props.segmentID}/`, "get");
 
         console.log(getNewSegmentTraceData);
         if (props.submissionType != "SAVE") {
@@ -245,20 +253,20 @@ export function SubmissionButton(props) {
 
         let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
 
-        contactAPI(`segment/${props.segmentid}/`, "patch",
+        contactAPI(`segment/${props.segmentID}/`, "patch",
             {
-                'segmentstatusid': segmentstatusid,
+                'segment_status_id': segmentStatusID,
                 'content': currentContent
             }
         )
             .then(
                 function (value) {
                     if (props.submissionType == "ABANDON") {
-                        if (value.previoussegmentid != null) {
+                        if (value.previous_segment_id != null) {
                             console.log("second conditional!");
-                            contactAPI(`segment/${value.previoussegmentid}/`, "patch",
+                            contactAPI(`segment/${value.previous_segment_id}/`, "patch",
                                 {
-                                    'segmentstatusid': 4
+                                    'segment_status_id': 4
                                 }
                             )
                         }
@@ -275,16 +283,16 @@ export function SubmissionButton(props) {
 
 
 export function ModalJoinButton(props) {
-    const authorid = useContext(AuthorContext);
+    const authorID = useContext(AuthorContext);
     const storiesInModal = 3;
 
     async function getSegmentsForModal() {
-        let availabilityData = await contactAPI(`authorincludingavailability/${authorid}/`, "get")
-        let randomSegmentIDArray = await getRandomItem(availabilityData.availablesegment, storiesInModal);
+        let availabilityData = await contactAPI(`authorincludingavailability/${authorID}/`, "get")
+        let randomSegmentIDArray = await getRandomItem(availabilityData.available_segment, storiesInModal);
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
-            segmentTraceData = await contactAPI(`segmenttrace/${segmentID}`, "get");
+            segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
             segmentTraceDataArray.push(segmentTraceData);
         }
         )
@@ -308,9 +316,9 @@ export function ModalJoinButton(props) {
 
     }
 
-    function selectStory(previoussegmentid) {
+    function selectStory(previousSegmentID) {
         setIsOpen(false);
-        uploadNewSegment(previoussegmentid, authorid)
+        uploadNewSegment(previousSegmentID, authorID)
             .then(function (value) { props.addNewStory(value) });
     }
 
@@ -333,13 +341,13 @@ export function ModalJoinButton(props) {
 
 function StoryDisplayInModal(props) {
     console.log(props.storyDict);
-    let firstSegment = props.storyDict.segmenttrace[0]
-    let finalSegment = props.storyDict.segmenttrace.slice(-1)[0]
+    let firstSegment = props.storyDict.segment_trace[0]
+    let finalSegment = props.storyDict.segment_trace.slice(-1)[0]
     finalSegment = (finalSegment == firstSegment) ? null : finalSegment
 
 
 
-    const selectStory = () => props.selectStory(finalSegment.earlier_segmentid);
+    const selectStory = () => props.selectStory(finalSegment.earlier_segment_id);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
@@ -368,16 +376,16 @@ function ModalWindow(props) {
 
 
 export function NewModerationModalButton(props) {
-    const authorid = useContext(AuthorContext);
+    const authorID = useContext(AuthorContext);
     const storiesInModal = 3;
 
     async function getSegmentsForModal() {
-        let moderatabilityData = await contactAPI(`authorincludingavailability/${authorid}/`, "get");
-        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatablesegment, storiesInModal);
+        let moderatabilityData = await contactAPI(`authorincludingavailability/${authorID}/`, "get");
+        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatable_segment, storiesInModal);
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
-            segmentTraceData = await contactAPI(`segmenttrace/${segmentID}`, "get");
+            segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
             segmentTraceDataArray.push(segmentTraceData);
         }
         )
@@ -401,9 +409,9 @@ export function NewModerationModalButton(props) {
 
     }
 
-    function selectStory(previoussegmentid) {
+    function selectStory(previousSegmentID) {
         setIsOpen(false);
-        uploadNewModerationAssignment(previoussegmentid, authorid)
+        uploadNewModerationAssignment(previousSegmentID, authorID)
             .then(function (value) { props.addNewStory(value) });
     }
 
@@ -423,11 +431,11 @@ export function NewModerationModalButton(props) {
 }
 
 function NewModerationOptionsPanel(props) {
-    let firstSegment = props.storyDict.segmenttrace[0]
-    let finalSegment = props.storyDict.segmenttrace.slice(-1)[0]
+    let firstSegment = props.storyDict.segment_trace[0]
+    let finalSegment = props.storyDict.segment_trace.slice(-1)[0]
     finalSegment = (finalSegment == firstSegment) ? null : finalSegment
 
-    const selectStory = () => props.selectStory(finalSegment.earlier_segmentid);
+    const selectStory = () => props.selectStory(finalSegment.earlier_segment_id);
 
     return (
         <button onClick={selectStory} className="displayStoryContainer">
