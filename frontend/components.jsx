@@ -41,13 +41,13 @@ function AppByAuthor(props) {
                 newDictArray.push(storyDict);
                 console.log(newDictArray)
         }
-        setFunction(newDictArray);
+        setFunction(newDictArray)
         console.log(newDictArray)
         if (newDictArray == dictArrayToChange) {
             console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
         }
+        else { console.log("Successfully changed ", dictArrayToChange, " to ", writeDicts) }
     }
-
 
     return (
         <BrowserRouter>
@@ -166,6 +166,7 @@ function Story(props) {
     const { storyID } = useParams();
     console.log("Story loading", storyID)
 
+    console.log(props.dicts)
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);

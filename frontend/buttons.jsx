@@ -266,7 +266,7 @@ export function SubmissionButton(props) {
 
         contactAPI(`segment/${props.segmentID}/`, "patch",
             {
-                'segment_status_id': segmentStatusID,
+                'segment_status': segmentStatusID,
                 'content': currentContent
             }
         )
