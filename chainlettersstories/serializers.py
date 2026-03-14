@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor
+from django.views.decorators.cache import cache_page
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
-        fields = ['id', 'author_id']
+        fields = '__all__'
 
 class SegmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,17 +32,19 @@ class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
                 'segment_id'
         ] 
 
+@cache_page(60*15)
 class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
-    available_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
-    moderatable_segment_id = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
+    available_segments = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
+    # available_segment_id = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    # moderatable_segments = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
 
     class Meta:
         model = Author
         fields = [
             'id',
             'display_name',
-            'available_segment_id',
-            'moderatable_segment_id'
+            'available_segments',
+            # 'moderatable_segments'
         ]
 
 class SegmentTraceSerializer(serializers.ModelSerializer):
@@ -50,8 +53,8 @@ class SegmentTraceSerializer(serializers.ModelSerializer):
         model = SegmentTrace
         fields = [
                     # 'earlier_segment_ordering'
-                    'earlier_segment_id',
-                  'earlier_segment_content'
+                'earlier_segment_id',
+                'earlier_segment_content'
                   ]
 
 class SegmentTraceBySegmentSerializer(serializers.ModelSerializer):

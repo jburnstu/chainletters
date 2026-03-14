@@ -87,6 +87,7 @@ class ModerationAssignment(models.Model):
 
 
 class SegmentTrace(models.Model):
+    pk = models.CompositePrimaryKey("final_segment","earlier_segment_id")
     final_segment = models.ForeignKey(Segment, models.DO_NOTHING, related_name="segment_trace")
     earlier_segment_id = models.IntegerField()
     earlier_segment_order = models.IntegerField()
@@ -102,7 +103,7 @@ class SegmentTrace(models.Model):
 class AvailableSegmentByAuthor(models.Model):
     # id = models.IntegerField
     pk = models.CompositePrimaryKey("author","segment_id")
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segment")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="available_segments")
     segment_id = models.IntegerField()
 
 
@@ -113,7 +114,7 @@ class AvailableSegmentByAuthor(models.Model):
 
 class ModeratableSegmentByAuthor(models.Model):    # id = models.IntegerField
     pk = models.CompositePrimaryKey("author","segment_id")
-    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatable_segment")
+    author = models.ForeignKey(Author, models.DO_NOTHING, related_name="moderatable_segments")
     segment_id = models.IntegerField()
 
     class Meta:

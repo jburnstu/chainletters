@@ -8,14 +8,13 @@ import { AuthorContext, DictsContext } from "./context.jsx";
 
 
 function AppByAuthor(props) {
-    useEffect(() => console.log("Rendered"));
 
     const [authorID, setAuthorID] = useState(props.authorID);
     const [displayName, setDisplayName] = useState(props.displayName);
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-
+    useEffect(() => console.log("Rendered - write dicts: ", writeDicts));
 
     console.log(authorID);
     const rootPath = `/chainlettersstories/${authorID}/`;
@@ -43,6 +42,10 @@ function AppByAuthor(props) {
                 console.log(newDictArray)
         }
         setFunction(newDictArray);
+        console.log(newDictArray)
+        if (newDictArray == dictArrayToChange) {
+            console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
+        }
     }
 
 
@@ -222,7 +225,7 @@ function SubmissionButtons(props) {
                     key={buttonType}
                     submissionType={buttonType}
                     currentContent={props.currentContent}
-                    segment={props.segmentID}
+                    segmentID={props.segmentID}
                     removeCurrentStory={props.removeCurrentStory} />)}
         </div>
     )

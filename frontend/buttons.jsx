@@ -61,6 +61,8 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 
 
 async function uploadNewSegment(previousSegmentID, authorID) {
+
+    console.log(previousSegmentID);
     let updatePreviousSegmentData = await contactAPI(`segment/${previousSegmentID}/`,
         "patch",
         { 'segment_status_id': 5 }
@@ -69,10 +71,10 @@ async function uploadNewSegment(previousSegmentID, authorID) {
     let createSegmentData = await contactAPI("segment/",
         "post",
         {
-            'story_id': updatePreviousSegmentData.storyid,
-            'author_id': authorID,
-            'segment_status_id': 1,
-            'previous_segment_id': previousSegmentID
+            'story': updatePreviousSegmentData.storyid,
+            'author': authorID,
+            'segment_status': 1,
+            'previous_segment': previousSegmentID
         }
     );
 
@@ -84,34 +86,42 @@ async function uploadNewSegment(previousSegmentID, authorID) {
 async function uploadNewStoryAndSegment(authorID, storyParameters) {
 
     console.log("calling uploadNewStoryAndSegment")
+    console.log(storyParameters)
+
+    contactAPI(`story/2`, "get")
+        .then(function (value) { console.log("storyGet, ", value) })
+
+
     let storyCreationData = await contactAPI("story/", "post",
         {
-            'author_id': authorID,
-            ...storyParameters
+            'author': authorID,
+            // ...storyParameters
         }
     )
 
     let segmentCreationData = await contactAPI("segment/", "post",
         {
-            'story_id': storyCreationData.id,
-            'author_id': authorID,
-            'segment_status_id': 1,
+            'story': storyCreationData.id,
+            'author': authorID,
+            'segment_status': 1,
         }
     )
-    return segmentCreationData;
+    let getNewSegmentTraceData = await contactAPI(`segment_trace/${segmentCreationData.id}`, "get");
+
+    return getNewSegmentTraceData
 
 }
 
 async function uploadNewModerationAssignment(previousSegmentID, authorID) {
 
     let updateSegmentStatusData = await contactAPI("segment/", "patch",
-        { "segment_status_id": 3 }
+        { "segment_status_": 3 }
     )
 
     let moderationAssignmentCreationData = await contactAPI("moderation_assignment/", "post",
         {
-            'segmentID': previousSegmentID,
-            'author_id': authorID
+            'segment': previousSegmentID,
+            'author': authorID
         }
     )
     return moderationAssignmentCreationData;
@@ -187,32 +197,33 @@ export function NewStoryOptionspanel(props) {
                         onChange={handleValueChange}>
                     </input>Words
                 </label>
-                <label>Max. Segment Length<input type="checkbox" name="check_max_segment_length"
+                <label>Max. Segment Length<input type="checkbox" name="checkMaxSegmentLength"
                     checked={storyParameters.checkMaxSegmentLength}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="maxSegmentLength"
-                        value={storyParameters.maxSegmentLength}
+                    <input defaultValue="200" type="number" name="max_segment_length"
+                        value={storyParameters.max_segment_length}
                         disabled={!parameterChecks.checkMaxSegmentLength}
                         onChange={handleValueChange}></input>
                     Words</label>
                 <label >Max. Number of Segments?<input type="checkbox" name="checkMaxNumberOfSegments"
                     checked={storyParameters.checkMaxNumberOfSegments}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="maxNumberOfSegments"
-                        value={storyParameters.maxNumberOfSegments}
+                    <input defaultValue="200" type="number" name="max_number_of_segments"
+                        value={storyParameters.max_number_of_segments}
                         disabled={!parameterChecks.checkMaxNumberOfSegments}
                         onChange={handleValueChange}></input>
                     Segments</label>
                 <label>Max. Number of Branches?<input type="checkbox" name="checkMaxNumberOfBranches"
                     checked={storyParameters.checkMaxNumberOfBranches}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="maxNumberOfBranches"
+                    <input defaultValue="200" type="number" name="max_number_of_branches"
                         disabled={!parameterChecks.checkMaxNumberOfBranches}
-                        value={storyParameters.maxNumberOfBranches}
+                        value={storyParameters.max_number_of_branches}
                         onChange={handleValueChange}></input>
                     Branches</label>
                 <label>Mature<input type="checkbox"
-                    checked="isItMature"
+                    name="is_it_mature"
+                    checked={storyParameters.is_it_mature}
                     onChange={handleValueChange}></input>
                 </label>
             </fieldset>
@@ -243,12 +254,12 @@ export function SubmissionButton(props) {
     }
 
     async function handleSubmit(e) {
+        console.log(props.segmentID);
+        let getSegmentTraceData = await contactAPI(`segment_trace/${props.segmentID}/`, "get");
 
-        let getNewSegmentTraceData = await contactAPI(`segment_trace/${props.segmentID}/`, "get");
-
-        console.log(getNewSegmentTraceData);
+        console.log(getSegmentTraceData);
         if (props.submissionType != "SAVE") {
-            props.removeCurrentStory(getNewSegmentTraceData);
+            props.removeCurrentStory(getSegmentTraceData);
         }
 
         let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
@@ -266,7 +277,7 @@ export function SubmissionButton(props) {
                             console.log("second conditional!");
                             contactAPI(`segment/${value.previous_segment_id}/`, "patch",
                                 {
-                                    'segment_status_id': 4
+                                    'segment_status': 4
                                 }
                             )
                         }
