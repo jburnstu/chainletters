@@ -38,7 +38,7 @@ class Story(models.Model):
 
 
 class Segment(models.Model):
-    story = models.ForeignKey('Story', models.DO_NOTHING)
+    story = models.ForeignKey('Story', models.DO_NOTHING, related_name="story_data")
     author = models.ForeignKey('Author', models.DO_NOTHING)
     segment_status = models.ForeignKey('SegmentStatus', models.DO_NOTHING)
     content = models.TextField(default="")
@@ -94,6 +94,7 @@ class SegmentTrace(models.Model):
     earlier_segment_content = models.CharField()
     final_author_id = models.IntegerField()
     final_segment_status_id = models.IntegerField()
+    story_id = models.IntegerField()
 
     class Meta:
         db_table = "segment_trace"

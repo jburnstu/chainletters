@@ -1,5 +1,5 @@
 
-import React, { useState, authoref, useEffect, createContext, useContext } from "react";
+import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
@@ -50,25 +50,27 @@ function AppByAuthor(props) {
     }
 
     return (
-        <BrowserRouter>
-            <AuthorContext.Provider value={authorID}>
-                <Routes>
-                    <Route path={rootPath} element={<UniversalHeader displayName={displayName} />}>
-                        <Route index path="" relative element={<Home />} />
-                        <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
-                            <Route path=":storyID/"
-                                element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />} />
+        <StrictMode>
+            <BrowserRouter>
+                <AuthorContext.Provider value={authorID}>
+                    <Routes>
+                        <Route path={rootPath} element={<UniversalHeader displayName={displayName} />}>
+                            <Route index path="" relative element={<Home />} />
+                            <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
+                                <Route path=":storyID/"
+                                    element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />} />
+                            </Route>
+                            <Route path="read/" element={<Dashboard readOrWrite="read" dicts={readDicts}
+                                setDicts={changeStoryDicts} />}>
+                                <Route path=":storyID/"
+                                    element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />} />
+                            </Route>
                         </Route>
-                        <Route path="read/" element={<Dashboard readOrWrite="read" dicts={readDicts}
-                            setDicts={changeStoryDicts} />}>
-                            <Route path=":storyID/"
-                                element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />} />
-                        </Route>
-                    </Route>
-                    <Route path="*" element={<NoMatch />} />
-                </Routes>
-            </AuthorContext.Provider>
-        </BrowserRouter>
+                        <Route path="*" element={<NoMatch />} />
+                    </Routes>
+                </AuthorContext.Provider>
+            </BrowserRouter>
+        </StrictMode>
     );
 }
 
@@ -192,7 +194,7 @@ function Story(props) {
 
     return (
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
-            <StoryHeader />
+            <StoryHeader storyID={storyID} />
             <div className="storyContent">
                 {storySoFarElement}
                 {currentSegmentElement}
@@ -203,10 +205,25 @@ function Story(props) {
     )
 }
 
-function StoryHeader() {
+function StoryHeader(props) {
+
+
+
+    let currentStoryLength = null;
+    let maxStoryLength = null;
+
     return (<div className="storyHeader">THIS IS THE STORY HEADER
+        <div>{title}</div>
+        <div>{"Section " + currentStoryLength + " / " + maxStoryLength}</div>
     </div>)
 }
+
+/*
+how to pass story info to story component? 
+I guess can just add to state on render?
+Add story information to the segment trace...?
+ 
+*/
 
 function SubmissionButtons(props) {
 
