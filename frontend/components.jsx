@@ -178,9 +178,18 @@ function Story(props) {
     let presavedCurrentContent = storyDict.segment_trace.slice(-1);
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
+    const [wordCount, setWordCount] = useState(getWordCount(presavedCurrentContent));
+
 
     function handleChange(e) {
         setCurrentContent(e.target.value);
+        setWordCount(getWordCount(currentContent));
+    }
+
+    function getWordCount(myText) {
+        const spaceMatchPattern = `[\w\d][\s\W*\d*]+[\w\d]`
+        return spaceMatchPattern.match(myText).length + 1;
+
     }
 
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
@@ -190,11 +199,12 @@ function Story(props) {
         <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segment_id} value={segmentDict.earlier_segment_content}></ textarea>
     )
 
+
     let currentSegmentElement = <input className="currentSegmentText" type="text" value={currentContent} onChange={handleChange}></input>
 
     return (
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
-            <StoryHeader storyID={storyID} />
+            <StoryHeader storyDict={storyDict} wordCount={wordCount} />
             <div className="storyContent">
                 {storySoFarElement}
                 {currentSegmentElement}
@@ -207,14 +217,16 @@ function Story(props) {
 
 function StoryHeader(props) {
 
+    let storyData = props.storyDict["story_data"];
+    console.log(storyData)
+    let length = props.storyDict.segment_trace.length;
+    console.log(length)
 
-
-    let currentStoryLength = null;
-    let maxStoryLength = null;
 
     return (<div className="storyHeader">THIS IS THE STORY HEADER
-        <div>{title}</div>
-        <div>{"Section " + currentStoryLength + " / " + maxStoryLength}</div>
+        <div>{storyData.title}</div>
+        <div>{"Section " + length + " / " + storyData.max_number_of_segments}</div>
+        <div>{"Word Count :" + props.wordCount + " / " + storyData.max_segment_length}</div>
     </div>)
 }
 
