@@ -178,7 +178,9 @@ function Story(props) {
     let presavedCurrentContent = storyDict.segment_trace.slice(-1);
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
-    const [wordCount, setWordCount] = useState(getWordCount(presavedCurrentContent));
+    console.log(currentContent)
+    // let initialWordCount = getWordCount(currentContent);
+    const [wordCount, setWordCount] = useState(0);
 
 
     function handleChange(e) {
@@ -187,8 +189,13 @@ function Story(props) {
     }
 
     function getWordCount(myText) {
-        const spaceMatchPattern = `[\w\d][\s\W*\d*]+[\w\d]`
-        return spaceMatchPattern.match(myText).length + 1;
+        // const spaceMatchPattern = /[\w\d][\s\W*\d*]+[\w\d]/;
+        const spaceMatchPattern = /\S+/g;
+        console.log(myText, typeof (myText))
+        console.log("hello world".match(spaceMatchPattern));
+        let numberOfSpaces = myText.match(spaceMatchPattern);
+        console.log(numberOfSpaces)
+        return (numberOfSpaces ? numberOfSpaces : []).length;
 
     }
 
@@ -224,9 +231,9 @@ function StoryHeader(props) {
 
 
     return (<div className="storyHeader">THIS IS THE STORY HEADER
-        <div>{storyData.title}</div>
-        <div>{"Section " + length + " / " + storyData.max_number_of_segments}</div>
-        <div>{"Word Count :" + props.wordCount + " / " + storyData.max_segment_length}</div>
+        <div>{storyData.title ? storyData.title : "Untitled"}</div>
+        <div>{"Section " + length + " / " + (storyData.max_number_of_segments ? storyData.max_number_of_segments : "Infinite")}</div>
+        <div>{"Word Count :" + props.wordCount + " / " + (storyData.max_segment_length ? storyData.max_segment_length : "Infinite")}</div>
     </div>)
 }
 
