@@ -182,6 +182,14 @@ function Story(props) {
     // let initialWordCount = getWordCount(currentContent);
     const [wordCount, setWordCount] = useState(0);
 
+    const [selectedSegments, setSelectedSegment] = useState([]);
+
+    function selectSegment() {
+
+    }
+
+
+
 
     function handleChange(e) {
         setCurrentContent(e.target.value);
@@ -203,7 +211,7 @@ function Story(props) {
 
 
     let storySoFarElement = storySoFar.map(segmentDict =>
-        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segment_id} value={segmentDict.earlier_segment_content}></ textarea>
+        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segment_id} value={segmentDict.earlier_segment_content} onClick={selectSegment}></ textarea>
     )
 
 
@@ -237,6 +245,10 @@ function StoryHeader(props) {
     </div>)
 }
 
+
+function SegmentDisplay(props) {
+
+}
 /*
 how to pass story info to story component? 
 I guess can just add to state on render?
@@ -269,10 +281,16 @@ function SubmissionButtons(props) {
 }
 
 function Comments() {
+
+
+
+
     return (
         <div className="comments">THESE ARE THE COMMENTS</div>
     )
 }
+
+
 
 
 const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
