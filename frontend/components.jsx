@@ -174,7 +174,8 @@ function Story(props) {
         return storyDictArray.find(idMatch);
     }
     let storyDict = getStoryByID(props.dicts, storyID);
-    let storySoFar = storyDict.segment_trace.slice(0, -1);
+
+    // let storySoFar = storyDict.segment_trace.slice(0, -1);
     let presavedCurrentContent = storyDict.segment_trace.slice(-1);
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
@@ -188,9 +189,6 @@ function Story(props) {
 
     }
 
-
-
-
     function handleChange(e) {
         setCurrentContent(e.target.value);
         setWordCount(getWordCount(currentContent));
@@ -199,20 +197,13 @@ function Story(props) {
     function getWordCount(myText) {
         // const spaceMatchPattern = /[\w\d][\s\W*\d*]+[\w\d]/;
         const spaceMatchPattern = /\S+/g;
-        console.log(myText, typeof (myText))
-        console.log("hello world".match(spaceMatchPattern));
         let numberOfSpaces = myText.match(spaceMatchPattern);
-        console.log(numberOfSpaces)
         return (numberOfSpaces ? numberOfSpaces : []).length;
 
     }
 
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
-
-    let storySoFarElement = storySoFar.map(segmentDict =>
-        <textarea className="previousSegmentText" readOnly key={segmentDict.earlier_segment_id} value={segmentDict.earlier_segment_content} onClick={selectSegment}></ textarea>
-    )
 
 
     let currentSegmentElement = <input className="currentSegmentText" type="text" value={currentContent} onChange={handleChange}></input>
@@ -221,8 +212,12 @@ function Story(props) {
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
             <StoryHeader storyDict={storyDict} wordCount={wordCount} />
             <div className="storyContent">
-                {storySoFarElement}
-                {currentSegmentElement}
+                {storyDict.segment_trace.map(segmentDict =>
+                    <SegmentDisplay key={segmentDict.earlier_segment_id} finalSegment={segmentDict.earlier_segment_id == storyID} fixedContent={segmentDict.earlier_segment_content} currentContent={currentContent}
+                        onClick={selectSegment}
+                        onChange={handleChange} />
+                )
+                }
             </div>
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentID={storyID} removeCurrentStory={removeCurrentStory} />
             <Comments />
@@ -247,6 +242,22 @@ function StoryHeader(props) {
 
 
 function SegmentDisplay(props) {
+
+    let readOnly = true;
+    let onChange = null;
+    let value = props.fixedContent;
+
+    if (props.finalSegment) {
+        readOnly = false;
+        onChange = props.onChange;
+        value = props.currentContent;
+    }
+
+    console.log(props.key, props.finalSegment, readOnly)
+
+    return (<textarea className="segmentDisplay" readOnly={readOnly} value={value}
+        onChange={onChange} onClick={props.onClick} ></ textarea>)
+
 
 }
 /*
@@ -280,7 +291,7 @@ function SubmissionButtons(props) {
     )
 }
 
-function Comments() {
+function Comments(props) {
 
 
 

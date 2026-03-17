@@ -32,11 +32,10 @@ class ModeratableSegmentByAuthorSerializer(serializers.ModelSerializer):
                 'segment_id'
         ] 
 
-@cache_page(60*15)
+# @cache_page(60*15)
 class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
     available_segments = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
-    # available_segment_id = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-    # moderatable_segments = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
+    moderatable_segments = serializers.SlugRelatedField(many=True,read_only=True,slug_field="segment_id")
 
     class Meta:
         model = Author
@@ -44,8 +43,13 @@ class AuthorIncludingAvailabilitySerializer(serializers.ModelSerializer):
             'id',
             'display_name',
             'available_segments',
-            # 'moderatable_segments'
+            'moderatable_segments'
         ]
+
+'''
+Right now: AIA serializer must find all available segments (not even doign the moderatable ones right now)
+
+'''
 
 class SegmentTraceSerializer(serializers.ModelSerializer):
 

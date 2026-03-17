@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from django.db.models import F
+from django.db.models import F, Prefetch
 from django.forms.models import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -9,7 +9,7 @@ import random
 
 
 from .models import Story, Author, Segment, SegmentTrace, SegmentStatus, ModerationAssignment,\
- AvailableSegmentByAuthor
+ AvailableSegmentByAuthor, ModeratableSegmentByAuthor
 from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer
 # Create your views here.
 
@@ -123,7 +123,16 @@ class AvailableSegmentByAuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AvailableSegmentByAuthorSerializer
 
 class AuthorIncludingAvailabilityViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
+    queryset = Author.objects.all().prefetch_related(
+        Prefetch(
+            "available_segments",
+            queryset=AvailableSegmentByAuthor.objects.only("author", "segment_id")
+        ),
+        Prefetch(
+            "moderatable_segments",
+            queryset=ModeratableSegmentByAuthor.objects.only("author", "segment_id")
+        )
+    )
     serializer_class = AuthorIncludingAvailabilitySerializer
 
 class ModerationAssignmentViewSet(viewsets.ModelViewSet):
