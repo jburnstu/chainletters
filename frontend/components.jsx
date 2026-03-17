@@ -183,10 +183,12 @@ function Story(props) {
     // let initialWordCount = getWordCount(currentContent);
     const [wordCount, setWordCount] = useState(0);
 
-    const [selectedSegments, setSelectedSegment] = useState([]);
+    let noSelections = {};
+    storyDict.segment_trace.forEach(dictInArray => noSelections[dictInArray["earlier_segment_id"]] = 0)
+    const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
-    function selectSegment() {
-
+    function changeSegmentSelection(segmentID) {
+        // setSelectedSegmentDict({ selectedSegmentDict, (selectedSegmentDict[segmentID] == 1) })
     }
 
     function handleChange(e) {
@@ -205,22 +207,23 @@ function Story(props) {
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
 
-
-    let currentSegmentElement = <input className="currentSegmentText" type="text" value={currentContent} onChange={handleChange}></input>
-
     return (
         <div className="storyContainer" id={"storyContainer" + { storyID }}>
             <StoryHeader storyDict={storyDict} wordCount={wordCount} />
             <div className="storyContent">
                 {storyDict.segment_trace.map(segmentDict =>
-                    <SegmentDisplay key={segmentDict.earlier_segment_id} finalSegment={segmentDict.earlier_segment_id == storyID} fixedContent={segmentDict.earlier_segment_content} currentContent={currentContent}
-                        onClick={selectSegment}
+                    <SegmentDisplay key={segmentDict.earlier_segment_id}
+                        id={segmentDict.earlier_segment_id}
+                        finalSegment={segmentDict.earlier_segment_id == storyID}
+                        fixedContent={segmentDict.earlier_segment_content}
+                        currentContent={currentContent}
+                        onClick={changeSegmentSelection}
                         onChange={handleChange} />
                 )
                 }
             </div>
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentID={storyID} removeCurrentStory={removeCurrentStory} />
-            <Comments />
+            <Comments selections={selectedSegmentDict} />
         </div>
     )
 }
@@ -240,7 +243,6 @@ function StoryHeader(props) {
     </div>)
 }
 
-
 function SegmentDisplay(props) {
 
     let readOnly = true;
@@ -253,19 +255,15 @@ function SegmentDisplay(props) {
         value = props.currentContent;
     }
 
+    const onClick = () => props.onClick(props.id)
+
     console.log(props.key, props.finalSegment, readOnly)
 
     return (<textarea className="segmentDisplay" readOnly={readOnly} value={value}
-        onChange={onChange} onClick={props.onClick} ></ textarea>)
+        onChange={onChange} onClick={onClick} ></ textarea>)
 
 
 }
-/*
-how to pass story info to story component? 
-I guess can just add to state on render?
-Add story information to the segment trace...?
- 
-*/
 
 function SubmissionButtons(props) {
 
@@ -293,16 +291,62 @@ function SubmissionButtons(props) {
 
 function Comments(props) {
 
+    let selectionArray = props.arrayOfSelectedSegments;
+
+    selectionArray.forEach(key => )
 
 
 
     return (
-        <div className="comments">THESE ARE THE COMMENTS</div>
+        <div className="comments">
+            <StoryCommentPanel></StoryCommentPanel>
+            {selectionArray.map(selectionID =>
+                <SegmentInfo segmentID={selectionID}>
+
+                </SegmentInfo>
+            )}
+        </div>
     )
 }
 
+function StoryCommentPanel() { }
 
 
+function SegmentInfo(props) {
+
+    let author = null;
+    let moderationNotes = null;
+    let content = null;
+    let commentDict = null;
+
+    const [isModerationOpen, setIsModerationOpen] = useState(false);
+
+
+    return (<div className="segmentComment">
+        <div>{author}</div>
+        <div className="moderationContainer">
+            <button onCLick={() => setIsModerationOpen(true)}></button>
+            <div visible={isModerationOpen}></div>
+        </div>
+        <div className="segmentCommentsContainer">
+            {commentDict.map(segmentCommentID => <SegmentComment commentDict={commentDict[segmentCommentID]}></SegmentComment>)}
+        </div>
+        <div className="addCommentContainer">
+            <button onClick={createComment}></button>
+            <textarea></textarea>
+            <button onClick={submitComment}></button>
+            <button onClick={abandonComment}></button>
+        </div>
+    </div>)
+}
+
+
+```
+What would a large, all-comment-info-for-a-given-segment dict look like?
+{segmentID: {segmentCommentID: {authorID::, content::, childComments: [commentCommentID: {authorID::}, ]}}}
+
+
+```
 
 const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
