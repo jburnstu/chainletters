@@ -62,16 +62,17 @@ async function contactAPI(urlTarget, method, bodyDict = {}) {
 
 async function uploadNewSegment(previousSegmentID, authorID) {
 
-    console.log(previousSegmentID);
+    console.log(previousSegmentID, authorID);
     let updatePreviousSegmentData = await contactAPI(`segment/${previousSegmentID}/`,
         "patch",
         { 'segment_status_id': 5 }
     );
 
+    await console.log(updatePreviousSegmentData);
     let createSegmentData = await contactAPI("segment/",
         "post",
         {
-            'story': updatePreviousSegmentData.storyid,
+            'story': updatePreviousSegmentData.story,
             'author': authorID,
             'segment_status': 1,
             'previous_segment': previousSegmentID
@@ -299,7 +300,8 @@ export function ModalJoinButton(props) {
 
     async function getSegmentsForModal() {
         let availabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get")
-        let randomSegmentIDArray = await getRandomItem(availabilityData.available_segment, storiesInModal);
+        let randomSegmentIDArray = await getRandomItem(availabilityData.available_segments, storiesInModal);
+
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
@@ -330,10 +332,11 @@ export function ModalJoinButton(props) {
     function selectStory(previousSegmentID) {
         setIsOpen(false);
         uploadNewSegment(previousSegmentID, authorID)
-            .then(function (value) { props.addNewStory(value) });
+            .then(function (value) {
+                console.log(value);
+                props.addNewStory(value);
+            });
     }
-
-    useEffect(() => console.log("STATESET"));
 
     return (
         <>
@@ -392,7 +395,7 @@ export function NewModerationModalButton(props) {
 
     async function getSegmentsForModal() {
         let moderatabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get");
-        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatable_segment, storiesInModal);
+        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatable_segments, storiesInModal);
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
