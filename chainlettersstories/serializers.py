@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor
+from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor, Comment
 from django.views.decorators.cache import cache_page
 
 class StorySerializer(serializers.ModelSerializer):
@@ -78,3 +78,10 @@ class ModerationAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModerationAssignment
         fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Comment
