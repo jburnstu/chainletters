@@ -123,30 +123,34 @@ class ModeratableSegmentByAuthor(models.Model):    # id = models.IntegerField
         managed = False
 
 
-# class Comment(models.Model):
-#     author = models.ForeignKey('Author', models.DO_NOTHING)
-#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
-#     text_content = models.TextField(default="")
+class Comment(models.Model):
+    author = models.ForeignKey('Author', models.DO_NOTHING)
+    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    comment_status = models.ForeignKey('CommentStatus',models.DO_NOTHING)
+    text_content = models.TextField(default="")
+
+    def __str__(self):
+        return self.text_content
+
+class CommentType(models.Model):
+    description = models.CharField(max_length=20)
+
+class CommentStatus(models.Model):
+    description = models.CharField(max_length=30)
 
 
-#     def __str__(self):
-#         return self.text_content
-
-# class CommentType(models.Model):
-#     description = models.CharField(max_length=20)
-
-# class CommentComment(models.Model):
-#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
-#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
-#     parent_comment = models.ForeignKey('Comment', models.DO_NOTHING)
+class CommentComment(models.Model):
+    comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="comment_comment")
+    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    parent_comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="parent_comment_comment")
 
 
-# class SegmentComment(models.Model):
-#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
-#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
-#     parent_segment = models.ForeignKey('Segment', models.DO_NOTHING)
+class SegmentComment(models.Model):
+    comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="segment_comment")
+    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    parent_segment = models.ForeignKey('Segment', models.DO_NOTHING,related_name="parent_segment_comment")
 
-# class StoryComment(models.Model):
-#     comment = models.ForeignKey('Comment', models.DO_NOTHING)
-#     comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
-#     parent_story = models.ForeignKey('Story', models.DO_NOTHING)
+class StoryComment(models.Model):
+    comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="story_comment")
+    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    parent_story = models.ForeignKey('Story', models.DO_NOTHING,related_name="parent_story_comment")

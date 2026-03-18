@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
+import { Comments } from "./comments.jsx"
 // import './dashboardStyles.css';
 
 
@@ -174,18 +175,16 @@ function Story(props) {
         return storyDictArray.find(idMatch);
     }
     let storyDict = getStoryByID(props.dicts, storyID);
+    let presavedCurrentContent = storyDict.segment_trace.slice(-1).earlier_segment_content;
 
-    // let storySoFar = storyDict.segment_trace.slice(0, -1);
-    let presavedCurrentContent = storyDict.segment_trace.slice(-1);
-
-    const [currentContent, setCurrentContent] = useState(presavedCurrentContent.earlier_segment_content);
-    console.log(currentContent)
-    // let initialWordCount = getWordCount(currentContent);
+    const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
     const [wordCount, setWordCount] = useState(0);
 
     let noSelections = {};
     storyDict.segment_trace.forEach(dictInArray => noSelections[dictInArray["earlier_segment_id"]] = 0)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
+
+
 
     function changeSegmentSelection(segmentID) {
         // setSelectedSegmentDict({ selectedSegmentDict, (selectedSegmentDict[segmentID] == 1) })
@@ -289,64 +288,6 @@ function SubmissionButtons(props) {
     )
 }
 
-function Comments(props) {
-
-    let selectionArray = props.arrayOfSelectedSegments;
-
-    selectionArray.forEach(key => )
-
-
-
-    return (
-        <div className="comments">
-            <StoryCommentPanel></StoryCommentPanel>
-            {selectionArray.map(selectionID =>
-                <SegmentInfo segmentID={selectionID}>
-
-                </SegmentInfo>
-            )}
-        </div>
-    )
-}
-
-function StoryCommentPanel() { }
-
-
-function SegmentInfo(props) {
-
-    let author = null;
-    let moderationNotes = null;
-    let content = null;
-    let commentDict = null;
-
-    const [isModerationOpen, setIsModerationOpen] = useState(false);
-
-
-    return (<div className="segmentComment">
-        <div>{author}</div>
-        <div className="moderationContainer">
-            <button onCLick={() => setIsModerationOpen(true)}></button>
-            <div visible={isModerationOpen}></div>
-        </div>
-        <div className="segmentCommentsContainer">
-            {commentDict.map(segmentCommentID => <SegmentComment commentDict={commentDict[segmentCommentID]}></SegmentComment>)}
-        </div>
-        <div className="addCommentContainer">
-            <button onClick={createComment}></button>
-            <textarea></textarea>
-            <button onClick={submitComment}></button>
-            <button onClick={abandonComment}></button>
-        </div>
-    </div>)
-}
-
-
-```
-What would a large, all-comment-info-for-a-given-segment dict look like?
-{segmentID: {segmentCommentID: {authorID::, content::, childComments: [commentCommentID: {authorID::}, ]}}}
-
-
-```
 
 const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
