@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Story, Segment, AvailableSegmentByAuthor, Author, SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor, Comment
+from .models import Story, Segment, AvailableSegmentByAuthor, Author,\
+      SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor,\
+          Comment, SegmentComment,StoryComment, CommentComment
 from django.views.decorators.cache import cache_page
 
 class StorySerializer(serializers.ModelSerializer):
@@ -56,7 +58,6 @@ class SegmentTraceSerializer(serializers.ModelSerializer):
     class Meta: 
         model = SegmentTrace
         fields = [
-                    # 'earlier_segment_ordering'
                 'earlier_segment_id',
                 'earlier_segment_content'
                   ]
@@ -73,6 +74,27 @@ class SegmentTraceBySegmentSerializer(serializers.ModelSerializer):
                   'segment_trace'
         ]
 
+class SegmentTraceWithCommentsSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = SegmentTrace
+
+
+
+class FullStoryInfoSerializer(serializers.ModelSerializer):
+    segment_trace = SegmentTraceSerializer(many=True,read_only=True)
+    story_data = StorySerializer(read_only=True, source="story")
+
+
+    class Meta:
+        model = Segment
+        fields = ['id',
+                    'story_data',
+                  'segment_trace'
+    ]
+
+
 class ModerationAssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -80,8 +102,28 @@ class ModerationAssignmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CommentSerializer(serializers.ModelSerializer):
-
+class AuthorSerilializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Comment
+        model = Author
+        fields = ['id',
+                  'display_name']
+
+class CommentCommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerilializer(read_only=True,source="author")
+
+    class Meta:
+        model = CommentComment
+        fields = []
+
+
+class SegmentCommentWithChildrenSerializer(serializers.ModelSerializer):
+    author = AuthorSerilializer(read_only=True,source="author")
+    child_comments = CommentCommentSerializer(many=True,read_only=True,source="comment_comment")
+
+    class Meta:
+        model = SegmentComment
+        fields = ['id',
+                  'content',
+                  'author',
+                  'child_comments']

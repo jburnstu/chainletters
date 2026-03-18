@@ -9,7 +9,8 @@ import random
 
 
 from .models import Story, Author, Segment, SegmentTrace, SegmentStatus, ModerationAssignment,\
- AvailableSegmentByAuthor, ModeratableSegmentByAuthor
+ AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
+ Comment,SegmentComment,StoryComment,CommentComment,CommentStatus
 from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer
 # Create your views here.
 
@@ -64,10 +65,16 @@ def get_story_dicts_from_QS(QS):
         return []
     else:
         df = pd.DataFrame(QS)
-        return [{"id":key,"segment_trace":[{"earlier_segment_id":id,"earlier_segment_content":content} for id,content in zip(group["earlier_segment_id"],group["earlier_segment_content"])],
-                                             "story_data":model_to_dict(Segment.objects.get(pk=key).story)}                              
-                                           for key, group in df.groupby("final_segment_id")
-        ]
+        return [{"id":key,
+                 "segment_trace":
+                    [{"earlier_segment_id":id,
+                    "earlier_segment_content":content,
+                    "comments":get_all_comments_on_obj(Segment.objects.get(pk=id))
+                    } for id,content in zip(
+                        group["earlier_segment_id"],group["earlier_segment_content"])],
+                  "story_data":model_to_dict(Segment.objects.get(pk=key).story).update({"comments":get_all_comments_on_obj(Segment.objects.get(pk=key).story)})}                              
+                    for key, group in df.groupby("final_segment_id")
+]
 
 def home(request,author_id):
     template = "chainlettersstories/dashboard.html"
@@ -88,12 +95,82 @@ def home(request,author_id):
     read_dicts = get_story_dicts_from_QS(segment_ids_to_moderate)
 
 
+
+
     return render(request,template, 
                   {
                       "author_id": author_id,
                       "display_name": my_author_name,
                       "read_dicts":read_dicts,
                       "write_dicts":write_dicts})
+
+
+def get_all_comments_on_obj(obj,type="segment"):
+
+    if type=="segment":
+        comments_main_table_QS = Comment.objects.filter(segment_comment__parent_segment=obj)
+    else:
+        comments_main_table_QS = Comment.objects.filter(story_comment__parent_story=obj)
+
+    return [model_to_dict(comment)\
+            .update({"author":model_to_dict(comment.author)})\
+            .update({"child_comments":
+                     [model_to_dict(child_comment)\
+                      .update({"author":model_to_dict(child_comment.author)})
+                      for child_comment in Comment.objects.filter(comment_comment_parent_comment=comment)]})
+            for comment in comments_main_table_QS]
+        
+
+
+'''
+Where to put the comment data?
+
+write_dicts: 
+[{"final_segment_id"::,
+    "segment_trace":[{
+                    "id"::, 
+                    "content"::, 
+                    "segment_info":{
+                                    "author":{
+                                            "id"::,
+                                            "name":display_name}
+                                            },
+                                    "moderator":{
+                                                "id"::,
+                                                "name":display_name,
+                                                "moderation_notes":notes
+                                                 },
+                                     },
+                    "comments":[{
+                                "commentID"::,
+                                "author":{
+                                        "id"::,
+                                        "name":display_name}
+                                        },
+                                "content"::,
+                                "child_comments":[{
+                                                "commentID"::,
+                                                "author":{
+                                                        "id"::,
+                                                        "name":display_name}
+                                                        },
+                                                "content"::,
+                                                }]
+                                }]
+                    }],
+    "story_data":{
+                    "variousData"::,
+                    "comments":},
+
+    ]
+
+    
+What would a large, all-comment-info-for-a-given-segment dict look like?
+{segmentID: 
+        {authorID::, segmentCommentID: 
+                {authorID::, content::, childComments: [commentCommentID: {authorID::}, ]}}}
+
+'''
 
 class SegmentViewSet(viewsets.ModelViewSet):
     queryset = Segment.objects.all()
@@ -130,4 +207,3 @@ class SegmentTraceViewSet(viewsets.ModelViewSet):
     queryset = Segment.objects.all()
     serializer_class = SegmentTraceBySegmentSerializer
 
-    
