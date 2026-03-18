@@ -2,33 +2,17 @@ from django.test import TestCase
 import random
 import string
 from .models import Story, Author, Segment, ModerationAssignment,\
-AvailableSegmentByAuthor, ModeratableSegmentByAuthor
+AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
+Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment
 
 """
 import random
 import string
-from chainlettersstories.models import Story, Author, Segment, ModerationAssignment, AvailableSegmentByAuthor, ModeratableSegmentByAuthor
-from chainlettersstories.tests import create_random_segment_tree
+from chainlettersstories.models import Story, Author, Segment, ModerationAssignment, AvailableSegmentByAuthor, ModeratableSegmentByAuthor, Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment
+from chainlettersstories.tests import create_random_segment_tree, create_bulk_comment_submission
 """
 
-# Create your tests here.
-'''
-Checks on status:
-- if a 1,2 or 3, assert previous are 5, and assert not previousid of anything
-- if in moderationassignment and not closed, assert 3
-- if no 1, 2, or 3 following, assert not 5
-
-'''
-
-'''
-Checks on login details:
-- assert an existing author_name will prompt login
-- assert an existing login will login
-- assert an empty author_name / password will prompt a message
-
-'''
-
-### UTILITY FUNCTIONS ###
+### UTILITY FUNCTIONS ###########################################################################
 
 def create_random_string_of_length(string_length,up_to_this_length=False,lowest_length_allowed=1):
     if up_to_this_length:
@@ -47,7 +31,7 @@ def create_author(author_name):
     email = author_name + "@example.com"
     return Author.objects.create(display_name=author_name,email=email,password=author_name)
 
-### UPDATED FLOW
+### MAIN FLOW #########################################################
 
 def create_new_story_and_segment(author):
         new_story = Story.objects.create(author=author)
@@ -106,48 +90,14 @@ def approve_moderation(segment,moderation_assignment):
     moderation_assignment.save()
     print("MA post update:",moderation_assignment.__dict__)
 
-### OVERALL FUNCTION ###
- 
-'''
-def create_submit_and_approve_segment(content,
-                                      author_creator,
-                                      author_moderator,
-                                      previous_segment_id=None,
-                                      ):
-    try:
-        previoussegment = get_previous_segment_if_exists(previous_segment_id)
-        segment = add_segment_to_story_by_author(author_creator,previoussegment=previoussegment,valid_check=previous_segment_id)
-        update_segment_content(segment,content)
-        move_to_moderation(segment)
-        assign_a_moderator(segment,author_moderator,valid_check=previous_segment_id)
-        approve_moderation(segment)
-    except KeyError:
-        segment = create_submit_and_approve_segment(content,author_creator,author_moderator,None)
-    return segment
-
-def create_segment_from_dict(dict,offset=0):
-    segment = create_submit_and_approve_segment(dict["content"],
-                                                dict["author_creator"],
-                                                dict["author_moderator"],
-                                                dict["previous_segment_id"] if dict["previous_segment_id"] is None else dict["previous_segment_id"]+offset,
-                                                
-    )
-    return segment
-'''
+### SUMMARY FUNCTIONS  #################################################
 
 def new_create_submit_and_approve_segment(author,content):    
-    print(1)
     segment = join_to_random_open_segment(author)["segment"]
-    print(2, " segment " + segment + " created")
     update_segment_content(segment,content)
-    print(3, segment + "updated")
     move_to_moderation(segment)
-    print(4)
     author_and_assignment = find_and_assign_moderator(segment)
-    print(5)
     approve_moderation(segment,author_and_assignment["assignment"])
-    print(6)
-    print(segment.__dict__)
     return segment
 
 def new_create_segment_from_dict(dict):
@@ -160,31 +110,104 @@ def create_random_segment_tree(number_of_authors,number_of_segments, segment_cha
     else:
         author_array = create_random_author_array(number_of_authors,10)
 
-    print("AUTHOR ARRAY",author_array)
-    # array_of_previous_segment_ids = create_array_of_previous_segment_ids(number_of_segments)
-
     list_of_segment_dicts = [{
         "author_creator" : random.choice(author_array),
         "content" : create_random_string_of_length(segment_char_length,up_to_this_length=True),
         } for i in range(number_of_segments)]
 
-
-    print("LIST OF SEGMENT  DICTS",list_of_segment_dicts)
     count = 0
     for dict in list_of_segment_dicts: 
         count += 1
-        print(count,dict)
         segment = new_create_segment_from_dict(dict)
         
-        if segment:
-            print("SEGMENT:",segment)
-            print("Compare to count / ", count,  segment.id)
-        else: print ("Compare to count / ",count, "None")
-
-#########################################################################################
+##### COMMENTS #############################################################################
 
 
 
+def add_comment_to_story(story, author):
+    comment = Comment.objects.create(author=author,comment_parent_type_id=2)
+    story_comment = StoryComment.objects.create(comment=comment,parent_story=story)
+    return {"comment_table":comment,"sub_table":story_comment}
+
+def add_comment_to_segment(segment, author):
+    comment = Comment.objects.create(author=author,comment_parent_type_id=1)
+    segment_comment = SegmentComment.objects.create(comment=comment,parent_segment=segment)
+    return {"comment_table":comment,"sub_table":segment_comment}
+
+def add_comment_to_comment(parent_comment,author):
+    comment = Comment.objects.create(author=author,comment_parent_type_id=3)
+    comment_comment = CommentComment.objects.create(comment=comment,parent_comment=parent_comment)
+    return {"comment_table":comment,"sub_table":comment_comment}
+
+def update_comment_content(comment,content):
+    comment.text_content = content
+    comment.save()
+
+def abandon_segment(comment,default_if_empty=True,):
+    if default_if_empty and str(comment.content) == "":
+        comment.content = "Default Empty Text"
+    comment.comment_status_id = 3
+    comment.save()
+
+def submit_comment(comment):
+    comment.comment_status_id = 2
+    comment.save()
+
+
+def get_random_commentable_object(type=None):
+    if not type:
+        type = random.choice(["segment","segment","segment","segment","segment","segment",
+                              "story","story","story",
+                              "comment"])
+
+    if type == "segment":
+        random_obj = random.choice(Segment.objects.filter(segment_status_id__in=[4,5]))
+    if type == "story":
+        random_obj = random.choice(Story.objects.all())
+    if type == "comment":
+        try:
+            random_obj = random.choice(Comment.objects.filter(comment_status_id=2)\
+                                                .exclude(comment_parent_type_id=3))
+        except IndexError:
+            random_obj = get_random_commentable_object("segment")
+           
+    return random_obj
+
+
+def create_and_submit_comment(obj,author,content):
+    if isinstance(obj,Segment):
+        comment = add_comment_to_segment(obj,author)
+    elif isinstance(obj,Story):
+        comment = add_comment_to_story(obj,author)
+    elif isinstance(obj,Comment):
+        comment = add_comment_to_comment(obj,author)
+    update_comment_content(comment["comment_table"],content)
+    submit_comment(comment["comment_table"])
+    return comment
+
+def create_comment_from_dict(dict):
+    comment = create_and_submit_comment(dict["obj"],dict["author"],dict["content"])
+    return comment
+
+def create_bulk_comment_submission(number_of_comments,number_of_authors=None,comment_length=50):
+
+    if number_of_authors is None:
+        author_array = list(Author.objects.all())
+    else:
+        author_array = create_random_author_array(number_of_authors,10)
+
+    list_of_segment_dicts = [{
+        "obj" : get_random_commentable_object(None),
+        "author" : random.choice(author_array),
+        "content" : create_random_string_of_length(comment_length,up_to_this_length=True),
+        } for i in range(number_of_comments)]
+
+    count = 0
+    for comment_dict in list_of_segment_dicts: 
+        count += 1
+        print(comment_dict)
+        comment = create_comment_from_dict(comment_dict)
+        print(comment)
 
 
 
@@ -192,6 +215,22 @@ def create_random_segment_tree(number_of_authors,number_of_segments, segment_cha
 
 
 
+# Create your tests here.
+'''
+Checks on status:
+- if a 1,2 or 3, assert previous are 5, and assert not previousid of anything
+- if in moderationassignment and not closed, assert 3
+- if no 1, 2, or 3 following, assert not 5
+
+'''
+
+'''
+Checks on login details:
+- assert an existing author_name will prompt login
+- assert an existing login will login
+- assert an empty author_name / password will prompt a message
+
+'''
 
 
 class SegmentContentTests(TestCase):

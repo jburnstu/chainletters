@@ -125,8 +125,8 @@ class ModeratableSegmentByAuthor(models.Model):    # id = models.IntegerField
 
 class Comment(models.Model):
     author = models.ForeignKey('Author', models.DO_NOTHING)
-    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
-    comment_status = models.ForeignKey('CommentStatus',models.DO_NOTHING)
+    comment_parent_type = models.ForeignKey('CommentParentType', models.DO_NOTHING)
+    comment_status = models.ForeignKey('CommentStatus',models.DO_NOTHING,default=1)
     text_content = models.TextField(default="")
 
     def __str__(self):
@@ -135,11 +135,11 @@ class Comment(models.Model):
     class Meta:
         db_table = "comment"
 
-class CommentType(models.Model):
+class CommentParentType(models.Model):
     description = models.CharField(max_length=20)
 
     class Meta:
-        db_table = "comment_type"
+        db_table = "comment_parent_type"
 
 class CommentStatus(models.Model):
     description = models.CharField(max_length=30)
@@ -150,7 +150,7 @@ class CommentStatus(models.Model):
 
 class CommentComment(models.Model):
     comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="comment_comment")
-    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    comment_parent_type = models.ForeignKey('CommentParentType', models.DO_NOTHING,default=3)
     parent_comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="parent_comment_comment")
 
     class Meta:
@@ -159,7 +159,7 @@ class CommentComment(models.Model):
 
 class SegmentComment(models.Model):
     comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="segment_comment")
-    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    comment_parent_type = models.ForeignKey('CommentParentType', models.DO_NOTHING,default=2)
     parent_segment = models.ForeignKey('Segment', models.DO_NOTHING,related_name="parent_segment_comment")
 
     class Meta:
@@ -167,7 +167,7 @@ class SegmentComment(models.Model):
 
 class StoryComment(models.Model):
     comment = models.ForeignKey('Comment', models.DO_NOTHING,related_name="story_comment")
-    comment_type = models.ForeignKey('CommentType', models.DO_NOTHING)
+    comment_parent_type = models.ForeignKey('CommentParentType', models.DO_NOTHING,default=1)
     parent_story = models.ForeignKey('Story', models.DO_NOTHING,related_name="parent_story_comment")
 
     class Meta:
