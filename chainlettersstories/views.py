@@ -65,6 +65,8 @@ def get_story_dicts_from_QS(QS):
         return []
     else:
         df = pd.DataFrame(QS)
+        print(df)
+        print(df.columns)
         return [{"id":key,
                  "segment_trace":
                     [{"earlier_segment_id":id,
@@ -72,7 +74,9 @@ def get_story_dicts_from_QS(QS):
                     "comments":get_all_comments_on_obj(Segment.objects.get(pk=id))
                     } for id,content in zip(
                         group["earlier_segment_id"],group["earlier_segment_content"])],
-                  "story_data":model_to_dict(Segment.objects.get(pk=key).story).update({"comments":get_all_comments_on_obj(Segment.objects.get(pk=key).story)})}                              
+                  "story_data":model_to_dict(Segment.objects.get(pk=key).story)
+                    # .update({"comments":get_all_comments_on_obj(Segment.objects.get(pk=key).story)})
+                    }                              
                     for key, group in df.groupby("final_segment_id")
 ]
 
@@ -83,8 +87,9 @@ def home(request,author_id):
 
     write_segment_trace_QS = SegmentTrace.objects.filter(final_author_id=author_id)\
                                 .filter(final_segment_status_id=1)\
-                                .values("earlier_segment_id","earlier_segment_content","final_segment_id")\
+                                .values("earlier_segment_id","earlier_segment_content","final_segment__id")\
                                 .order_by("earlier_segment_order")
+    print(write_segment_trace_QS)
     write_dicts = get_story_dicts_from_QS(write_segment_trace_QS)
 
 
@@ -106,19 +111,34 @@ def home(request,author_id):
 
 
 def get_all_comments_on_obj(obj,type="segment"):
-
     if type=="segment":
         comments_main_table_QS = Comment.objects.filter(segment_comment__parent_segment=obj)
     else:
         comments_main_table_QS = Comment.objects.filter(story_comment__parent_story=obj)
 
-    return [model_to_dict(comment)\
-            .update({"author":model_to_dict(comment.author)})\
-            .update({"child_comments":
-                     [model_to_dict(child_comment)\
-                      .update({"author":model_to_dict(child_comment.author)})
-                      for child_comment in Comment.objects.filter(comment_comment_parent_comment=comment)]})
-            for comment in comments_main_table_QS]
+    comment_list = []
+    for comment in comments_main_table_QS:
+        comment_dict = model_to_dict(comment)
+        comment_dict.update({"author":model_to_dict(comment.author)})
+
+        child_comment_list = []
+        for child_comment in Comment.objects.filter(comment_comment__parent_comment=comment):
+            child_comment_dict = model_to_dict(child_comment)
+            child_comment_dict.update({"author":model_to_dict(child_comment.author)})
+            child_comment_list.append(child_comment_dict)
+        
+        comment_dict.update({"child_comments":child_comment_list})
+        comment_list.append(comment_dict)
+
+    return comment_list
+
+    # return [model_to_dict(comment)\
+    #         .update({"author":model_to_dict(comment.author)})\
+    #         .update({"child_comments":
+    #                  [model_to_dict(child_comment)\
+    #                   .update({"author":model_to_dict(child_comment.author)})
+    #                   for child_comment in Comment.objects.filter(comment_comment_parent_comment=comment)]})
+    #         for comment in comments_main_table_QS]
         
 
 

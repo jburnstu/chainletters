@@ -143,7 +143,11 @@ class SegmentTraceIncludingCommentsSerializer(serializers.ModelSerializer):
         segment = Segment.objects.get(id=obj.earlier_segment_id)
         return SegmentWithCommentsSerializer(segment).data
 
-
+class StoryIncludingCommentsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Story
+        fields = '__all__'
 
 class FullStoryInfoSerializer(serializers.ModelSerializer):
     segment_trace = SegmentTraceIncludingCommentsSerializer(many=True,read_only=True)
