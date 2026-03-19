@@ -61,9 +61,12 @@ def login(request):
 
 
 def get_story_dicts_from_QS(QS):
+    print(QS)
     if not QS:
+        print("NOT")
         return []
     else:
+        print("YES")
         df = pd.DataFrame(QS)
         print(df)
         print(df.columns)
@@ -87,7 +90,7 @@ def home(request,author_id):
 
     write_segment_trace_QS = SegmentTrace.objects.filter(final_author_id=author_id)\
                                 .filter(final_segment_status_id=1)\
-                                .values("earlier_segment_id","earlier_segment_content","final_segment__id")\
+                                .values("earlier_segment_id","earlier_segment_content","final_segment_id")\
                                 .order_by("earlier_segment_order")
     print(write_segment_trace_QS)
     write_dicts = get_story_dicts_from_QS(write_segment_trace_QS)
@@ -97,8 +100,14 @@ def home(request,author_id):
                                                 .filter(author=author_id)\
                                                 .filter(is_it_closed=False)\
                                                 .values_list("segment")
-    read_dicts = get_story_dicts_from_QS(segment_ids_to_moderate)
 
+    if not segment_ids_to_moderate:
+        read_dicts = []
+    else:
+        read_segment_trace_QS = SegmentTrace.objects.filter(final_segment_id__in = segment_ids_to_moderate)\
+                                    .values("earlier_segment_id","earlier_segment_content","final_segment_id")\
+                                    .order_by("earlier_segment_order")
+        read_dicts = get_story_dicts_from_QS(read_segment_trace_QS)
 
 
 
