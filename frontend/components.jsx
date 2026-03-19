@@ -170,7 +170,7 @@ function Story(props) {
 
     let noSelections = {};
     storyDict.segment_trace.forEach(dictInArray =>
-        noSelections[dictInArray["earlier_segment_id"]] = true)
+        noSelections[dictInArray["earlier_segment_id"]] = false)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
     console.log(storyDict);
@@ -178,7 +178,7 @@ function Story(props) {
     function changeSegmentSelection(segmentID) {
         console.log("oroginal change selection function called")
         console.log(!selectedSegmentDict[segmentID])
-        setSelectedSegmentDict({ [segmentID]: !selectedSegmentDict[segmentID] })
+        setSelectedSegmentDict({ ...selectedSegmentDict, [segmentID]: !selectedSegmentDict[segmentID] })
         console.log(selectedSegmentDict)
     }
 
