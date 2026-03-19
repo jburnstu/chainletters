@@ -11,29 +11,19 @@ export default { Comments };
 export function Comments(props) {
 
     let selections = props.selections;
-    let segmentKeys = Object.keys(selections);
-    console.log(segmentKeys)
+    console.log(selections)
 
     let storyDict = props.storyDict;
     let segmentTraceWithInfo = storyDict.segment_trace
-
-    // function getSegmentByID(segmentDictArray, id) {
-    //     const idMatch = (segmentDict) => segmentDict.id == id;
-    //     return segmentDictArray.find(idMatch);
-    // }
 
     return (
         <div className="comments">
             <StoryCommentPanel />
             {segmentTraceWithInfo.map(segmentObj =>
-                <SegmentInfoPanel key={segmentObj.id} isSelected={selections[segmentObj.id]} segmentInfo={segmentObj} />
+                <SegmentInfoPanel key={segmentObj.id} selections={selections} segmentInfo={segmentObj} />
             )}
         </div>
     )
-
-    {/* {segmentKeys.map(segmentKey =>
-    <SegmentInfoPanel key={segmentKey} isSelected={selections[segmentKey]} segmentInfo={getSegmentByID(segmentTraceWithInfo, segmentKey)} />
-)} */}
 }
 
 function StoryCommentPanel() { }
@@ -43,26 +33,19 @@ function SegmentInfoPanel(props) {
 
     let segmentInfo = props.segmentInfo;
     console.log(segmentInfo);
+    console.log(props.selections)
+    console.log(props.selections[segmentInfo.earlier_segment_id]);
 
     const [isModerationOpen, setIsModerationOpen] = useState(false);
 
-    // function getArrayObjByID(array, id) {
-    //     const idMatch = (obj) => obj.id == id;
-    //     return array.find(idMatch);
-    // }
-
     function createComment() { }
-
     function submitComment() { }
-
     function abandonComment() { }
 
-
-
-    return (<div className={`segmentInfoContainer ${props.isSelected ? undefined : 'hidden'}`} >
+    return (<div className={`segmentInfoContainer ${props.selections[segmentInfo.earlier_segment_id] ? undefined : 'hidden'}`} >
         <div>{segmentInfo.author.display_name}</div>
         <div className="moderationContainer">
-            <button onCLick={() => setIsModerationOpen(!isModerationOpen)}>LOOK AT MODERATION</button>
+            <button onClick={() => setIsModerationOpen(!isModerationOpen)}>LOOK AT MODERATION</button>
             <div className={isModerationOpen ? undefined : 'hidden'}>MODERATION PANEL</div>
         </div>
         <div className="segmentCommentsContainer">

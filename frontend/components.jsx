@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutl
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
 import { Comments } from "./comments.jsx";
-import { getArrayObjByID } from ",/utilityFuncs";
+import { getArrayObjByID } from "./utilityFuncs";
 
 
 function AppByAuthor(props) {
@@ -170,13 +170,16 @@ function Story(props) {
 
     let noSelections = {};
     storyDict.segment_trace.forEach(dictInArray =>
-        noSelections[dictInArray["earlier_segment_id"]] = false)
+        noSelections[dictInArray["earlier_segment_id"]] = true)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
     console.log(storyDict);
 
     function changeSegmentSelection(segmentID) {
+        console.log("oroginal change selection function called")
+        console.log(!selectedSegmentDict[segmentID])
         setSelectedSegmentDict({ [segmentID]: !selectedSegmentDict[segmentID] })
+        console.log(selectedSegmentDict)
     }
 
     function handleChange(e) {
@@ -204,7 +207,7 @@ function Story(props) {
                         isFinalSegment={segmentDict.earlier_segment_id == storyID}
                         fixedContent={segmentDict.earlier_segment_content}
                         currentContent={currentContent}
-                        onClick={changeSegmentSelection}
+                        changeSelection={changeSegmentSelection}
                         onChange={handleChange} />
                 )
                 }
@@ -239,11 +242,15 @@ function SegmentDisplay(props) {
         value = props.currentContent;
     }
 
-    const onClick = () => props.onClick(props.id)
+    const onClick = () => {
+        props.changeSelection(props.id)
+        console.log(`${props.id} clicked`)
+    }
 
 
-    return (<textarea className={`segmentDisplay ${readOnly ? undefined : 'currentSegmentDisplay'}`} readOnly={readOnly} value={value}
-        onChange={onChange} onClick={onClick} ></ textarea>)
+    return (
+        <textarea className={`segmentDisplay ${readOnly ? undefined : 'currentSegmentDisplay'}`} readOnly={readOnly} value={value}
+            onChange={onChange} onClick={onClick} ></ textarea>)
 
 }
 

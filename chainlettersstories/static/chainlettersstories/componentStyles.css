@@ -1,21 +1,28 @@
 :root {
     --col-1: #FCF0CC;
     --col-2: #EDAFB8;
+    --col-2-A: #ecc3ca;
     --col-3: #A07178;
+    --col-3-A: #513b3e;
     --col-4: #95B8D1;
     --col-5: #333333;
 }
 
 
 button {
-    color: var(--col-2);
-    background-color: var(--col-3);
+    color: var(--col-2-A);
+    background-color: var(--col-3-A);
 }
 
 * {
     margin: 2px;
     padding: 0.1%;
     border-radius: 5px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+textarea {
+    font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 div.container {
