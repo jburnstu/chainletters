@@ -61,15 +61,10 @@ def login(request):
 
 
 def get_story_dicts_from_QS(QS):
-    print(QS)
     if not QS:
-        print("NOT")
         return []
     else:
-        print("YES")
         df = pd.DataFrame(QS)
-        print(df)
-        print(df.columns)
         return [{"id":key,
                  "segment_trace":
                     [{"earlier_segment_id":id,
@@ -109,7 +104,7 @@ def home(request,author_id):
                                     .order_by("earlier_segment_order")
         read_dicts = get_story_dicts_from_QS(read_segment_trace_QS)
 
-
+    print(read_dicts)
 
     return render(request,template, 
                   {

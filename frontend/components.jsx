@@ -18,6 +18,7 @@ function AppByAuthor(props) {
     useEffect(() => console.log("Rendered - write dicts: ", writeDicts));
 
     console.log(authorID);
+    console.log(readDicts);
     const rootPath = `/chainlettersstories/${authorID}/`;
 
 
@@ -169,7 +170,8 @@ function Story(props) {
     const { storyID } = useParams();
     console.log("Story loading", storyID)
 
-    console.log(props.dicts)
+    // console.log(props.dicts)
+
     function getStoryByID(storyDictArray, id) {
         const idMatch = (storyDict) => storyDict.id == id;
         return storyDictArray.find(idMatch);
@@ -181,13 +183,13 @@ function Story(props) {
     const [wordCount, setWordCount] = useState(0);
 
     let noSelections = {};
-    storyDict.segment_trace.forEach(dictInArray => noSelections[dictInArray["earlier_segment_id"]] = 0)
+    storyDict.segment_trace.forEach(dictInArray => noSelections[dictInArray["earlier_segment_id"]] = false)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
-
+    console.log(storyDict);
 
     function changeSegmentSelection(segmentID) {
-        // setSelectedSegmentDict({ selectedSegmentDict, (selectedSegmentDict[segmentID] == 1) })
+        setSelectedSegmentDict({ [segmentID]: !selectedSegmentDict[segmentID] })
     }
 
     function handleChange(e) {
@@ -222,7 +224,7 @@ function Story(props) {
                 }
             </div>
             <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentID={storyID} removeCurrentStory={removeCurrentStory} />
-            <Comments selections={selectedSegmentDict} />
+            <Comments selections={selectedSegmentDict} storyDict={storyDict} />
         </div>
     )
 }

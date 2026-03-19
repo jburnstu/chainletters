@@ -4,59 +4,64 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
-import { contactAPI } from "./buttons.jsx";
-
-```
-When / where 
-```
+import { getRandomItem, contactAPI } from "./utilityFuncs.jsx";
+export default { Comments };
 
 
-function Comments(props) {
+export function Comments(props) {
 
     let selections = props.selections;
     let segmentKeys = Object.keys(selections);
     console.log(segmentKeys)
 
-    async function getCommentsForSegmentTrace() {
-        let segmentCommentDict = await Promise.all(segmentKeys.map(async (segmentID) => {
-            segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
-            segmentTraceDataArray.push(segmentTraceData);
-        }
-        )
-        )
-    }
+    let storyDict = props.storyDict;
+    let segmentTraceWithInfo = storyDict.segment_trace
+
+    // function getSegmentByID(segmentDictArray, id) {
+    //     const idMatch = (segmentDict) => segmentDict.id == id;
+    //     return segmentDictArray.find(idMatch);
+    // }
 
     return (
         <div className="comments">
-            <StoryCommentPanel></StoryCommentPanel>
-            {selectionArray.map(selectionID =>
-                <SegmentCommentPanel segmentID={selectionID}> /</SegmentCommentPanel>
+            <StoryCommentPanel />
+            {segmentTraceWithInfo.map(segmentObj =>
+                <SegmentInfoPanel key={segmentObj.id} isSelected={selections[segmentObj.id]} segmentInfo={segmentObj} />
             )}
         </div>
     )
+
+    {/* {segmentKeys.map(segmentKey =>
+    <SegmentInfoPanel key={segmentKey} isSelected={selections[segmentKey]} segmentInfo={getSegmentByID(segmentTraceWithInfo, segmentKey)} />
+)} */}
 }
 
 function StoryCommentPanel() { }
 
 
-function SegmentCommentPanel(props) {
+function SegmentInfoPanel(props) {
 
-    let author = null;
-    let moderationNotes = null;
-    let content = null;
-    let commentDict = null;
+    let segmentInfo = props.segmentInfo;
+    console.log(segmentInfo);
 
     const [isModerationOpen, setIsModerationOpen] = useState(false);
 
+    // function getArrayObjByID(array, id) {
+    //     const idMatch = (obj) => obj.id == id;
+    //     return array.find(idMatch);
+    // }
 
-    return (<div className="segmentComment">
-        <div>{author}</div>
+
+
+    return (<div className={"segmentInfoContainer " + props.isSelected ? undefined : 'hidden'} >
+        <div>{segmentInfo.author.display_name}</div>
         <div className="moderationContainer">
-            <button onCLick={() => setIsModerationOpen(true)}></button>
-            <div visible={isModerationOpen}></div>
+            <button onCLick={() => setIsModerationOpen(!isModerationOpen)}>LOOK AT MODERATION</button>
+            <div className={isModerationOpen ? undefined : 'hidden'}>MODERATION PANEL</div>
         </div>
         <div className="segmentCommentsContainer">
-            {commentDict.map(segmentCommentID => <SegmentComment commentDict={commentDict[segmentCommentID]}></SegmentComment>)}
+            {segmentInfo.comments.map(segmentCommentObj =>
+                <SegmentComment key={segmentCommentObj.id} segmentCommentInfo={segmentCommentObj} />)}
         </div>
         <div className="addCommentContainer">
             <button onClick={createComment}></button>
@@ -64,13 +69,31 @@ function SegmentCommentPanel(props) {
             <button onClick={submitComment}></button>
             <button onClick={abandonComment}></button>
         </div>
-    </div>)
+    </ div>)
 }
 
 
-```
-What would a large, all-comment-info-for-a-given-segment dict look like?
-{segmentID: 
-        {authorID::, segmentCommentID: 
-                {authorID::, content::, childComments: [commentCommentID: {authorID::}, ]}}}
-```
+function SegmentComment(props) {
+
+    let segmentCommentInfo = props.segmentCommentInfo;
+
+    return (
+        <div className="segmentCommentContainer">{commentDict.author.display_name}
+            <textarea readOnly value={commentDict.text_content} />
+            <div className="commentCommentsContainer">
+                {segmentCommentInfo.comments.map(commentCommentObj =>
+                    <CommentComment key={commentCommentObj.id} commentCommentInfo={commentCommentObj} />
+                )}
+            </div>
+            <div className="addCommentCommentContainer"></div>
+        </div>)
+}
+
+function CommentComment(props) {
+
+    return (
+        <div className="CommentCommentContainer">{props.commentCommentInfo.author.display_name}
+            <textarea readOnly value={props.commentCommentInfo.text_content} />
+        </div>
+    )
+}

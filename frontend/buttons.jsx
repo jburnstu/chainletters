@@ -4,60 +4,7 @@ import { createPortal } from 'react-dom';
 export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
 import { AuthorContext } from "./context.jsx";
 import { useNavigate, useLocation, redirect } from "react-router";
-
-function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
-    console.log("started getRandomItem");
-    if ((numberOfResults == 1 || array.length == 1) && !(arrayOfOne)) {
-        return array[Math.floor(Math.random() * array.length)];
-    }
-
-    let set = new Set();
-    while (set.size < numberOfResults && set.size < array.length) {
-        console.log("Inside the while");
-        var randomIndex = Math.floor(Math.random() * array.length);
-        set.add(randomIndex);
-    }
-    let randomIndexArray = Array.from(set);
-    console.log("finished getrandomitem");
-
-    return randomIndexArray.map(index => array[index]);
-}
-
-async function contactAPI(urlTarget, method, bodyDict = {}) {
-
-    const urlStub = "http://127.0.0.1:8000/api/";
-    let fetchData;
-    switch (method) {
-        case "get":
-            fetchData = {
-                method: method
-            }
-            break;
-        default:
-            fetchData = {
-                method: method,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(bodyDict)
-            }
-    }
-
-    let response = await fetch(`${urlStub}${urlTarget}`,
-        fetchData
-    )
-
-    if ((method == "get" && response.status != 200) || !response.ok) {
-        console.log("HTTP Error ", response.status, "at url ", `${urlStub}${urlTarget}`);
-        return {};
-    }
-    else {
-        console.log("SUCCESS at url ", `${urlStub}${urlTarget}`);
-    }
-
-    return response.json();
-};
+import { getRandomItem, contactAPI } from "./utilityFuncs.jsx";
 
 
 async function uploadNewSegment(previousSegmentID, authorID) {
@@ -128,7 +75,6 @@ async function uploadNewModerationAssignment(previousSegmentID, authorID) {
     return moderationAssignmentCreationData;
 }
 
-
 export function ModalNewButton(props) {
 
 
@@ -152,7 +98,7 @@ export function ModalNewButton(props) {
     )
 }
 
-export function NewStoryOptionspanel(props) {
+function NewStoryOptionspanel(props) {
     const authorID = useContext(AuthorContext);
 
     const [storyParameters, setStoryParameters] = useState({});
@@ -233,7 +179,6 @@ export function NewStoryOptionspanel(props) {
     )
 }
 
-
 export function SubmissionButton(props) {
     let navigate = useNavigate();
     let location = useLocation();
@@ -292,7 +237,6 @@ export function SubmissionButton(props) {
         <button onClick={handleSubmit}>{props.submissionType}</button>
     )
 }
-
 
 export function ModalJoinButton(props) {
     const authorID = useContext(AuthorContext);
@@ -387,7 +331,6 @@ function ModalWindow(props) {
         )
     )
 }
-
 
 export function NewModerationModalButton(props) {
     const authorID = useContext(AuthorContext);
