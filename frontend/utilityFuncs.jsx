@@ -1,4 +1,9 @@
-export default { getRandomItem, contactAPI }
+export default { getRandomItem, contactAPI, getArrayObjByID }
+
+export function getArrayObjByID(array, id) {
+    const idMatch = (obj) => obj.id == id;
+    return array.find(idMatch);
+}
 
 
 export function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {

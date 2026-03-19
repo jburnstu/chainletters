@@ -4,8 +4,8 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
-import { Comments } from "./comments.jsx"
-// import './dashboardStyles.css';
+import { Comments } from "./comments.jsx";
+import { getArrayObjByID } from ",/utilityFuncs";
 
 
 function AppByAuthor(props) {
@@ -15,10 +15,6 @@ function AppByAuthor(props) {
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-    useEffect(() => console.log("Rendered - write dicts: ", writeDicts));
-
-    console.log(authorID);
-    console.log(readDicts);
     const rootPath = `/chainlettersstories/${authorID}/`;
 
 
@@ -38,13 +34,10 @@ function AppByAuthor(props) {
                 break
             case "add":
             default:
-                console.log("adding story " + storyDict + " to " + dictArrayToChange);
                 newDictArray = dictArrayToChange.slice();
                 newDictArray.push(storyDict);
-                console.log(newDictArray)
         }
         setFunction(newDictArray)
-        console.log(newDictArray)
         if (newDictArray == dictArrayToChange) {
             console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
         }
@@ -168,22 +161,16 @@ function Story(props) {
 
     let readOrWrite = props.readOrWrite;
     const { storyID } = useParams();
-    console.log("Story loading", storyID)
 
-    // console.log(props.dicts)
-
-    function getStoryByID(storyDictArray, id) {
-        const idMatch = (storyDict) => storyDict.id == id;
-        return storyDictArray.find(idMatch);
-    }
-    let storyDict = getStoryByID(props.dicts, storyID);
+    let storyDict = getArrayObjByID(props.dicts, storyID);
     let presavedCurrentContent = storyDict.segment_trace.slice(-1).earlier_segment_content;
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
     const [wordCount, setWordCount] = useState(0);
 
     let noSelections = {};
-    storyDict.segment_trace.forEach(dictInArray => noSelections[dictInArray["earlier_segment_id"]] = false)
+    storyDict.segment_trace.forEach(dictInArray =>
+        noSelections[dictInArray["earlier_segment_id"]] = false)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
     console.log(storyDict);
@@ -202,7 +189,6 @@ function Story(props) {
         const spaceMatchPattern = /\S+/g;
         let numberOfSpaces = myText.match(spaceMatchPattern);
         return (numberOfSpaces ? numberOfSpaces : []).length;
-
     }
 
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
@@ -215,7 +201,7 @@ function Story(props) {
                 {storyDict.segment_trace.map(segmentDict =>
                     <SegmentDisplay key={segmentDict.earlier_segment_id}
                         id={segmentDict.earlier_segment_id}
-                        finalSegment={segmentDict.earlier_segment_id == storyID}
+                        isFinalSegment={segmentDict.earlier_segment_id == storyID}
                         fixedContent={segmentDict.earlier_segment_content}
                         currentContent={currentContent}
                         onClick={changeSegmentSelection}
@@ -232,10 +218,7 @@ function Story(props) {
 function StoryHeader(props) {
 
     let storyData = props.storyDict["story_data"];
-    console.log(storyData)
     let length = props.storyDict.segment_trace.length;
-    console.log(length)
-
 
     return (<div className="storyHeader">THIS IS THE STORY HEADER
         <div>{storyData.title ? storyData.title : "Untitled"}</div>
@@ -250,7 +233,7 @@ function SegmentDisplay(props) {
     let onChange = null;
     let value = props.fixedContent;
 
-    if (props.finalSegment) {
+    if (props.isFinalSegment) {
         readOnly = false;
         onChange = props.onChange;
         value = props.currentContent;
@@ -258,11 +241,9 @@ function SegmentDisplay(props) {
 
     const onClick = () => props.onClick(props.id)
 
-    console.log(props.key, props.finalSegment, readOnly)
 
     return (<textarea className={`segmentDisplay ${readOnly ? undefined : 'currentSegmentDisplay'}`} readOnly={readOnly} value={value}
         onChange={onChange} onClick={onClick} ></ textarea>)
-
 
 }
 
@@ -298,3 +279,14 @@ const WRITEDICTS = JSON.parse(document.getElementById('write_dicts').textContent
 createRoot(document.getElementById('myAppContainer')).render(
     <AppByAuthor authorID={AUTHORID} displayName={DISPLAYNAME} readDicts={READDICTS} writeDicts={WRITEDICTS} />
 );
+
+
+document.querySelectorAll("textarea").forEach(function (textarea) {
+    textarea.style.height = textarea.scrollHeight + "px";
+    textarea.style.overflowY = "hidden";
+
+    textarea.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+    });
+});
