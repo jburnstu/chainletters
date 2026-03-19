@@ -176,10 +176,7 @@ function Story(props) {
     console.log(storyDict);
 
     function changeSegmentSelection(segmentID) {
-        console.log("oroginal change selection function called")
-        console.log(!selectedSegmentDict[segmentID])
         setSelectedSegmentDict({ ...selectedSegmentDict, [segmentID]: !selectedSegmentDict[segmentID] })
-        console.log(selectedSegmentDict)
     }
 
     function handleChange(e) {
@@ -244,7 +241,6 @@ function SegmentDisplay(props) {
 
     const onClick = () => {
         props.changeSelection(props.id)
-        console.log(`${props.id} clicked`)
     }
 
 

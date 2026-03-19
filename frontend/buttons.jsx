@@ -9,7 +9,7 @@ import { getRandomItem, contactAPI } from "./utilityFuncs.jsx";
 
 async function uploadNewSegment(previousSegmentID, authorID) {
 
-    console.log(previousSegmentID, authorID);
+
     let updatePreviousSegmentData = await contactAPI(`segment/${previousSegmentID}/`,
         "patch",
         { 'segment_status_id': 5 }
@@ -26,9 +26,10 @@ async function uploadNewSegment(previousSegmentID, authorID) {
         }
     );
 
-    let getNewSegmentTraceData = await contactAPI(`segment_trace/${createSegmentData.id}`, "get");
-    console.log(getNewSegmentTraceData);
-    return getNewSegmentTraceData;
+    let getNewFullStoryInfoData = await contactAPI(`full_story_info/${createSegmentData.id}`, "get");
+    console.log("FULL STORY INFO", getNewFullStoryInfoData)
+
+    return getNewFullStoryInfoData
 }
 
 async function uploadNewStoryAndSegment(authorID, storyParameters) {
@@ -47,16 +48,16 @@ async function uploadNewStoryAndSegment(authorID, storyParameters) {
         }
     )
 
-    let segmentCreationData = await contactAPI("segment/", "post",
+    let createSegmentData = await contactAPI("segment/", "post",
         {
             'story': storyCreationData.id,
             'author': authorID,
             'segment_status': 1,
         }
     )
-    let getNewSegmentTraceData = await contactAPI(`segment_trace/${segmentCreationData.id}`, "get");
+    let getNewFullStoryInfoData = await contactAPI(`full_story_info/${createSegmentData.id}`, "get");
 
-    return getNewSegmentTraceData
+    return getNewFullStoryInfoData
 
 }
 
@@ -201,11 +202,10 @@ export function SubmissionButton(props) {
 
     async function handleSubmit(e) {
         console.log(props.segmentID);
-        let getSegmentTraceData = await contactAPI(`segment_trace/${props.segmentID}/`, "get");
+        let getNewFullStoryInfoData = await contactAPI(`full_story_info/${props.segmentID}`, "get");
 
-        console.log(getSegmentTraceData);
         if (props.submissionType != "SAVE") {
-            props.removeCurrentStory(getSegmentTraceData);
+            props.removeCurrentStory(getNewFullStoryInfoData);
         }
 
         let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;

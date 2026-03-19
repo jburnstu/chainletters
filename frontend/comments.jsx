@@ -43,7 +43,7 @@ function SegmentInfoPanel(props) {
     function abandonComment() { }
 
     return (<div className={`segmentInfoContainer ${props.selections[segmentInfo.earlier_segment_id] ? undefined : 'hidden'}`} >
-        <div>{segmentInfo.author.display_name}</div>
+        <div>{segmentInfo.earlier_segment_author.display_name}</div>
         <div className="moderationContainer">
             <button onClick={() => setIsModerationOpen(!isModerationOpen)}>LOOK AT MODERATION</button>
             <div className={isModerationOpen ? undefined : 'hidden'}>MODERATION PANEL</div>
@@ -71,7 +71,7 @@ function SegmentComment(props) {
         <div className="segmentCommentContainer">{segmentCommentInfo.author.display_name}
             <textarea readOnly value={segmentCommentInfo.text_content} />
             <div className="commentCommentsContainer">
-                {segmentCommentInfo.child_comments.map(commentCommentObj =>
+                {segmentCommentInfo.comments.map(commentCommentObj =>
                     <CommentComment key={commentCommentObj.id} commentCommentInfo={commentCommentObj} />
                 )}
             </div>

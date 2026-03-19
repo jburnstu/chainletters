@@ -69,7 +69,7 @@ def get_story_dicts_from_QS(QS):
                  "segment_trace":
                     [{"earlier_segment_id":id,
                     "earlier_segment_content":content,
-                    "author":model_to_dict(Segment.objects.get(pk=id).author,
+                    "earlier_segment_author":model_to_dict(Segment.objects.get(pk=id).author,
                                            fields=["id","display_name"]),
                     "comments":get_all_comments_on_obj(Segment.objects.get(pk=id))
                     } for id,content in zip(

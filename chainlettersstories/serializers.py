@@ -75,15 +75,11 @@ class SegmentTraceBySegmentSerializer(serializers.ModelSerializer):
                   'segment_trace'
         ]
 
-
-
-
 class ModerationAssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ModerationAssignment
         fields = '__all__'
-
 
 class AuthorSerilializer(serializers.ModelSerializer):
 
@@ -95,22 +91,25 @@ class AuthorSerilializer(serializers.ModelSerializer):
 
 class SegmentCommentCommentByCommentSerializer(serializers.ModelSerializer):
     author = AuthorSerilializer(read_only=True)
+    id = serializers.IntegerField(source="child_comment_id")
 
     class Meta:
         model = SegmentCommentCommentByComment
-        fields = ['child_comment',
+        fields = ['id',
                   'author',
                   'text_content']
 
 class SegmentCommentBySegmentSerializer(serializers.ModelSerializer):
     comments = SegmentCommentCommentByCommentSerializer(read_only=True,many=True,source="segment_comment_comment_trace")
     author = AuthorSerilializer(read_only=True)
+    id = serializers.IntegerField(source="comment_id")
 
 
     class Meta:
         model = SegmentCommentBySegment
-        fields = ['comment',
+        fields = ['id',
                   'author',
+                  'text_content',
                   'comments']
 
 
@@ -140,14 +139,12 @@ class SegmentTraceIncludingCommentsSerializer(serializers.ModelSerializer):
                   ]
         
     def get_comments(self, obj):
-        segment = Segment.objects.get(id=obj.earlier_segment_id)
-        return SegmentWithCommentsSerializer(segment).data
+        try:
+            comments = SegmentCommentBySegment.objects.filter(segment_id=obj.earlier_segment_id)
+        except SegmentCommentBySegment.DoesNotExist:
+            return []    
+        return [SegmentCommentBySegmentSerializer(comment).data for comment in comments]
 
-class StoryIncludingCommentsSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Story
-        fields = '__all__'
 
 class FullStoryInfoSerializer(serializers.ModelSerializer):
     segment_trace = SegmentTraceIncludingCommentsSerializer(many=True,read_only=True)
@@ -160,3 +157,10 @@ class FullStoryInfoSerializer(serializers.ModelSerializer):
                   'segment_trace'
     ]
 
+
+
+# class StoryIncludingCommentsSerializer(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = Story
+#         fields = '__all__'
