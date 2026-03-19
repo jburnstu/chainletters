@@ -11,7 +11,7 @@ import random
 from .models import Story, Author, Segment, SegmentTrace, SegmentStatus, ModerationAssignment,\
  AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
  Comment,SegmentComment,StoryComment,CommentComment,CommentStatus
-from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer
+from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer,  SegmentWithCommentsSerializer, FullStoryInfoSerializer
 # Create your views here.
 
 
@@ -207,3 +207,11 @@ class SegmentTraceViewSet(viewsets.ModelViewSet):
     queryset = Segment.objects.all()
     serializer_class = SegmentTraceBySegmentSerializer
 
+class SegmentWithCommentsViewSet(viewsets.ModelViewSet):
+    queryset = Segment.objects.all()
+    serializer_class =  SegmentWithCommentsSerializer
+
+
+class FullStoryInfoViewSet(viewsets.ModelViewSet):
+    queryset = Segment.objects.all()
+    serializer_class = FullStoryInfoSerializer

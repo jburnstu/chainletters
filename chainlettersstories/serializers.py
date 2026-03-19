@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import Story, Segment, AvailableSegmentByAuthor, Author,\
       SegmentTrace, ModerationAssignment, ModeratableSegmentByAuthor,\
-          Comment, SegmentComment,StoryComment, CommentComment
+          Comment, SegmentComment,StoryComment, CommentComment,\
+          SegmentCommentBySegment, SegmentCommentCommentByComment
 from django.views.decorators.cache import cache_page
 
 class StorySerializer(serializers.ModelSerializer):
@@ -82,19 +83,6 @@ class SegmentTraceWithCommentsSerializer(serializers.ModelSerializer):
 
 
 
-class FullStoryInfoSerializer(serializers.ModelSerializer):
-    segment_trace = SegmentTraceSerializer(many=True,read_only=True)
-    story_data = StorySerializer(read_only=True, source="story")
-
-
-    class Meta:
-        model = Segment
-        fields = ['id',
-                    'story_data',
-                  'segment_trace'
-    ]
-
-
 class ModerationAssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -109,21 +97,60 @@ class AuthorSerilializer(serializers.ModelSerializer):
         fields = ['id',
                   'display_name']
 
-class CommentCommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerilializer(read_only=True,source="author")
+
+class SegmentCommentCommentByCommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerilializer(read_only=True)
 
     class Meta:
-        model = CommentComment
-        fields = []
-
-
-class SegmentCommentWithChildrenSerializer(serializers.ModelSerializer):
-    author = AuthorSerilializer(read_only=True,source="author")
-    child_comments = CommentCommentSerializer(many=True,read_only=True,source="comment_comment")
-
-    class Meta:
-        model = SegmentComment
-        fields = ['id',
-                  'content',
+        model = SegmentCommentCommentByComment
+        fields = ['child_comment',
                   'author',
-                  'child_comments']
+                  'text_content']
+
+class SegmentCommentBySegmentSerializer(serializers.ModelSerializer):
+    comments = SegmentCommentCommentByCommentSerializer(read_only=True,many=True,source="segment_comment_comment_trace")
+    author = AuthorSerilializer(read_only=True)
+
+
+    class Meta:
+        model = SegmentCommentBySegment
+        fields = ['comment',
+                  'author',
+                  'comments']
+
+
+class SegmentWithCommentsSerializer(serializers.ModelSerializer):
+    comments = SegmentCommentBySegmentSerializer(read_only=True,many=True,source="segment_comment_trace")
+    author = AuthorSerilializer(read_only=True)
+
+    class Meta:
+        model = Segment
+        fields = ['id',
+                  'author',
+                  'comments']
+
+
+class SegmentTraceIncludingCommentsSerializer(serializers.ModelSerializer):
+    comments = SegmentWithCommentsSerializer(read_only=True,source="earlier_segment_id")
+    earlier_segment_author = AuthorSerilializer(read_only=True)
+
+    class Meta: 
+        model = SegmentTrace
+        fields = [
+                'earlier_segment_id',
+                'earlier_segment_content',
+                'earlier_segment_author',
+                'comments'
+                  ]
+
+class FullStoryInfoSerializer(serializers.ModelSerializer):
+    segment_trace = SegmentTraceIncludingCommentsSerializer(many=True,read_only=True)
+    story_data = StorySerializer(read_only=True, source="story")
+
+    class Meta:
+        model = Segment
+        fields = ['id',
+                    'story_data',
+                  'segment_trace'
+    ]
+

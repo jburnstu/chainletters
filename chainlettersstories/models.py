@@ -95,6 +95,7 @@ class SegmentTrace(models.Model):
     final_author_id = models.IntegerField()
     final_segment_status_id = models.IntegerField()
     story_id = models.IntegerField()
+    earlier_segment_author = models.ForeignKey("Author", models.DO_NOTHING)
 
     class Meta:
         db_table = "segment_trace"
@@ -172,3 +173,26 @@ class StoryComment(models.Model):
 
     class Meta:
         db_table = "story_comment"
+
+
+class SegmentCommentBySegment(models.Model):
+    # pk = models.CompositePrimaryKey("segment","comment")
+    segment = models.ForeignKey("Segment",models.DO_NOTHING,related_name="segment_comment_trace")
+    comment = models.ForeignKey("Comment", models.DO_NOTHING, primary_key=True)
+    author = models.ForeignKey("Author", models.DO_NOTHING)
+    text_content = models.CharField()
+
+    class Meta:
+        db_table = "segment_comment_by_segment"
+        managed=False
+
+class SegmentCommentCommentByComment(models.Model):
+    # pk = models.CompositePrimaryKey("comment","child_comment")
+    comment = models.ForeignKey("SegmentCommentBySegment",models.DO_NOTHING,related_name="segment_comment_comment_trace")
+    child_comment = models.ForeignKey("Comment", models.DO_NOTHING,primary_key=True)
+    author = models.ForeignKey("Author", models.DO_NOTHING)
+    text_content = models.CharField()
+
+    class Meta:
+        db_table = "segment_comment_comment_by_comment"
+        managed=False

@@ -12,6 +12,10 @@ router.register(r'story',views.StoryViewSet)
 router.register(r'author_including_availability',views.AuthorIncludingAvailabilityViewSet)
 router.register(r'moderation_assignment', views.ModerationAssignmentViewSet)
 router.register(r'segment_trace', views.SegmentTraceViewSet, basename='segment_trace')
+router.register(r'segment_with_comments', views.SegmentWithCommentsViewSet, basename='segment_with_comments')
+router.register(r'full_story_info', views.FullStoryInfoViewSet, basename='full_story_info')
+
+
 
 app_name = "chainlettersstories"
 urlpatterns = [
