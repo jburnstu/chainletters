@@ -44,7 +44,7 @@ async function uploadNewStoryAndSegment(authorID, storyParameters) {
     let storyCreationData = await contactAPI("story/", "post",
         {
             'author': authorID,
-            // ...storyParameters
+            ...storyParameters
         }
     )
 
@@ -129,7 +129,7 @@ function NewStoryOptionspanel(props) {
 
     return (
         <form>
-            <fieldset>
+            <fieldset className="newStoryModalFieldset">
                 <input type="text" name="title"
                     value={storyParameters.storyTitle}
                     defaultValue="Title"

@@ -99,7 +99,7 @@ def get_all_comments_on_obj(obj,type="segment"):
             child_comment_dict.update({"author": model_to_dict(comment.author,fields=["id","display_name"])})
             child_comment_list.append(child_comment_dict)
         
-        comment_dict.update({"child_comments":child_comment_list})
+        comment_dict.update({"comments":child_comment_list})
         comment_list.append(comment_dict)
     # print(comment_list)
     return comment_list

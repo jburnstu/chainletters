@@ -114,7 +114,7 @@ function Dashboard(props) {
 
             <nav className="storyTabs">
                 {arrayOfStoryIDs.map((storyID, index) =>
-                    <Link to={storyID + "/"} key={index + storyID}>
+                    <Link to={storyID + "/"} key={index + storyID} className="storyTabLink">
                         <button className="storyTabButton"
                             onClick={() => console.log("link button clicked", storyID)}
                         >{index}</button>
@@ -220,7 +220,7 @@ function StoryHeader(props) {
     let storyData = props.storyDict["story_data"];
     let length = props.storyDict.segment_trace.length;
 
-    return (<div className="storyHeader">THIS IS THE STORY HEADER
+    return (<div className="storyHeader">
         <div>{storyData.title ? storyData.title : "Untitled"}</div>
         <div>{"Section " + length + " / " + (storyData.max_number_of_segments ? storyData.max_number_of_segments : "Infinite")}</div>
         <div>{"Word Count :" + props.wordCount + " / " + (storyData.max_segment_length ? storyData.max_segment_length : "Infinite")}</div>

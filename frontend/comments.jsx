@@ -53,10 +53,10 @@ function SegmentInfoPanel(props) {
                 <SegmentComment key={segmentCommentObj.id} segmentCommentInfo={segmentCommentObj} />)}
         </div>
         <div className="addCommentContainer">
-            <button onClick={createComment}></button>
+            <button onClick={createComment}>+</button>
             <textarea></textarea>
-            <button onClick={submitComment}></button>
-            <button onClick={abandonComment}></button>
+            <button onClick={submitComment}>!</button>
+            <button onClick={abandonComment}>X</button>
         </div>
     </ div >)
 }
