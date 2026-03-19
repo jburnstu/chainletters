@@ -67,7 +67,7 @@ nav.storyTabs {
 nav.storyTabs button {
     flex-grow: 1;
     /* margin-left: 2.5px;
-    margin-right: 2.5px; */
+                margin-right: 2.5px; */
 }
 
 div.storyContainer {
@@ -98,11 +98,6 @@ div.storyContent {
     background-color: yellow;
 }
 
-div.submissions {
-    grid-area: submissions;
-    display: flex;
-    background-color: red;
-}
 
 .previousSectionText {
     grid-area: read-only-content;
@@ -123,10 +118,16 @@ div.submissions {
     margin: 5px;
 }
 
+div.submissions {
+    grid-area: submissions;
+    display: flex;
+    background-color: red;
+}
+
 
 div.modalPortal {
     position: 'fixed';
-    top: 0;
+    top: 50;
     left: 0;
     right: 0;
     bottom: 0;
