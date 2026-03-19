@@ -260,7 +260,7 @@ function SegmentDisplay(props) {
 
     console.log(props.key, props.finalSegment, readOnly)
 
-    return (<textarea className="segmentDisplay" readOnly={readOnly} value={value}
+    return (<textarea className={`segmentDisplay ${readOnly ? undefined : 'currentSegmentDisplay'}`} readOnly={readOnly} value={value}
         onChange={onChange} onClick={onClick} ></ textarea>)
 
 

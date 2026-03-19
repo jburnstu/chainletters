@@ -51,9 +51,15 @@ function SegmentInfoPanel(props) {
     //     return array.find(idMatch);
     // }
 
+    function createComment() { }
+
+    function submitComment() { }
+
+    function abandonComment() { }
 
 
-    return (<div className={"segmentInfoContainer " + props.isSelected ? undefined : 'hidden'} >
+
+    return (<div className={`segmentInfoContainer ${props.isSelected ? undefined : 'hidden'}`} >
         <div>{segmentInfo.author.display_name}</div>
         <div className="moderationContainer">
             <button onCLick={() => setIsModerationOpen(!isModerationOpen)}>LOOK AT MODERATION</button>
@@ -69,19 +75,20 @@ function SegmentInfoPanel(props) {
             <button onClick={submitComment}></button>
             <button onClick={abandonComment}></button>
         </div>
-    </ div>)
+    </ div >)
 }
 
 
 function SegmentComment(props) {
 
     let segmentCommentInfo = props.segmentCommentInfo;
+    console.log(segmentCommentInfo)
 
     return (
-        <div className="segmentCommentContainer">{commentDict.author.display_name}
-            <textarea readOnly value={commentDict.text_content} />
+        <div className="segmentCommentContainer">{segmentCommentInfo.author.display_name}
+            <textarea readOnly value={segmentCommentInfo.text_content} />
             <div className="commentCommentsContainer">
-                {segmentCommentInfo.comments.map(commentCommentObj =>
+                {segmentCommentInfo.child_comments.map(commentCommentObj =>
                     <CommentComment key={commentCommentObj.id} commentCommentInfo={commentCommentObj} />
                 )}
             </div>
@@ -92,7 +99,7 @@ function SegmentComment(props) {
 function CommentComment(props) {
 
     return (
-        <div className="CommentCommentContainer">{props.commentCommentInfo.author.display_name}
+        <div className="commentCommentContainer">{props.commentCommentInfo.author.display_name}
             <textarea readOnly value={props.commentCommentInfo.text_content} />
         </div>
     )
