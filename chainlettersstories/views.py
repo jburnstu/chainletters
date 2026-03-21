@@ -142,6 +142,18 @@ def home(request,author_id):
 
 
         
+def home_write(request,author_id):
+    return home(request,author_id)
+
+def home_read(request,author_id):
+    return home(request,author_id)
+
+def home_write_story(request,author_id,story_id):
+    return home(request,author_id)
+
+def home_read_story(request,author_id,story_id):
+    return home(request,author_id)
+
 
 
 '''

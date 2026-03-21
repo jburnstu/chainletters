@@ -231,9 +231,9 @@ export function SubmissionButton(props) {
                             )
                         }
                         console.log(location.pathname);
-                        return redirect('/write');
                     }
                 })
+        return redirect('/write');
     }
 
     return (
