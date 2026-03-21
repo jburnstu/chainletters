@@ -117,7 +117,7 @@ function Dashboard(props) {
                     <Link to={storyID + "/"} key={index + storyID} className="storyTabLink">
                         <button className="storyTabButton"
                             onClick={() => console.log("link button clicked", storyID)}
-                        >{index}</button>
+                        >{(getArrayObjByID(props.dicts, storyID).story_data.title) ? `${index}. ${(getArrayObjByID(props.dicts, storyID).story_data.title)}` : `${index}.`}</button>
                     </Link>
                 )}
             </nav>
@@ -222,8 +222,8 @@ function StoryHeader(props) {
 
     return (<div className="storyHeader">
         <div>{storyData.title ? storyData.title : "Untitled"}</div>
-        <div>{"Section " + length + " / " + (storyData.max_number_of_segments ? storyData.max_number_of_segments : "Infinite")}</div>
-        <div>{"Word Count :" + props.wordCount + " / " + (storyData.max_segment_length ? storyData.max_segment_length : "Infinite")}</div>
+        <div>{"Section : " + length + (storyData.max_number_of_segments ? " / " + storyData.max_number_of_segments : null)}</div>
+        <div>{"Word Count :" + props.wordCount + (storyData.max_segment_length ? " / " + storyData.max_segment_length : null)}</div>
     </div>)
 }
 

@@ -37,14 +37,16 @@ async function uploadNewStoryAndSegment(authorID, storyParameters) {
     console.log("calling uploadNewStoryAndSegment")
     console.log(storyParameters)
 
-    contactAPI(`story/2`, "get")
-        .then(function (value) { console.log("storyGet, ", value) })
 
+    console.log({
+        'author': authorID,
+        ...storyParameters,
+    })
 
     let storyCreationData = await contactAPI("story/", "post",
         {
             'author': authorID,
-            ...storyParameters
+            ...storyParameters,
         }
     )
 
@@ -218,6 +220,7 @@ export function SubmissionButton(props) {
         )
             .then(
                 function (value) {
+                    console.log(value)
                     if (props.submissionType == "ABANDON") {
                         if (value.previous_segment_id != null) {
                             console.log("second conditional!");

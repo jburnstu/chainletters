@@ -65,6 +65,7 @@ div.dashboardContainer {
         "sidebar storyTabs"
         "sidebar storyContainer";
     grid-template-rows: min-content auto;
+    grid-template-columns: min-content auto;
     height: 100%;
 }
 
@@ -119,10 +120,15 @@ div.storyHeader {
     grid-area: storyHeader;
     display: flex;
     flex-direction: row;
+    justify-content: space-evenly;
 }
 
 div.storyHeader>div {
     background-color: var(--col-1-A);
+}
+
+div.storyHeader>div:first-child {
+    flex-grow: 50;
 }
 
 div.storyContent {
