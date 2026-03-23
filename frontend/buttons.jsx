@@ -107,6 +107,8 @@ export function ModalNewButton(props) {
 function NewStoryOptionspanel(props) {
     const authorID = useContext(AuthorContext);
     let navigate = useNavigate();
+    let location = useLocation();
+    const urlStub = `/chainlettersstories/${authorID}/`;
 
     const [storyParameters, setStoryParameters] = useState({});
     const [parameterChecks, setParameterChecks] = useState({});
@@ -127,9 +129,13 @@ function NewStoryOptionspanel(props) {
         console.log("Creating new story/seg");
         uploadNewStoryAndSegment(authorID, storyParameters)
             .then(function (value) {
-                console.log("inside then function", value)
-                props.addNewStory(value, value.id);
-                return redirect(`write/${value.id}`);
+                console.log("inside then function", value, value.id)
+                props.addNewStory(value)
+                    .then(function (innerValue) {
+                        console.log(innerValue)
+                        console.log("NEW URL", `${urlStub}write/${value.id}`)
+                        navigate(`${urlStub}write/${value.id}`)
+                    })
             }
             )
     }
@@ -171,7 +177,7 @@ function NewStoryOptionspanel(props) {
                 <label>Max. Number of Branches?<input type="checkbox" name="checkMaxNumberOfBranches"
                     checked={storyParameters.checkMaxNumberOfBranches}
                     onChange={handleCheckChange}></input>
-                    <input defaultValue="200" type="number" name="max_number_of_branches"
+                    <input defaultValue="2" type="number" name="max_number_of_branches"
                         disabled={!parameterChecks.checkMaxNumberOfBranches}
                         value={storyParameters.max_number_of_branches}
                         onChange={handleValueChange}></input>
@@ -246,9 +252,6 @@ export function SubmissionButton(props) {
                     }
                 })
         console.log("about to navigate:")
-        // let navigate = useNavigate();
-
-        // if (!relative) {
         navigate(`${urlStub}write`);
         // return
     }
@@ -260,6 +263,9 @@ export function SubmissionButton(props) {
 
 export function ModalJoinButton(props) {
     const authorID = useContext(AuthorContext);
+    let navigate = useNavigate();
+    let location = useLocation();
+    const urlStub = `/chainlettersstories/${authorID}/`;
     const storiesInModal = 3;
 
     async function getSegmentsForModal() {
@@ -298,7 +304,10 @@ export function ModalJoinButton(props) {
         uploadNewSegment(previousSegmentID, authorID)
             .then(function (value) {
                 console.log(value);
-                props.addNewStory(value);
+                props.addNewStory(value)
+                    .then(function (innerValue) {
+                        navigate(`${urlStub}write/${value.id}`)
+                    });
             });
     }
 
