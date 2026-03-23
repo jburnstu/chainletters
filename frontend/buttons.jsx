@@ -4,7 +4,8 @@ import { createPortal } from 'react-dom';
 export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
 import { AuthorContext } from "./context.jsx";
 import { useNavigate, useLocation, redirect } from "react-router";
-import { getRandomItem, contactAPI } from "./utilityFuncs.jsx";
+import { getRandomItem, contactAPI, goToRoute } from "./utilityFuncs.jsx";
+
 
 
 async function uploadNewSegment(previousSegmentID, authorID) {
@@ -28,6 +29,8 @@ async function uploadNewSegment(previousSegmentID, authorID) {
 
     let getNewFullStoryInfoData = await contactAPI(`full_story_info/${createSegmentData.id}`, "get");
     console.log("FULL STORY INFO", getNewFullStoryInfoData)
+
+
 
     return getNewFullStoryInfoData
 }
@@ -103,6 +106,7 @@ export function ModalNewButton(props) {
 
 function NewStoryOptionspanel(props) {
     const authorID = useContext(AuthorContext);
+    let navigate = useNavigate();
 
     const [storyParameters, setStoryParameters] = useState({});
     const [parameterChecks, setParameterChecks] = useState({});
@@ -124,7 +128,8 @@ function NewStoryOptionspanel(props) {
         uploadNewStoryAndSegment(authorID, storyParameters)
             .then(function (value) {
                 console.log("inside then function", value)
-                props.addNewStory(value);
+                props.addNewStory(value, value.id);
+                return redirect(`write/${value.id}`);
             }
             )
     }
@@ -185,6 +190,8 @@ function NewStoryOptionspanel(props) {
 export function SubmissionButton(props) {
     let navigate = useNavigate();
     let location = useLocation();
+    const authorID = useContext(AuthorContext);
+    const urlStub = `/chainlettersstories/${authorID}/`;
 
     let segmentStatusID;
     switch (props.submissionType) {
@@ -207,10 +214,14 @@ export function SubmissionButton(props) {
         let getNewFullStoryInfoData = await contactAPI(`full_story_info/${props.segmentID}`, "get");
 
         if (props.submissionType != "SAVE") {
-            props.removeCurrentStory(getNewFullStoryInfoData);
+            props.removeCurrentStory(getNewFullStoryInfoData)
+                .then(function (value) {
+                    console.log("WRITE DICTS WITHIN CODE", value)
+                });
         }
 
-        let currentContent = (typeof (props.currentContent) == "undefined") ? "" : props.currentContent;
+
+        let currentContent = !props.currentContent ? "(Blank)" : props.currentContent;
 
         contactAPI(`segment/${props.segmentID}/`, "patch",
             {
@@ -231,9 +242,15 @@ export function SubmissionButton(props) {
                             )
                         }
                         console.log(location.pathname);
+
                     }
                 })
-        return redirect('/write');
+        console.log("about to navigate:")
+        // let navigate = useNavigate();
+
+        // if (!relative) {
+        navigate(`${urlStub}write`);
+        // return
     }
 
     return (

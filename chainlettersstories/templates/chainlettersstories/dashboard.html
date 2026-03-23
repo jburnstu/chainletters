@@ -18,6 +18,7 @@
     {{ display_name|json_script:'display_name' }}
     {{ read_dicts|json_script:'read_dicts' }}
     {{ write_dicts|json_script:'write_dicts' }}
+    {{ starting_url_dict|json_script:'starting_url_dict' }}
     {% vite_asset 'frontend/components.jsx' %}
 </body>
 </html> 

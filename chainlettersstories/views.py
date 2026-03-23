@@ -105,7 +105,7 @@ def get_all_comments_on_obj(obj,type="segment"):
     return comment_list
 
 
-def home(request,author_id):
+def home(request,author_id,read_or_write=None,story_id=None):
     template = "chainlettersstories/dashboard.html"
     my_author = Author.objects.get(pk=author_id)
     my_author_name = my_author.display_name
@@ -114,7 +114,7 @@ def home(request,author_id):
                                 .filter(final_segment_status_id=1)\
                                 .values("earlier_segment_id","earlier_segment_content","final_segment_id")\
                                 .order_by("earlier_segment_order")
-    print(write_segment_trace_QS)
+    # print(write_segment_trace_QS)
     write_dicts = get_story_dicts_from_QS(write_segment_trace_QS)
 
 
@@ -132,27 +132,47 @@ def home(request,author_id):
         read_dicts = get_story_dicts_from_QS(read_segment_trace_QS)
 
     # print(read_dicts)
+    starting_url_dict = {"read_or_write": read_or_write,
+                         "story_id": story_id}
+    print(starting_url_dict)
 
     return render(request,template, 
                   {
                       "author_id": author_id,
                       "display_name": my_author_name,
                       "read_dicts":read_dicts,
-                      "write_dicts":write_dicts})
+                      "write_dicts":write_dicts,
+                      "starting_url_dict":starting_url_dict})
 
 
         
 def home_write(request,author_id):
-    return home(request,author_id)
+    print("going through home write")
+    return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author_id,"write")))
 
 def home_read(request,author_id):
-    return home(request,author_id)
+    return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author_id,"read")))
 
 def home_write_story(request,author_id,story_id):
-    return home(request,author_id)
+    print("HOME WRITE STORY CALLED")
+    test_for_valid_story = SegmentTrace.objects\
+                            .filter(final_author_id=author_id)\
+                            .filter(final_segment_status_id=1)\
+                            .filter(final_segment_id=story_id)
+    print(test_for_valid_story)
+    if not test_for_valid_story:
+        print("STORY NOT PRESENT")
+        return HttpResponseRedirect(reverse("chainlettersstories:home_write", args=(author_id,"write")))
+    return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author_id,"write",story_id)))
 
 def home_read_story(request,author_id,story_id):
-    return home(request,author_id)
+    test_for_valid_story = ModerationAssignment.objects\
+                            .filter(author=author_id)\
+                            .filter(is_it_closed=False)\
+                            .filter(segment_id=story_id)
+    if not test_for_valid_story:
+        return HttpResponseRedirect(reverse("chainlettersstories:home_read", args=(author_id,"read")))
+    return HttpResponseRedirect(reverse("chainlettersstories:home", args=(author_id,"read",story_id)))
 
 
 

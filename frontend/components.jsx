@@ -1,7 +1,7 @@
 
 import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
 import { Comments } from "./comments.jsx";
@@ -9,6 +9,7 @@ import { getArrayObjByID } from "./utilityFuncs";
 
 
 function AppByAuthor(props) {
+
 
     const [authorID, setAuthorID] = useState(props.authorID);
     const [displayName, setDisplayName] = useState(props.displayName);
@@ -18,7 +19,31 @@ function AppByAuthor(props) {
     const rootPath = `/chainlettersstories/${authorID}/`;
 
 
-    function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
+    const startingReadOrWrite = props.startingURLDict.read_or_write;
+    let startingStoryID = props.startingURLDict.story_id;
+    console.log(startingReadOrWrite, typeof (startingReadOrWrite))
+    console.log(getArrayObjByID(writeDicts, startingStoryID));
+
+    let startingURL;
+    if (startingReadOrWrite == null) {
+        startingURL = "";
+    }
+    else if (
+        (startingReadOrWrite == "write" &&
+            getArrayObjByID(writeDicts, startingStoryID) == undefined)
+        ||
+        (startingReadOrWrite == "read" &&
+            getArrayObjByID(readDicts, startingStoryID) == undefined)
+    ) {
+        startingURL = `${startingReadOrWrite}`;
+    }
+    else {
+        startingURL = `${startingReadOrWrite}/${startingStoryID}`;
+    }
+    console.log(startingURL);
+
+
+    async function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
         let dictArrayToChange = (readOrWrite == "write") ? writeDicts : readDicts
         let setFunction = (readOrWrite == "write") ? setWriteDicts : setReadDicts
         let newDictArray;
@@ -41,8 +66,14 @@ function AppByAuthor(props) {
         if (newDictArray == dictArrayToChange) {
             console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
         }
-        else { console.log("Successfully changed ", dictArrayToChange, " to ", writeDicts) }
+        else { console.log("Successfully changed ", dictArrayToChange, " to ", writeDicts, "via", newDictArray) }
+
+        return await writeDicts
     }
+
+    useEffect(() => {
+        console.log("Write dicts changed:", writeDicts)
+    }, [writeDicts])
 
     return (
         <StrictMode>
@@ -50,15 +81,20 @@ function AppByAuthor(props) {
                 <AuthorContext.Provider value={authorID}>
                     <Routes>
                         <Route path={rootPath} element={<UniversalHeader displayName={displayName} />}>
-                            <Route index path="" relative element={<Home />} />
-                            <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}>
+                            <Route path="" relative element={<Home startingURL={startingURL} />}
+                                index />
+                            <Route path="write/" element={<Dashboard readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}
+                            >
                                 <Route path=":storyID/"
-                                    element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />} />
+                                    element={<Story readOrWrite="write" dicts={writeDicts} setDicts={changeStoryDicts} />}
+                                />
                             </Route>
                             <Route path="read/" element={<Dashboard readOrWrite="read" dicts={readDicts}
-                                setDicts={changeStoryDicts} />}>
+                                setDicts={changeStoryDicts} />}
+                            >
                                 <Route path=":storyID/"
-                                    element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />} />
+                                    element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />}
+                                />
                             </Route>
                         </Route>
                         <Route path="*" element={<NoMatch />} />
@@ -79,6 +115,14 @@ function NoMatch() {
 }
 
 function Home(props) {
+
+    let navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("initital navigate")
+        navigate(props.startingURL);
+    }, [navigate])
+
     return (<div className="container"></div>);
 }
 
@@ -163,10 +207,17 @@ function Story(props) {
     const { storyID } = useParams();
 
     let storyDict = getArrayObjByID(props.dicts, storyID);
-    let presavedCurrentContent = storyDict.segment_trace.slice(-1).earlier_segment_content;
+    console.log(storyDict.segment_trace.slice(-1)[0])
+    let presavedCurrentContent = storyDict.segment_trace.slice(-1)[0]["earlier_segment_content"];
+    console.log("PRESAVED", presavedCurrentContent)
 
     const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
     const [wordCount, setWordCount] = useState(0);
+
+    useEffect(() => {
+        console.log("CURRENT CONTENT CHANGED", currentContent)
+    }, [currentContent]
+    )
 
     let noSelections = {};
     storyDict.segment_trace.forEach(dictInArray =>
@@ -279,8 +330,10 @@ const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
 const DISPLAYNAME = JSON.parse(document.getElementById('display_name').textContent);
 const READDICTS = JSON.parse(document.getElementById('read_dicts').textContent);
 const WRITEDICTS = JSON.parse(document.getElementById('write_dicts').textContent);
+const STARTINGURLDICT = JSON.parse(document.getElementById('starting_url_dict').textContent);
+
 createRoot(document.getElementById('myAppContainer')).render(
-    <AppByAuthor authorID={AUTHORID} displayName={DISPLAYNAME} readDicts={READDICTS} writeDicts={WRITEDICTS} />
+    <AppByAuthor authorID={AUTHORID} displayName={DISPLAYNAME} readDicts={READDICTS} writeDicts={WRITEDICTS} startingURLDict={STARTINGURLDICT} />
 );
 
 

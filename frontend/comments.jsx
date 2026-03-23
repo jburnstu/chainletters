@@ -15,6 +15,8 @@ export function Comments(props) {
 
     let storyDict = props.storyDict;
     let segmentTraceWithInfo = storyDict.segment_trace
+    segmentTraceWithInfo.map(segmentObj =>
+        console.log(segmentObj.id))
 
     return (
         <div className="comments">

@@ -1,4 +1,9 @@
-export default { getRandomItem, contactAPI, getArrayObjByID }
+import { useContext } from "react";
+import { AuthorContext, DictsContext } from "./context.jsx";
+import { useNavigate } from "react-router-dom";
+
+export default { getRandomItem, goToRoute, contactAPI, getArrayObjByID }
+
 
 export function getArrayObjByID(array, id) {
     const idMatch = (obj) => obj.id == id;
@@ -23,6 +28,20 @@ export function getRandomItem(array, numberOfResults = 1, arrayOfOne = false) {
 
     return randomIndexArray.map(index => array[index]);
 }
+
+
+export function goToRoute(newRoute) {
+    const authorID = useContext(AuthorContext);
+    const urlStub = `http://127.0.0.1:8000/chainlettersstories/${authorID}/`;
+    let navigate = useNavigate();
+
+    // if (!relative) {
+    navigate(`${urlStub}${newRoute}`);
+    // }
+
+
+}
+
 
 export async function contactAPI(urlTarget, method, bodyDict = {}) {
 
