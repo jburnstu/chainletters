@@ -11,18 +11,18 @@ export default { Comments };
 export function Comments(props) {
 
     let selections = props.selections;
-    console.log(selections)
+    // console.log(selections)
 
     let storyDict = props.storyDict;
     let segmentTraceWithInfo = storyDict.segment_trace
-    segmentTraceWithInfo.map(segmentObj =>
-        console.log(segmentObj.id))
+    // segmentTraceWithInfo.map(segmentObj =>
+    //     console.log(segmentObj.earlier_segment_id))
 
     return (
         <div className="comments">
             <StoryCommentPanel />
             {segmentTraceWithInfo.map(segmentObj =>
-                <SegmentInfoPanel key={segmentObj.id} selections={selections} segmentInfo={segmentObj} />
+                <SegmentInfoPanel key={segmentObj.earlier_segment_id} selections={selections} segmentInfo={segmentObj} />
             )}
         </div>
     )
@@ -34,9 +34,9 @@ function StoryCommentPanel() { }
 function SegmentInfoPanel(props) {
 
     let segmentInfo = props.segmentInfo;
-    console.log(segmentInfo);
-    console.log(props.selections)
-    console.log(props.selections[segmentInfo.earlier_segment_id]);
+    // console.log(segmentInfo);
+    // console.log(props.selections)
+    // console.log(props.selections[segmentInfo.earlier_segment_id]);
 
     const [isModerationOpen, setIsModerationOpen] = useState(false);
 
@@ -67,7 +67,7 @@ function SegmentInfoPanel(props) {
 function SegmentComment(props) {
 
     let segmentCommentInfo = props.segmentCommentInfo;
-    console.log(segmentCommentInfo)
+    // console.log(segmentCommentInfo)
 
     return (
         <div className="segmentCommentContainer">{segmentCommentInfo.author.display_name}

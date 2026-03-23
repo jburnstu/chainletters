@@ -21,8 +21,8 @@ function AppByAuthor(props) {
 
     const startingReadOrWrite = props.startingURLDict.read_or_write;
     let startingStoryID = props.startingURLDict.story_id;
-    console.log(startingReadOrWrite, typeof (startingReadOrWrite))
-    console.log(getArrayObjByID(writeDicts, startingStoryID));
+    // console.log(startingReadOrWrite, typeof (startingReadOrWrite))
+    // console.log(getArrayObjByID(writeDicts, startingStoryID));
 
     let startingURL;
     if (startingReadOrWrite == null) {
@@ -40,8 +40,7 @@ function AppByAuthor(props) {
     else {
         startingURL = `${startingReadOrWrite}/${startingStoryID}`;
     }
-    console.log(startingURL);
-
+    // console.log(startingURL);
 
     async function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
         let dictArrayToChange = (readOrWrite == "write") ? writeDicts : readDicts
@@ -147,10 +146,19 @@ function UniversalHeader(props) {
 
 function Dashboard(props) {
 
-    const outlet = useOutlet();
     let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
 
     const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
+
+
+    let presavedCurrentContentByStory = {};
+
+    props.dicts.forEach(dictInArray => {
+        presavedCurrentContentByStory[dictInArray.id] =
+            dictInArray.segment_trace.slice(-1)[0]["earlier_segment_content"];
+    })
+    const [currentContentByStory, setCurrentContentByStory] = useState(presavedCurrentContentByStory);
+    const outlet = useOutlet([currentContentByStory, setCurrentContentByStory]);
 
     return (
         <div className={props.readOrWrite + "DashboardContainer" + " dashboardContainer"}>
@@ -207,31 +215,34 @@ function Story(props) {
     const { storyID } = useParams();
 
     let storyDict = getArrayObjByID(props.dicts, storyID);
-    console.log(storyDict.segment_trace.slice(-1)[0])
+    // console.log(storyDict.segment_trace.slice(-1)[0])
     let presavedCurrentContent = storyDict.segment_trace.slice(-1)[0]["earlier_segment_content"];
-    console.log("PRESAVED", presavedCurrentContent)
+    // console.log("PRESAVED", presavedCurrentContent)
 
-    const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
+    // const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
     const [wordCount, setWordCount] = useState(0);
 
-    useEffect(() => {
-        console.log("CURRENT CONTENT CHANGED", currentContent)
-    }, [currentContent]
-    )
+    // useEffect(() => {
+    //     console.log("CURRENT CONTENT CHANGED", currentContent)
+    // }, [currentContent]
+    // )
+
+    const [currentContentByStory, setCurrentContentByStory] = useOutletContext();
+    let currentContent = currentContentByStory[storyID];
 
     let noSelections = {};
     storyDict.segment_trace.forEach(dictInArray =>
         noSelections[dictInArray["earlier_segment_id"]] = false)
     const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
 
-    console.log(storyDict);
+    // console.log(storyDict);
 
     function changeSegmentSelection(segmentID) {
         setSelectedSegmentDict({ ...selectedSegmentDict, [segmentID]: !selectedSegmentDict[segmentID] })
     }
 
     function handleChange(e) {
-        setCurrentContent(e.target.value);
+        setCurrentContentByStory({ ...currentContentByStory, [storyID]: e.target.value });
         setWordCount(getWordCount(currentContent));
     }
 
