@@ -196,3 +196,34 @@ class SegmentCommentCommentByComment(models.Model):
     class Meta:
         db_table = "segment_comment_comment_by_comment"
         managed=False
+
+
+class AuthorRelation(models.Model):
+    author = models.ForeignKey("Author",models.DO_NOTHING)
+    related_author = models.ForeignKey("Author",models.DO_NOTHING,related_name="related_author")
+    author_relation_type = models.ForeignKey("AuthorRelationType",models.DO_NOTHING)
+
+    class Meta:
+        db_table = "author_relation"
+
+
+class AuthorRelationType(models.Model):
+    description = models.CharField()
+
+    class Meta:
+        db_table = "author_relation_type"
+
+
+class Circle(models.Model):
+    description = models.CharField()
+
+    class Meta:
+        db_table = "circle"
+
+
+class CircleAssignment(models.Model):
+    circle = models.ForeignKey("Circle",models.DO_NOTHING)
+    author = models.ForeignKey("Author",models.DO_NOTHING)
+
+    class Meta:
+        db_table = "circle_assignment"

@@ -2,10 +2,12 @@
 import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
-import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './buttons.jsx';
+import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './storyButtons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
+import { AuthorProfile } from "./authorProfileComponents.jsx";
 import { Comments } from "./comments.jsx";
 import { getArrayObjByID } from "./utilityFuncs";
+import { AuthorSearchButton, FriendSearchButton } from "./authorsButtons";
 
 
 function AppByAuthor(props) {
@@ -95,12 +97,19 @@ function AppByAuthor(props) {
                                     element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />}
                                 />
                             </Route>
+                            <Route path="authors/"
+                                element={<Dashboard readOrWrite="authors" dicts={authorsDicts}
+                                />}
+                            >
+                                <Route path=":storyID/"
+                                    element={<AuthorProfile readOrWrite="authors" dicts={authorsDicts} setDicts={changeStoryDicts} />} />
+                            </Route>
                         </Route>
                         <Route path="*" element={<NoMatch />} />
                     </Routes>
                 </AuthorContext.Provider>
             </BrowserRouter>
-        </StrictMode>
+        </StrictMode >
     );
 }
 
@@ -137,6 +146,7 @@ function UniversalHeader(props) {
                     <Link to="" ><button type="button">HOME</button></Link>|{" "}
                     <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
                     <Link to="read"><button type="button">READ</button></Link>
+                    <Link to="friends"><button type="button">FRIENDS</button></Link>
                 </nav>
             </header >
             <Outlet></Outlet>
@@ -144,32 +154,41 @@ function UniversalHeader(props) {
     )
 }
 
+
+
 function Dashboard(props) {
 
-    let arrayOfStoryIDs = props.dicts.map(dict => dict.id);
+    let arrayOfTabIDs = props.dicts.map(dict => dict.id);
+    const addNewTab = (tabID) => props.setDicts(tabID, props.readOrWrite, "add");
+    let getTabName;
+    let outlet;
 
-    const addNewStory = (storyID) => props.setDicts(storyID, props.readOrWrite, "add");
+    if (props.readOrWrite = "friends") {
+        getTabName = (id, index) => { getArrayObjByID(props.dicts, id)/*somthing !!*/ ?? index + " ." }
 
+        outlet = useOutlet();
+    }
+    else {
+        getTabName = (id, index) =>
+            getArrayObjByID(props.dicts, id).story_data.title ?? index + " .";
 
-    let presavedCurrentContentByStory = {};
+        let presavedCurrentContentByStory = {};
+        props.dicts.forEach(dictInArray => {
+            presavedCurrentContentByStory[dictInArray.id] =
+                dictInArray.segment_trace.slice(-1)[0]["earlier_segment_content"];
+        })
+        const [currentContentByStory, setCurrentContentByStory] = useState(presavedCurrentContentByStory);
+        outlet = useOutlet([currentContentByStory, setCurrentContentByStory]);
+    }
 
-    props.dicts.forEach(dictInArray => {
-        presavedCurrentContentByStory[dictInArray.id] =
-            dictInArray.segment_trace.slice(-1)[0]["earlier_segment_content"];
-    })
-    const [currentContentByStory, setCurrentContentByStory] = useState(presavedCurrentContentByStory);
-    const outlet = useOutlet([currentContentByStory, setCurrentContentByStory]);
 
     return (
         <div className={props.readOrWrite + "DashboardContainer" + " dashboardContainer"}>
-            <Sidebar readOrWrite={props.readOrWrite} addNewStory={addNewStory} />
-
-            <nav className="storyTabs">
-                {arrayOfStoryIDs.map((storyID, index) =>
-                    <Link to={storyID + "/"} key={index + storyID} className="storyTabLink">
-                        <button className="storyTabButton"
-                            onClick={() => console.log("link button clicked", storyID)}
-                        >{(getArrayObjByID(props.dicts, storyID).story_data.title) ? `${index}. ${(getArrayObjByID(props.dicts, storyID).story_data.title)}` : `${index}.`}</button>
+            <Sidebar readOrWrite={props.readOrWrite} addNewTab={addNewTab} />
+            <nav className="tabs">
+                {arrayOfTabIDs.map((tabID, index) =>
+                    <Link to={tabID + "/"} key={index + tabID} className="tabLink">
+                        <button className="tabButton">{getTabName(tabID, index)}</button>
                     </Link>
                 )}
             </nav>
@@ -191,18 +210,25 @@ function Sidebar(props) {
 
 
     switch (props.readOrWrite) {
+        case "authors":
+            return (
+                <div className="sidebar">
+                    <AuthorSearchButton addNewFriend={props.addNewTab} />
+                    <FriendSearchButton />
+                </div>
+            )
         case "write":
             return (
                 <div className="sidebar">
-                    <ModalNewButton addNewStory={props.addNewStory} />
-                    <ModalJoinButton addNewStory={props.addNewStory} />
+                    <ModalNewButton addNewStory={props.addNewTab} />
+                    <ModalJoinButton addNewStory={props.addNewTab} />
                 </div>
             )
         case "read":
         default:
             return (
                 <div className="sidebar">
-                    <NewModerationModalButton addNewStory={props.addNewStory} />
+                    <NewModerationModalButton addNewStory={props.addNewTab} />
                 </div>
             )
     }
@@ -213,21 +239,12 @@ function Story(props) {
 
     let readOrWrite = props.readOrWrite;
     const { storyID } = useParams();
+    const [wordCount, setWordCount] = useState(0);
+    const [currentContentByStory, setCurrentContentByStory] = useOutletContext();
+
 
     let storyDict = getArrayObjByID(props.dicts, storyID);
-    // console.log(storyDict.segment_trace.slice(-1)[0])
     let presavedCurrentContent = storyDict.segment_trace.slice(-1)[0]["earlier_segment_content"];
-    // console.log("PRESAVED", presavedCurrentContent)
-
-    // const [currentContent, setCurrentContent] = useState(presavedCurrentContent);
-    const [wordCount, setWordCount] = useState(0);
-
-    // useEffect(() => {
-    //     console.log("CURRENT CONTENT CHANGED", currentContent)
-    // }, [currentContent]
-    // )
-
-    const [currentContentByStory, setCurrentContentByStory] = useOutletContext();
     let currentContent = currentContentByStory[storyID];
 
     let noSelections = {};
@@ -335,6 +352,12 @@ function SubmissionButtons(props) {
         </div>
     )
 }
+
+
+
+
+
+
 
 
 const AUTHORID = JSON.parse(document.getElementById('author_id').textContent);
