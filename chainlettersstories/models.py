@@ -83,6 +83,7 @@ class ModerationAssignment(models.Model):
 
 
     class Meta:
+        unique_together = ("segment","author")
         db_table = "moderation_assignment"
 
 
@@ -201,7 +202,7 @@ class SegmentCommentCommentByComment(models.Model):
 class AuthorRelation(models.Model):
     author = models.ForeignKey("Author",models.DO_NOTHING)
     related_author = models.ForeignKey("Author",models.DO_NOTHING,related_name="related_author")
-    author_relation_type = models.ForeignKey("AuthorRelationType",models.DO_NOTHING)
+    author_relation_type = models.ForeignKey("AuthorRelationType",models.DO_NOTHING, default=1)
 
     class Meta:
         db_table = "author_relation"
@@ -215,7 +216,7 @@ class AuthorRelationType(models.Model):
 
 
 class Circle(models.Model):
-    description = models.CharField()
+    circle_name = models.CharField()
 
     class Meta:
         db_table = "circle"
@@ -226,4 +227,5 @@ class CircleAssignment(models.Model):
     author = models.ForeignKey("Author",models.DO_NOTHING)
 
     class Meta:
+        unique_together = ("circle","author")
         db_table = "circle_assignment"
