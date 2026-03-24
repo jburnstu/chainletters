@@ -5,12 +5,15 @@ from .models import Story, Author, Segment, ModerationAssignment,\
 AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
 Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment,\
 AuthorRelation, AuthorRelationType, Circle, CircleAssignment
-
+from django.db.utils import IntegrityError
 """
 import random
 import string
-from chainlettersstories.models import Story, Author, Segment, ModerationAssignment, AvailableSegmentByAuthor, ModeratableSegmentByAuthor, Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment
-from chainlettersstories.tests import create_random_segment_tree, create_bulk_comment_submission
+from chainlettersstories.models import Story, Author, Segment, ModerationAssignment,\
+AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
+Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment,\
+AuthorRelation, AuthorRelationType, Circle, CircleAssignment
+from chainlettersstories.tests import create_random_segment_tree, create_bulk_comment_submission, bulk_create_social_network
 """
 
 ### UTILITY FUNCTIONS ###########################################################################
@@ -212,37 +215,41 @@ def create_bulk_comment_submission(number_of_comments,number_of_authors=None,com
 
 #### RELATIONS AND CIRCLES ############################################################################
 
-def controlled_follow_user(user_follower, user_to_follow):
-    if user_follower==user_to_follow:
-        return
-    try:
-        AuthorRelation.objects.create(author=user_follower,related_author=user_to_follow)
-    except AuthorRelation.MultipleObjectsReturned:
-        return
-
-def add_user_to_circle(author,circle):
-    CircleAssignment.objects.create(circle=circle,author=author)
-
 def bulk_create_social_network(number_of_follows,number_of_circle_memberships,number_of_circles=None,number_of_authors=None):
 
-    circles = []
-    for i in range(len(number_of_circles)):
-        circles.append(Circle.objects.create(circle_name=create_random_string_of_length(20)))
+    if not number_of_circles:
+        circles = Circle.objects.all()
+    else:
+        circles = []
+        for i in range(number_of_circles):
+            circles.append(Circle.objects.create(circle_name=create_random_string_of_length(20)))
 
 
     if not number_of_authors: 
         authors = Author.objects.all()
     else:
-        for i in range(len(number_of_authors)):
+        for i in range(number_of_authors):
             authors = create_random_author_array(number_of_authors,10)
 
-    for i in range(len(number_of_circle_memberships)):
-        CircleAssignment.objects.create(random.choice(authors),random.choice(circles))
+    for i in range(number_of_circle_memberships):
+        try:
+            CircleAssignment.objects.create(author=random.choice(authors),circle=random.choice(circles))
+        except IntegrityError:
+            continue
 
-
-    for i in range(len(number_of_follows)):
-        
-
+    for i in range(number_of_follows):
+        try:
+            author= random.choice(authors)
+            related_author = random.choice(authors)
+            print(author,related_author)
+            if author is not related_author:
+                AuthorRelation.objects.create(author=author, related_author=related_author)
+            else:
+                print("SAME THING")
+        except IntegrityError as e:
+            print(e)
+            print("INTEGRITY OF RELATION")
+            continue
 
 # Create your tests here.
 '''

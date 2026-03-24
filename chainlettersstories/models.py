@@ -205,6 +205,7 @@ class AuthorRelation(models.Model):
     author_relation_type = models.ForeignKey("AuthorRelationType",models.DO_NOTHING, default=1)
 
     class Meta:
+        unique_together = ("author","related_author")
         db_table = "author_relation"
 
 
