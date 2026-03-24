@@ -14,7 +14,8 @@ router.register(r'moderation_assignment', views.ModerationAssignmentViewSet)
 router.register(r'segment_trace', views.SegmentTraceViewSet, basename='segment_trace')
 router.register(r'segment_with_comments', views.SegmentWithCommentsViewSet, basename='segment_with_comments')
 router.register(r'full_story_info', views.FullStoryInfoViewSet, basename='full_story_info')
-
+router.register(r'completed_segment_by_author', views.CompletedSegmentByAuthorViewSet,
+                basename="completed_segment_by_author")
 
 
 app_name = "chainlettersstories"

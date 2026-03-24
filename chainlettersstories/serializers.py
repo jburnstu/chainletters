@@ -154,8 +154,19 @@ class FullStoryInfoSerializer(serializers.ModelSerializer):
     ]
 
 
-class AuthorRelationSerializer():
+class AuthorRelationSerializer(serializers.ModelSerializer):
     pass
+
+
+class CompletedSegmentByAuthorSerializer(serializers.ModelSerializer):
+    segment = serializers.PrimaryKeyRelatedField(many=True,
+            queryset=Segment.objects.filter(segment_status_id__in =[4,5]))
+
+
+    class Meta:
+        model = Author
+        fields = ['id',
+                  'segment']
 
 
 
