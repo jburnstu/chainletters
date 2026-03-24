@@ -1,60 +1,41 @@
-
+import { getRandomItem, contactAPI } from "./utilityFuncs";
 
 
 export function AuthorProfile(props) {
     let readOrWrite = props.readOrWrite;
-    const { storyID } = useParams();
-    const [wordCount, setWordCount] = useState(0);
-    const [currentContentByStory, setCurrentContentByStory] = useOutletContext();
+    const { tabID } = useParams();
+
 
 
     let storyDict = getArrayObjByID(props.dicts, storyID);
     let presavedCurrentContent = storyDict.segment_trace.slice(-1)[0]["earlier_segment_content"];
     let currentContent = currentContentByStory[storyID];
 
-    let noSelections = {};
-    storyDict.segment_trace.forEach(dictInArray =>
-        noSelections[dictInArray["earlier_segment_id"]] = false)
-    const [selectedSegmentDict, setSelectedSegmentDict] = useState(noSelections);
+    async function getArrayOfRecentSegments() {
+        const numberOfSegments = 3;
+        segmentByAuthorData = await contactAPI(`segment_by_author/${authorID}/`, "get");
+        randomSegmentSelection = getRandomItem(segmentByAuthorData, numberOfSegments);
 
-    // console.log(storyDict);
+        const segmentTraceDataArray = [];
+        let segmentTraceData;
+        await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
+            segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
+            segmentTraceDataArray.push(segmentTraceData);
+        }
+        )
+        )
+        return segmentTraceDataArray;
 
-    function changeSegmentSelection(segmentID) {
-        setSelectedSegmentDict({ ...selectedSegmentDict, [segmentID]: !selectedSegmentDict[segmentID] })
     }
 
-    function handleChange(e) {
-        setCurrentContentByStory({ ...currentContentByStory, [storyID]: e.target.value });
-        setWordCount(getWordCount(currentContent));
-    }
-
-    function getWordCount(myText) {
-        // const spaceMatchPattern = /[\w\d][\s\W*\d*]+[\w\d]/;
-        const spaceMatchPattern = /\S+/g;
-        let numberOfSpaces = myText.match(spaceMatchPattern);
-        return (numberOfSpaces ? numberOfSpaces : []).length;
-    }
+    const arrayOfRecentSegments = getArrayOfRecentSegments();
 
     const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
 
     return (
-        <div className="storyContainer" id={"storyContainer" + { storyID }}>
+        <div className="authorProfileContainer" id={"authorProfileContainer" + { storyID }}>
             <StoryHeader storyDict={storyDict} wordCount={wordCount} />
-            <div className="storyContent">
-                {storyDict.segment_trace.map(segmentDict =>
-                    <SegmentDisplay key={segmentDict.earlier_segment_id}
-                        id={segmentDict.earlier_segment_id}
-                        isFinalSegment={segmentDict.earlier_segment_id == storyID}
-                        fixedContent={segmentDict.earlier_segment_content}
-                        currentContent={currentContent}
-                        changeSelection={changeSegmentSelection}
-                        onChange={handleChange} />
-                )
-                }
-            </div>
-            <SubmissionButtons readOrWrite={readOrWrite} currentContent={currentContent} segmentID={storyID} removeCurrentStory={removeCurrentStory} />
-            <Comments selections={selectedSegmentDict} storyDict={storyDict} />
         </div>
     )
 }

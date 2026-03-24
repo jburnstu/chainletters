@@ -3,7 +3,8 @@ import random
 import string
 from .models import Story, Author, Segment, ModerationAssignment,\
 AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
-Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment
+Comment, CommentStatus, CommentParentType, SegmentComment, StoryComment,CommentComment,\
+AuthorRelation, AuthorRelationType, Circle, CircleAssignment
 
 """
 import random
@@ -122,8 +123,6 @@ def create_random_segment_tree(number_of_authors,number_of_segments, segment_cha
         
 ##### COMMENTS #############################################################################
 
-
-
 def add_comment_to_story(story, author):
     comment = Comment.objects.create(author=author,comment_parent_type_id=2)
     story_comment = StoryComment.objects.create(comment=comment,parent_story=story)
@@ -153,6 +152,7 @@ def submit_comment(comment):
     comment.comment_status_id = 2
     comment.save()
 
+#### COMMENT UTILITY AND OVERALL ################################################################
 
 def get_random_commentable_object(type=None):
     if not type:
@@ -210,9 +210,10 @@ def create_bulk_comment_submission(number_of_comments,number_of_authors=None,com
         print(comment)
 
 
+#### RELATIONS AND CIRCLES ############################################################################
 
-
-
+def follow_user(user_follower, user_to_follow):
+    AuthorRelation.objects.create(author=user_follower,related_author=user_to_follow)
 
 
 # Create your tests here.

@@ -272,6 +272,7 @@ export function ModalJoinButton(props) {
         let availabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get")
         let randomSegmentIDArray = await getRandomItem(availabilityData.available_segments, storiesInModal);
 
+
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
