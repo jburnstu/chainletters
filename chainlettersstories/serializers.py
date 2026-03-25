@@ -155,8 +155,34 @@ class FullStoryInfoSerializer(serializers.ModelSerializer):
 
 
 class AuthorRelationSerializer(serializers.ModelSerializer):
-    pass
+    
+    class Meta:
+        model = AuthorRelation
+        fields = "__all__"
 
+
+class RelatedAuthorByAuthorRelationSerializer(serializers.ModelSerializer):
+    related_author = AuthorSerilializer(read_only=True)
+
+    class Meta:
+        model = AuthorRelation
+        fields = ["author",
+                  "related_author"]
+
+
+class AuthorRelationByAuthorSerializer(serializers.ModelSerializer):
+    related_authors = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Author
+        fields = ['id', 'display_name', 'related_authors']
+
+    def get_related_authors(self, obj):
+        relations = obj.relating_author.all()  # uses prefetch
+        return AuthorSerilializer(
+            [rel.related_author for rel in relations],
+            many=True
+        ).data
 
 class CompletedSegmentByAuthorSerializer(serializers.ModelSerializer):
     segment = serializers.PrimaryKeyRelatedField(many=True,

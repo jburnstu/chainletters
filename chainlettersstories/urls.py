@@ -16,6 +16,11 @@ router.register(r'segment_with_comments', views.SegmentWithCommentsViewSet, base
 router.register(r'full_story_info', views.FullStoryInfoViewSet, basename='full_story_info')
 router.register(r'completed_segment_by_author', views.CompletedSegmentByAuthorViewSet,
                 basename="completed_segment_by_author")
+router.register(r'author_relation', views.AuthorRelationViewSet)
+router.register(r'author_relation_by_author', views.AuthorRelationByAuthorViewSet,
+                basename="author_relation_by_author")
+
+
 
 
 app_name = "chainlettersstories"

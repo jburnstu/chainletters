@@ -200,7 +200,7 @@ class SegmentCommentCommentByComment(models.Model):
 
 
 class AuthorRelation(models.Model):
-    author = models.ForeignKey("Author",models.DO_NOTHING)
+    author = models.ForeignKey("Author",models.DO_NOTHING, related_name="relating_author")
     related_author = models.ForeignKey("Author",models.DO_NOTHING,related_name="related_author")
     author_relation_type = models.ForeignKey("AuthorRelationType",models.DO_NOTHING, default=1)
 

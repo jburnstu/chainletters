@@ -10,8 +10,9 @@ import random
 
 from .models import Story, Author, Segment, SegmentTrace, SegmentStatus, ModerationAssignment,\
  AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
- Comment,SegmentComment,StoryComment,CommentComment,CommentStatus
-from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer,  SegmentWithCommentsSerializer, FullStoryInfoSerializer, CompletedSegmentByAuthorSerializer
+ Comment,SegmentComment,StoryComment,CommentComment,CommentStatus,\
+ AuthorRelation
+from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer,  SegmentWithCommentsSerializer, FullStoryInfoSerializer, CompletedSegmentByAuthorSerializer, AuthorRelationSerializer, AuthorRelationByAuthorSerializer
 # Create your views here.
 
 
@@ -273,3 +274,12 @@ class FullStoryInfoViewSet(viewsets.ModelViewSet):
 class CompletedSegmentByAuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = CompletedSegmentByAuthorSerializer
+
+
+class AuthorRelationViewSet(viewsets.ModelViewSet):
+    queryset = AuthorRelation.objects.all()
+    serializer_class = AuthorRelationSerializer
+
+class AuthorRelationByAuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorRelationByAuthorSerializer
