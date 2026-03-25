@@ -261,18 +261,30 @@ export function SubmissionButton(props) {
     )
 }
 
-export function ModalJoinButton(props) {
-    const authorID = useContext(AuthorContext);
+
+
+export function ModalSelectSegmentFromOptionsButton(props) {
     let navigate = useNavigate();
-    let location = useLocation();
+    const authorID = useContext(AuthorContext);
     const urlStub = `/chainlettersstories/${authorID}/`;
-    const storiesInModal = 3;
+    const numberOfChoices = 3;
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState([]);
+
+    let apiArrayToAccess;
+    switch (props.type) {
+        case "MODERATE":
+            apiArrayToAccess = "moderatabale_segments";
+            break;
+        case "JOIN":
+            apiArrayToAccess = "available_segments";
+            break;
+    }
 
     async function getSegmentsForModal() {
         let availabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get")
-        let randomSegmentIDArray = await getRandomItem(availabilityData.available_segments, storiesInModal);
-
-
+        let randomSegmentIDArray = await getRandomItem(availabilityData[apiArrayToAccess], numberOfChoices);
         let segmentTraceDataArray = [];
         let segmentTraceData;
         await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
@@ -285,26 +297,17 @@ export function ModalJoinButton(props) {
         return segmentTraceDataArray;
     }
 
-
-    const [isOpen, setIsOpen] = useState(false);
-
-    const [arrayOfAvailableStories, setArrayOfAvailableStories] = useState([]);
-
-    console.log(arrayOfAvailableStories);
-
     function createModal() {
         getSegmentsForModal()
             .then(function (value) {
                 setIsOpen(true);
             })
-
     }
 
     function selectStory(previousSegmentID) {
         setIsOpen(false);
         uploadNewSegment(previousSegmentID, authorID)
             .then(function (value) {
-                console.log(value);
                 props.addNewStory(value)
                     .then(function (innerValue) {
                         navigate(`${urlStub}write/${value.id}`)
@@ -314,9 +317,9 @@ export function ModalJoinButton(props) {
 
     return (
         <>
-            <button onClick={createModal}> ModalJoin
+            <button onClick={createModal}>{props.type}
             </ button >
-            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfAvailableStories} onClose={() => setIsOpen(false)}>
+            <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
                     {arrayOfAvailableStories.map(availableStory =>
                         <StoryDisplayInModal key={availableStory.id} selectStory={selectStory} storyDict={availableStory} />
@@ -333,8 +336,6 @@ function StoryDisplayInModal(props) {
     let finalSegment = props.storyDict.segment_trace.slice(-1)[0]
     finalSegment = (finalSegment == firstSegment) ? null : finalSegment
 
-
-
     const selectStory = () => props.selectStory(finalSegment.earlier_segment_id);
 
     return (
@@ -344,6 +345,8 @@ function StoryDisplayInModal(props) {
         </button>
     )
 }
+
+
 
 function ModalWindow(props) {
 
@@ -369,75 +372,5 @@ function ModalWindow(props) {
             </div>,
             document.body
         )
-    )
-}
-
-export function NewModerationModalButton(props) {
-    const authorID = useContext(AuthorContext);
-    const storiesInModal = 3;
-
-    async function getSegmentsForModal() {
-        let moderatabilityData = await contactAPI(`author_including_availability/${authorID}/`, "get");
-        let randomSegmentIDArray = await getRandomItem(moderatabilityData.moderatable_segments, storiesInModal);
-        let segmentTraceDataArray = [];
-        let segmentTraceData;
-        await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
-            segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
-            segmentTraceDataArray.push(segmentTraceData);
-        }
-        )
-        )
-        await setArrayOfModeratableStories(segmentTraceDataArray);
-        return segmentTraceDataArray;
-    }
-
-
-    const [isOpen, setIsOpen] = useState(false);
-
-    const [arrayOfModeratableStories, setArrayOfModeratableStories] = useState([]);
-
-    console.log(arrayOfModeratableStories);
-
-    function createModal() {
-        getSegmentsForModal()
-            .then(function (value) {
-                setIsOpen(true);
-            })
-
-    }
-
-    function selectStory(previousSegmentID) {
-        setIsOpen(false);
-        uploadNewModerationAssignment(previousSegmentID, authorID)
-            .then(function (value) { props.addNewStory(value) });
-    }
-
-    return (
-        <>
-            <button onClick={createModal}> ModalNewModeration
-            </ button >
-            <ModalWindow isOpen={isOpen} arrayOfStoryOptions={arrayOfModeratableStories} onClose={() => setIsOpen(false)}>
-                <div className="allDisplayStoriesContainer">
-                    {arrayOfModeratableStories.map(moderatableStory =>
-                        <NewModerationOptionsPanel key={moderatableStory.id} selectStory={selectStory} storyDict={moderatableStory} />
-                    )}
-                </div>
-            </ModalWindow >
-        </>
-    )
-}
-
-function NewModerationOptionsPanel(props) {
-    let firstSegment = props.storyDict.segment_trace[0]
-    let finalSegment = props.storyDict.segment_trace.slice(-1)[0]
-    finalSegment = (finalSegment == firstSegment) ? null : finalSegment
-
-    const selectStory = () => props.selectStory(finalSegment.earlier_segment_id);
-
-    return (
-        <button onClick={selectStory} className="displayStoryContainer">
-            <textarea value={firstSegment.earlier_segment_content} readOnly />
-            {(finalSegment != null) ? <textarea value={finalSegment.earlier_segment_content} readOnly /> : null}
-        </button>
     )
 }

@@ -213,22 +213,23 @@ function Sidebar(props) {
         case "authors":
             return (
                 <div className="sidebar">
-                    <AuthorSearchButton addNewFriend={props.addNewTab} />
-                    <FriendSearchButton />
+                    <AuthorListDisplayButton addNewAuthorTab={props.addNewTab} />
+                    {/* <AuthorSearchButton addNewFriend={props.addNewTab} />
+                    <FriendSearchButton /> */}
                 </div>
             )
         case "write":
             return (
                 <div className="sidebar">
                     <ModalNewButton addNewStory={props.addNewTab} />
-                    <ModalJoinButton addNewStory={props.addNewTab} />
+                    <ModalSelectSegmentFromOptionsButton type="JOIN" addNewStory={props.addNewTab} />
                 </div>
             )
         case "read":
         default:
             return (
                 <div className="sidebar">
-                    <NewModerationModalButton addNewStory={props.addNewTab} />
+                    <ModalSelectSegmentFromOptionsButton type="MODERATE" addNewStory={props.addNewTab} />
                 </div>
             )
     }
@@ -328,6 +329,7 @@ function SegmentDisplay(props) {
             onChange={onChange} onClick={onClick} ></ textarea>)
 
 }
+
 
 function SubmissionButtons(props) {
 

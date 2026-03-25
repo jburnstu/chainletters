@@ -10,9 +10,8 @@ import random
 
 from .models import Story, Author, Segment, SegmentTrace, SegmentStatus, ModerationAssignment,\
  AvailableSegmentByAuthor, ModeratableSegmentByAuthor,\
- Comment,SegmentComment,StoryComment,CommentComment,CommentStatus,\
- AuthorRelation
-from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer,  SegmentWithCommentsSerializer, FullStoryInfoSerializer, CompletedSegmentByAuthorSerializer, AuthorRelationSerializer, AuthorRelationByAuthorSerializer
+ Comment,SegmentComment,StoryComment,CommentComment,CommentStatus
+from .serializers import StorySerializer, SegmentSerializer, AvailableSegmentByAuthorSerializer, AuthorIncludingAvailabilitySerializer, SegmentTraceBySegmentSerializer, ModerationAssignmentSerializer,  SegmentWithCommentsSerializer, FullStoryInfoSerializer
 # Create your views here.
 
 
@@ -179,6 +178,12 @@ def home_read_story(request,author_id,story_id):
 
 '''
 Where to put the comment data?
+- Conceptual issue here is that the connection to a user you happen to have open, feels looser than to a story you're writing or moderating
+- Could factor this in! just store the id / names of recently opened ones....?
+
+in that case, have just:
+recent_user_
+
 
 write_dicts: 
 [{"final_segment_id"::,
@@ -270,16 +275,3 @@ class SegmentWithCommentsViewSet(viewsets.ModelViewSet):
 class FullStoryInfoViewSet(viewsets.ModelViewSet):
     queryset = Segment.objects.all()
     serializer_class = FullStoryInfoSerializer
-
-class CompletedSegmentByAuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
-    serializer_class = CompletedSegmentByAuthorSerializer
-
-
-class AuthorRelationViewSet(viewsets.ModelViewSet):
-    queryset = AuthorRelation.objects.all()
-    serializer_class = AuthorRelationSerializer
-
-class AuthorRelationByAuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
-    serializer_class = AuthorRelationByAuthorSerializer

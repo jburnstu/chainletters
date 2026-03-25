@@ -2,14 +2,11 @@ import { getRandomItem, contactAPI } from "./utilityFuncs";
 
 
 export function AuthorProfile(props) {
+
     let readOrWrite = props.readOrWrite;
     const { tabID } = useParams();
 
-
-
     let storyDict = getArrayObjByID(props.dicts, storyID);
-    let presavedCurrentContent = storyDict.segment_trace.slice(-1)[0]["earlier_segment_content"];
-    let currentContent = currentContentByStory[storyID];
 
     async function getArrayOfRecentSegments() {
         const numberOfSegments = 3;
@@ -36,6 +33,13 @@ export function AuthorProfile(props) {
     return (
         <div className="authorProfileContainer" id={"authorProfileContainer" + { storyID }}>
             <StoryHeader storyDict={storyDict} wordCount={wordCount} />
+            <div className="recentSegmentsContainer">
+                {getArrayOfRecentSegments.map(recentSegmentTrace =>
+                    <RecentSegmentDisplay />)
+                }
+            </div>
+            <div className="recentActivity"></div>
+            {/* Comments, likes, reviews, etc? */}
         </div>
     )
 }
