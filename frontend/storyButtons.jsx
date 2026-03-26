@@ -132,9 +132,9 @@ function NewStoryOptionspanel(props) {
                 console.log("inside then function", value, value.id)
                 props.addNewStory(value)
                     .then(function (innerValue) {
-                        console.log(innerValue)
+                        console.log("INNER VALUE", innerValue)
                         console.log("NEW URL", `${urlStub}write/${value.id}`)
-                        navigate(`${urlStub}write/${value.id}`)
+                        navigate(`${urlStub}write/${value.id}/`)
                     })
             }
             )

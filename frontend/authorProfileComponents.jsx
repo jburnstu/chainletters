@@ -1,4 +1,6 @@
 import { getRandomItem, contactAPI, getArrayObjByID } from "./utilityFuncs";
+import { AuthorContext } from "./context.jsx";
+import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
 export default { AuthorProfile, AuthorListDisplayButton };
 
@@ -62,28 +64,46 @@ function RecentSegmentDisplay() {
 
 
 export function AuthorListDisplayButton(props) {
-
-    authorDicts = props.authorDicts
+    const authorID = useContext(AuthorContext);
 
     const [threeMostRecentAuthors, setThreeMostRecentAuthors] = useState([])
 
-    let arrayOfFriendDicts = contactAPI(`author_relation_by_author/${authorID}/`, "get");
-    const [authorArray, setAuthorArray] = useState(arrayOfFriendDicts.related_authors)
+    const [isOpen, setIsOpen] = useState(false);
+
+    // let arrayOfFriendDicts = contactAPI(`author_relation_by_author/${authorID}/`, "get");
+    const [authorArray, setAuthorArray] = useState([])
+
+    const onClick = () => {
+        if (!isOpen) {
+            contactAPI(`author_relation_by_author/${authorID}/`, "get")
+                .then(function (value) {
+                    console.log(value)
+                    setAuthorArray(value.related_authors)
+                })
+                .then(function (innerValue) {
+                    setIsOpen(true);
+                }
+                )
+        }
+        else { setIsOpen(false) }
+    }
 
     return (
         <div className="friendSearchContainer">
+            <button onClick={onClick}>AUTHORS</button>
             {authorArray.map(authorDict =>
-                <FriendProfileButton addAuthorTab={props.addAuthorTab} authorInfo={authorDict} />)}
+                <FriendProfileButton key={authorDict.id} addAuthorTab={props.addAuthorTab} authorInfo={authorDict} />)}
         </div>
     )
 }
 
 function FriendProfileButton(props) {
 
-    const onClick = () => { props.addAuthorTab(props.authorDict, "author", "add") }
+    const onClick = () => { props.addAuthorTab(props.authorInfo, "author", "add") }
 
+    console.log(props.authorInfo)
     return (
         <button onClick={onClick}>
-            {props.authorDict.display_name}
+            {props.authorInfo.display_name}
         </button>)
 }

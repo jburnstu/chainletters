@@ -55,13 +55,17 @@ function AppByAuthor(props) {
 
         switch (readOrWrite) {
             case "write":
-                dictArrayToChange, setFunction = writeDicts, setWriteDicts;
+                dictArrayToChange = writeDicts;
+                setFunction = setWriteDicts;
                 break;
             case "read":
-                dictArrayToChange, setFunction = readDicts, setReadDicts;
+                dictArrayToChange = readDicts;
+                setFunction = setReadDicts;
                 break;
             case "author":
-                dictArrayToChange, setFunction = authorDicts, setAuthorDicts;
+                dictArrayToChange = authorDicts;
+                setFunction = setAuthorDicts;
+                break;
         }
 
         let newDictArray;
@@ -80,18 +84,17 @@ function AppByAuthor(props) {
                 newDictArray = dictArrayToChange.slice();
                 newDictArray.push(storyDict);
         }
-        setFunction(newDictArray)
-        if (newDictArray == dictArrayToChange) {
-            console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
-        }
-        else { console.log("Successfully changed ", dictArrayToChange, " to ", writeDicts, "via", newDictArray) }
+        setFunction(newDictArray, function () {
+            if (newDictArray == dictArrayToChange) {
+                console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
+            }
+            else { console.log("Successfully changed ", dictArrayToChange, " to ", dictArrayToChange, "via", newDictArray) };
 
-        return await dictArrayToChange;
+            return dictArrayToChange;
+        }
+        )
     }
 
-    useEffect(() => {
-        console.log("Write dicts changed:", writeDicts)
-    }, [writeDicts])
 
     return (
         <StrictMode>
@@ -115,7 +118,7 @@ function AppByAuthor(props) {
                                 />
                             </Route>
                             <Route path="author/"
-                                element={<Dashboard readOrWrite="author" dicts={authorDicts}
+                                element={<Dashboard readOrWrite="author" dicts={authorDicts} setDicts={changeStoryDicts}
                                 />}
                             >
                                 <Route path=":tabID/"
@@ -178,25 +181,26 @@ function Dashboard(props) {
     let arrayOfTabIDs = props.dicts.map(dict => dict.id);
     const addNewTab = (tabID) => props.setDicts(tabID, props.readOrWrite, "add");
     let getTabName;
-    let outlet;
+    let presavedCurrentContentByStory = {};
 
-    if (props.readOrWrite == "friends") {
-        getTabName = (id, index) => { getArrayObjByID(props.dicts, id).display_name ?? index + " ." }
-        outlet = useOutlet();
+    if (props.readOrWrite == "author") {
+        console.log(props.dicts)
+        getTabName = (id, index) =>
+            getArrayObjByID(props.dicts, id).display_name ?? `${index}.`
     }
     else {
         getTabName = (id, index) =>
             getArrayObjByID(props.dicts, id).story_data.title ?? index + " .";
 
-        let presavedCurrentContentByStory = {};
         props.dicts.forEach(dictInArray => {
             presavedCurrentContentByStory[dictInArray.id] =
                 dictInArray.segment_trace.slice(-1)[0]["earlier_segment_content"];
         })
-        const [currentContentByStory, setCurrentContentByStory] = useState(presavedCurrentContentByStory);
-        outlet = useOutlet([currentContentByStory, setCurrentContentByStory]);
+
     }
 
+    const [currentContentByStory, setCurrentContentByStory] = useState(presavedCurrentContentByStory);
+    const outlet = useOutlet([currentContentByStory, setCurrentContentByStory]);
 
     return (
         <div className={props.readOrWrite + "DashboardContainer" + " dashboardContainer"}>
@@ -224,14 +228,11 @@ function PlaceHolder() {
 
 function Sidebar(props) {
 
-
     switch (props.readOrWrite) {
-        case "authors":
+        case "author":
             return (
                 <div className="sidebar">
-                    <AuthorListDisplayButton addNewAuthorTab={props.addNewTab} />
-                    {/* <AuthorSearchButton addNewFriend={props.addNewTab} />
-                    <FriendSearchButton /> */}
+                    <AuthorListDisplayButton addAuthorTab={props.addNewTab} />
                 </div>
             )
         case "write":
