@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
 import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './storyButtons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
-import { AuthorProfile } from "./authorProfileComponents.jsx";
+import { AuthorProfile, AuthorListDisplayButton } from "./authorProfileComponents.jsx";
 import { Comments } from "./comments.jsx";
 import { getArrayObjByID } from "./utilityFuncs";
 import { AuthorSearchButton, FriendSearchButton } from "./authorsButtons";
@@ -17,6 +17,10 @@ function AppByAuthor(props) {
     const [displayName, setDisplayName] = useState(props.displayName);
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
+
+    const [authorDicts, setAuthorDicts] = useState([]);
+
+
 
     const rootPath = `/chainlettersstories/${authorID}/`;
 
@@ -44,9 +48,23 @@ function AppByAuthor(props) {
     }
     // console.log(startingURL);
 
+
+
     async function changeStoryDicts(storyDict, readOrWrite = "write", addOrRemove = "add") {
-        let dictArrayToChange = (readOrWrite == "write") ? writeDicts : readDicts
-        let setFunction = (readOrWrite == "write") ? setWriteDicts : setReadDicts
+
+        let dictArrayToChange, setFunction;
+
+        switch (readOrWrite) {
+            case "write":
+                dictArrayToChange, setFunction = writeDicts, setWriteDicts;
+                break;
+            case "read":
+                dictArrayToChange, setFunction = readDicts, setReadDicts;
+                break;
+            case "author":
+                dictArrayToChange, setFunction = authorDicts, setAuthorDicts;
+        }
+
         let newDictArray;
         switch (addOrRemove) {
             case "remove":
@@ -69,7 +87,7 @@ function AppByAuthor(props) {
         }
         else { console.log("Successfully changed ", dictArrayToChange, " to ", writeDicts, "via", newDictArray) }
 
-        return await writeDicts
+        return await dictArrayToChange;
     }
 
     useEffect(() => {
@@ -98,11 +116,11 @@ function AppByAuthor(props) {
                                 />
                             </Route>
                             <Route path="authors/"
-                                element={<Dashboard readOrWrite="authors" dicts={authorsDicts}
+                                element={<Dashboard readOrWrite="author" dicts={authorDicts}
                                 />}
                             >
-                                <Route path=":storyID/"
-                                    element={<AuthorProfile readOrWrite="authors" dicts={authorsDicts} setDicts={changeStoryDicts} />} />
+                                <Route path=":tabID/"
+                                    element={<AuthorProfile readOrWrite="author" dicts={authorDicts} setDicts={changeStoryDicts} />} />
                             </Route>
                         </Route>
                         <Route path="*" element={<NoMatch />} />
@@ -164,8 +182,7 @@ function Dashboard(props) {
     let outlet;
 
     if (props.readOrWrite = "friends") {
-        getTabName = (id, index) => { getArrayObjByID(props.dicts, id)/*somthing !!*/ ?? index + " ." }
-
+        getTabName = (id, index) => { getArrayObjByID(props.dicts, id).display_name ?? index + " ." }
         outlet = useOutlet();
     }
     else {
