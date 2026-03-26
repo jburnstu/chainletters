@@ -3,15 +3,28 @@
 This is the development code-base for my personal project, ChainLetters (one of many working titles) -- a desktop (for now) app on which users create, write and submit stories, which are then sent on for other users to continue and branch off of.
 Currently, the entire app is in development mode. I have used this project as a chance to keep my pre-existing Python / SQL skills sharp, and expand my knowledge of HTML / CSS / Javascrip, in particular JS-React.
 
-The stack:
+The "stack" (such as it is):
 - PostgreSQL database (currently hosted on my own laptop, and managed via PGAdmin4) consisting of base tables and supporting views
-- Accessed by a Django (Python) ORM and backend
-
+- Accessed by a Django (Python) ORM and backend, which includes a Django-Rest-Framework API layer
+- Passed to a HTML / CSS / Javascript-React frontend, either via basic views or API endpoints.
 
 ## General Coding Comments
 
 ### Potential Employers
-If you're here because of a link from a job application -- thank you for having a look at my code! While I've made a rough indication below where the code here isn't my own, it's somewhat in the nature of modding to copy a fair amount of code from the base-game, so sometimes this line gets blurred. For instance, the cards themselves are basically all copied from the same template, with differing permutations of lines of code taken from the base game.
+If you're here because of a link from a job application -- thank you for having a look at my code! The repository is a bit bloated right now, but essentially 90% of the coding goes on in just a couple of the folders:
+- chainletters/chainlettersstories/ for Python, including
+-   models.py for ORM,
+-   views.py for manipulating database outputs to be passed to the frontend,
+-   tests.py for creating a bulk-random-population of the database across all objects;
+- chainletters/frontend/ for JS-React.
+
+For Postgres, I've created the supporting file
+- chainletters/database_reference_material, which contains
+-   full_ERD.png, an image of the entity relationship diagram of the database which I designed and built,
+-   schema_explanation.txt, a guide to the schema in words as the ERD isn't the clearest,
+-   views_backup.sql, the SQL code I used to create the database's permanent views.
+-     see E.G. segment_trace for a complex recursive query.
+
 
 In particular, the places where I've done the most "ground-up" coding are in the following sub-folders (note: all in src / main / java / sleepermod):
 - patches: this is more or less all me (the Locator nested class in the Insert patches is fairly boilerplate though).
