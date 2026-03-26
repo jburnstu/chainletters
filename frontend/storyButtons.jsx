@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { createPortal } from 'react-dom';
-export default { SubmissionButton, ModalNewButton, ModalJoinButton, NewModerationModalButton };
+export default { SubmissionButton, ModalNewButton, ModalSelectSegmentFromOptionsButton };
 import { AuthorContext } from "./context.jsx";
 import { useNavigate, useLocation, redirect } from "react-router";
 import { getRandomItem, contactAPI, goToRoute } from "./utilityFuncs.jsx";

@@ -1,5 +1,5 @@
-import { getRandomItem, contactAPI } from "./utilityFuncs";
-
+import { getRandomItem, contactAPI, getArrayObjByID } from "./utilityFuncs";
+import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
 export default { AuthorProfile, AuthorListDisplayButton };
 
 export function AuthorProfile(props) {
@@ -7,6 +7,7 @@ export function AuthorProfile(props) {
     let readOrWrite = props.readOrWrite;
     const { tabID } = useParams();
 
+    console.log(props.dicts, tabID)
     let authorDict = getArrayObjByID(props.dicts, tabID);
 
     async function getArrayOfRecentSegmentTraces() {
@@ -28,12 +29,12 @@ export function AuthorProfile(props) {
 
     const arrayOfRecentSegmentTraces = getArrayOfRecentSegmentTraces();
 
-    const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
+    // const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
 
     return (
-        <div className="authorProfileContainer" id={"authorProfileContainer" + { storyID }}>
-            <StoryHeader storyDict={storyDict} wordCount={wordCount} />
+        <div className="authorProfileContainer" id={"authorProfileContainer" + { tabID }}>
+            {/* <StoryHeader storyDict={storyDict} wordCount={wordCount} /> */}
             <div className="recentSegmentsContainer">
                 {getArrayOfRecentSegments.map(recentSegmentTrace =>
                     <RecentSegmentDisplay segmentTraceInfo={recentSegmentTrace} />)
@@ -86,17 +87,3 @@ function FriendProfileButton(props) {
             {props.authorDict.display_name}
         </button>)
 }
-
-
-```
-        So, regardless of backend, we still need frontend to have a "friends" dict.
-        As not coming from the top, can put in the dashboard object *IF* we like
-
-        [{authorID::,
-        displayName::,
-
-}]
-
-
-
-        ```

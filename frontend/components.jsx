@@ -2,12 +2,11 @@
 import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet, useNavigate } from 'react-router-dom';
-import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './storyButtons.jsx';
+import { SubmissionButton, ModalSelectSegmentFromOptionsButton, ModalNewButton } from './storyButtons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
 import { AuthorProfile, AuthorListDisplayButton } from "./authorProfileComponents.jsx";
 import { Comments } from "./comments.jsx";
 import { getArrayObjByID } from "./utilityFuncs";
-import { AuthorSearchButton, FriendSearchButton } from "./authorsButtons";
 
 
 function AppByAuthor(props) {
@@ -115,7 +114,7 @@ function AppByAuthor(props) {
                                     element={<Story readOrWrite="read" dicts={readDicts} setDicts={changeStoryDicts} />}
                                 />
                             </Route>
-                            <Route path="authors/"
+                            <Route path="author/"
                                 element={<Dashboard readOrWrite="author" dicts={authorDicts}
                                 />}
                             >
@@ -164,7 +163,7 @@ function UniversalHeader(props) {
                     <Link to="" ><button type="button">HOME</button></Link>|{" "}
                     <Link to="write" ><button type="button">WRITE</button></Link>|{" "}
                     <Link to="read"><button type="button">READ</button></Link>
-                    <Link to="friends"><button type="button">FRIENDS</button></Link>
+                    <Link to="author"><button type="button">AUTHORS</button></Link>
                 </nav>
             </header >
             <Outlet></Outlet>
@@ -181,7 +180,7 @@ function Dashboard(props) {
     let getTabName;
     let outlet;
 
-    if (props.readOrWrite = "friends") {
+    if (props.readOrWrite == "friends") {
         getTabName = (id, index) => { getArrayObjByID(props.dicts, id).display_name ?? index + " ." }
         outlet = useOutlet();
     }

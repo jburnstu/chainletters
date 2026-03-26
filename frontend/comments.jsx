@@ -1,8 +1,8 @@
 
 import React, { StrictMode, useState, authoref, useEffect, createContext, useContext } from "react";
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
-import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './storyButtons.jsx';
+// import { BrowserRouter, Routes, Route, Link, Outlet, NavLink, useParams, useOutletContext, useOutlet } from 'react-router-dom';
+// import { SubmissionButton, ModalJoinButton, ModalNewButton, NewModerationModalButton } from './storyButtons.jsx';
 import { AuthorContext, DictsContext } from "./context.jsx";
 import { getRandomItem, contactAPI } from "./utilityFuncs.jsx";
 export default { Comments };
