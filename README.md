@@ -39,11 +39,7 @@ I've tried to avoid using AI too much during this exercise, as I worry it would 
 
 
 ### Use of GitHub
-Although I started this project with the intention of using the full branching capabilities of GitHub, I quickly realised this was overkill for a one-man project with a surprisingly linear development. Now that the mod is "finished", I might consider using branches for overall mechanical decisions I haven't yet settled to myself.
-
-I have committed as often as necessary to save my progress on this project. The size of commits varies a lot, as in some cases moving a single package around caused a large number of files to update. One take-away for me would be to half all other development while I perform one of these moves, as it occasionally muddied the water of actual code changes vs. pacakge structure.
-
-### Feedback and Future Updates
-I have every intention of continuing to maintain and update this mod, albeit at a slower pace. I've reached out to friends and the modding community for feedback (although of course they can't see the code, so there'll be no feedback there per se).
+In spite of this being a solo project, I've still made use of GitHub's branch feature. I've made a couple of abortive attempts to get into its "Issues" and other features, but I think these feel pretty untenable out of a group setting.
+In previous versions, this is where I'd explain key branches where different versions of the app were present; more recently though I've decided to consolidate into main, as I was only really using one branch the whole time anyway. 
 
 
