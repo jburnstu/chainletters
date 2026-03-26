@@ -25,27 +25,18 @@ For Postgres, I've created the supporting file
 -   views_backup.sql, the SQL code I used to create the database's permanent views.
 -     see E.G. segment_trace for a complex recursive query.
 
+### Omissions and Oversights
+This is a personal project and first and foremost a learning exercise, and as such I've prioritised trying things out and learning concepts over "business-ready" best practice. However, including/demonstrating use of some of these practices is my next priority. These include:
+- Testing: While I have tested the code as I've gone, this hasn't been particularly rigorous. My next objective is to add some unit-testing and go from there (ideally integrating with GitHub).
+- Authentification: Simply haven't got around to learning about this, but I'm keen to find a good entry-level framework for understanding authentification and then implement it.
+- Comments: I've favoured a "comments-lite" approach since it's just me working on this for now, but at some point I will go through and ensure the code is sufficiently well-documented to be understood.
 
-In particular, the places where I've done the most "ground-up" coding are in the following sub-folders (note: all in src / main / java / sleepermod):
-- patches: this is more or less all me (the Locator nested class in the Insert patches is fairly boilerplate though).
-- actions(.core): this is a real mix, as even where code is borrowed from the decompiled base-game, it was often a lot of work to adapt it here.
-  - for instance, the classes "RememberAction" and "Move" in actions.core are mostly my own;
-  - whereas the class "ForgetAction" in actions.core was adapted from the base game's "ExhaustAction". I've added the latter as "ReferenceExhaustAction", so that the line between adapting / copying is  hopefully clear.
-- powers (note this is "sleepermod / powers", not "sleepermod / cards / powers"): the functional code here is more or less all me, although the structure of each file is prescribed by the mod template.
+### Use of AI
+I've tried to avoid using AI too much during this exercise, as I worry it would get in the way of learning anything. That said, a couple of times I have resorted to it are as follows:
+- serializers.py: I find Django's approach to serialization quite counterintuitive, and have struggled to follow the documentation, so I've frequently usd AI to debug my failed Serializer classes. (It usually tells me to rename "related_name" in a completely unexpected place in models.py.)
+- setting up Django with React: the online guide I followed intructed me to do this via a Vite plugin. It also set up hot-module-replacement of my .jsx files. This was all super useful for development, but a complete pain to set up -- in particular dealing with how Django / React pass static files around -- which I then made worse by turning to AI to resolve issues. (This is in part why the repo is so bloated / why there are so many folders pertaining to static files.)
+- general consultation: If I can't find a solution to my React issue on Reddit or StackOverflow, I'm not above asking ChatGPT every now and then, although I try not to overdo it, and I never copy any code across.
 
-Also, all the abstract classes here (AbstractSleeperCard, AbstractSleeperPower, AbstractSleeperRelic) are my own work (although they're pretty basic obviously).
-
-Therefore I'd recommend having a look in these folders, for the work I lay the strongest claim to :)
-
-### Code Quality
-I've been a bit cavalier with allowing warnings on my commits, because Intellij marks a lot of classes as "unused" and it didn't seem like a good use of time to annnotate everything to avoid this.
-
-I've mostly been focusing on top-level functionality, ie "does the game work", over inherent code quality. In particular, I've slightly neglected modifiers on variables, eg "public / private / final" etc.. I'm going through now and trying to understand what would academically be best in each case, but overall this shouldn't affect how the code runs -- it just means there's places where you could in theory have an easier time breaking the code (intentionally or otherwise) by accessing a variable from a place you shouldn't be able to.
-
-### Commenting
-I am working through now and ensuring the comments in all the files are up-to-date. Tthere are quite a lot of files I copied and pasted as a starting point (eg all 75 cards!) so I found a couple of early comments that got erroneously copied all over the place.
-
-In general I've gone fairly light on comments, as I feel the code is fairly self-explanatory *provided a knowledge of the game's base code*. I have just provided comments where I feel that even someone who understands how Slay The Spire itself is coded, would still need a pointer. I suggest the Slay The Spire BaseMod wiki (https://github.com/Alchyr/BasicMod/wiki) for a fuller understanding of the base game's code -- it's actually a tutorial for setting up the mod template, but it takes you through how the game handles its objects.
 
 ### Use of GitHub
 Although I started this project with the intention of using the full branching capabilities of GitHub, I quickly realised this was overkill for a one-man project with a surprisingly linear development. Now that the mod is "finished", I might consider using branches for overall mechanical decisions I haven't yet settled to myself.
