@@ -2,14 +2,18 @@
 
 This document exists to explain the structure of the Postgres database schema i've created and used for my project. It's mostly kept the same structure from earliest drafts (for now).
 
-The main change was when I went from creating the DB in Postgres, and then uploading to Django, to later "reverse-engineering" and creating models in Django to then make the DB. This wasn't really my ideal choice -- I prefer working in SQL than using Django's ORM, which feels like it's deisgned for people who don't like SQL (I do) -- but I felt it was necessary to avoid swimming upstream with Django's ORM, especially once I started setting up the API layer.
+The main change was when I went from creating the DB in Postgres, and then uploading to Django, to later "reverse-engineering" and creating models in Django to then make the DB. This wasn't really my ideal choice -- I prefer working in SQL than using Django's ORM, which feels like it's deisgned for people who don't like SQL (I do) -- but the way Django was reading foreign key column names was causing issues, and I felt it was necessary to avoid swimming upstream with the ORM, especially once I started setting up the API layer.
+A couple of implications of this:
+- Some many-to-many tables nevertheless have a (somewhat redundant) primary key, as composite primary keys in Django arn't super well-supported.
+- Views are written in a way that allows them to be accessed via a Django "model", which requires a (somewhat arbitrary) primary key assignment.
+- In some of the views' Django models, there are inconsistent-*looking* column names, where some have id appended and others don't. This is because Django needs foreign key relations (and hence actual object names, not their ids) to serialize data, and for now I've just changed the ones that needed a foreign key, rather than add a load of foreign key relations that aren't really there. This will probably cause bugs down the line, so it's "on my list".
 
 ## Key Tables
 There are three key tables in the database schema -- author, story, and segment.
 In short, authors (users) create stories, and then add segments (separate sections, or "chapters" if you like) to other stories.
 
 ### author
-Users on the app. Each author has a dedicated access point and hence URL stub (although not authenticated yet -- coming soon!) which they never leave for their time on the site.
+Users on the app. Each author has a dedicated access point and hence URL stub (although not authenticated yet -- coming soon!) which they never leave for their time on the site. For now, the author object doesn't actually have much data associated with it.
 
 Created When: a user uses the "sign up" functionality to create a new account.
 
@@ -20,7 +24,7 @@ Note that when a story is created, its first segment will also necessarily be cr
 Created When: an author (user) uses the "New" button to create a new story (with first segment).
 
 ### segment
-When a user adds text to a story, this is saved in a "segment" object (hence, all the actual "story content" in the site is saved in segments). Each segment references:
+When a user adds text to a story, this is saved in a "segment" object (hence, all the actual "story content" in the site is saved in segments). Most of the fields on segment are references or content -- the "behaviour" of its text content (eg length) is validated via its story object. Each segment references:
 - The user who wrote it;
 - The story it belongs to;
 - The segment that it directly follows.
