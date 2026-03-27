@@ -1,4 +1,5 @@
 # ChainLetters (Working Title)
+NOTE: Please ensure you are in the branch *main-react-rewrite*. It's where all the good stuff is!
 
 This is the development code-base for my personal project, ChainLetters (one of many working titles) -- a desktop (for now) app on which users create, write and submit stories, which are then sent on for other users to continue and branch off of.
 Currently, the entire app is in development mode. I have used this project as a chance to keep my pre-existing Python / SQL skills sharp, and expand my knowledge of HTML / CSS / Javascrip, in particular JS-React.
