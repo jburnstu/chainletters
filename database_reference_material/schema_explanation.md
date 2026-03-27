@@ -2,24 +2,25 @@
 
 This document exists to explain the structure of the Postgres database schema i've created and used for my project. It's mostly kept the same structure from earliest drafts (for now).
 
-The main change was when I went from creating the DB in Postgres, and then uploading to Django, to later "reverse-engineering" and creating models in Django to then make the DB. This wasn't really my ideal choice -- I prefer working in SQL than using Django's ORM, which feels like it's deisgned for people who don't like SQL (I do) -- but the way Django was reading foreign key column names was causing issues, and I felt it was necessary to avoid swimming upstream with the ORM, especially once I started setting up the API layer.
+The main change was when I went from creating the DB in Postgres, and then uploading to Django, to later "reverse-engineering" and creating models in Django to then make the DB.<br>
+This wasn't really my ideal choice -- I prefer working in SQL than using Django's ORM, which feels like it's deisgned for people who don't like SQL (I do). But the way Django was reading foreign key column names was causing issues, and I felt it was necessary to avoid swimming upstream with the ORM, especially once I started setting up the API layer.<br>
 A couple of implications of this:
 - Some many-to-many tables nevertheless have a (somewhat redundant) primary key, as composite primary keys in Django arn't super well-supported.
 - Views are written in a way that allows them to be accessed via a Django "model", which requires a (somewhat arbitrary) primary key assignment.
 - In some of the views' Django models, there are inconsistent-*looking* column names, where some have id appended and others don't. This is because Django needs foreign key relations (and hence actual object names, not their ids) to serialize data, and for now I've just changed the ones that needed a foreign key, rather than add a load of foreign key relations that aren't really there. This will probably cause bugs down the line, so it's "on my list".
 
 ## Key Tables
-There are three key tables in the database schema -- author, story, and segment.
+There are three key tables in the database schema -- author, story, and segment.<br>
 In short, authors (users) create stories, and then add segments (separate sections, or "chapters" if you like) to other stories.
 
 ### author
-Users on the app. Each author has a dedicated access point and hence URL stub (although not authenticated yet -- coming soon!) which they never leave for their time on the site. For now, the author object doesn't actually have much data associated with it.
+Users on the app. Each author has a dedicated access point and hence URL stub (although not authenticated yet -- coming soon!) which they never leave for their time on the site. For now, the author object doesn't actually have much data associated with it.<br>
 
 Created When: a user uses the "sign up" functionality to create a new account.
 
 ### story
-Users create a "story" object when they create a new story on the app. This object controls story-wide features, such as the min/max words per segment "belonging" to that story.
-Note that when a story is created, its first segment will also necessarily be created.
+Users create a "story" object when they create a new story on the app. This object controls story-wide features, such as the min/max words per segment "belonging" to that story.<br>
+Note that when a story is created, its first segment will also necessarily be created.<br>
 
 Created When: an author (user) uses the "New" button to create a new story (with first segment).
 
@@ -28,14 +29,14 @@ When a user adds text to a story, this is saved in a "segment" object (hence, al
 - The user who wrote it;
 - The story it belongs to;
 - The segment that it directly follows.
-
+<br>
 Created When: an author uses either the "New" or the "Join" buttons. Segments are created empty, with the "In Progress" status, then have their content (and status) updated when they are submitted.
 
 ## Support Tables and the segment "life cycle".
 A couple of tables provide state management for segments as they move through their "life cycle".
 
 ### moderation_assignment
-After a segment is written, but before it becomes visible to be added to further, it must be moderated by a random unrelated author. This many-to-many table assigns segments to authors who can moderate them.
+After a segment is written, but before it becomes visible to be added to further, it must be moderated by a random unrelated author. This many-to-many table assigns segments to authors who can moderate them.<br><br>
 
 Created When: an author uses the "moderate" button to request a random segment awaiting moderation.
 
@@ -49,7 +50,7 @@ A segment passes through the following status values in order, depending on inte
 6. abandoned. The segment has been abandoned while being written.
 
 ## Helper Views
-Although not shown on the ERD, I have created some views to support the access of data from the database. These vary in complexity and how central they are to use of the app (some are just there to reshape data in a way that would be annoying in Django).
+Although not shown on the ERD, I have created some views to support the access of data from the database. These vary in complexity and how central they are to use of the app (some are just there to reshape data in a way that would be annoying in Django).<br><br>
 
 The most important:
 
