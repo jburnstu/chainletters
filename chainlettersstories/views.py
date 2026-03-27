@@ -272,7 +272,12 @@ class FullStoryInfoViewSet(viewsets.ModelViewSet):
     serializer_class = FullStoryInfoSerializer
 
 class CompletedSegmentByAuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
+    queryset = Author.objects.all().prefetch_related(
+        Prefetch(
+            "segment",
+            queryset=Segment.objects.only("id")
+        )
+    )
     serializer_class = CompletedSegmentByAuthorSerializer
 
 

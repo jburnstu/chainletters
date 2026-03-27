@@ -97,7 +97,7 @@ export function ModalNewButton(props) {
             </ button >
             <ModalWindow isOpen={isOpen} onClose={() => setIsOpen(false)}>
                 <div className="allDisplayStoriesContainer">
-                    <NewStoryOptionspanel addNewStory={props.addNewStory} />
+                    <NewStoryOptionspanel addNewStory={props.addNewStory} close={() => setIsOpen(false)} />
                 </div>
             </ModalWindow >
         </>
@@ -126,6 +126,7 @@ function NewStoryOptionspanel(props) {
     }
 
     function createNewStoryAndSegment() {
+        props.close()
         console.log("Creating new story/seg");
         uploadNewStoryAndSegment(authorID, storyParameters)
             .then(function (value) {
@@ -188,7 +189,7 @@ function NewStoryOptionspanel(props) {
                     onChange={handleValueChange}></input>
                 </label>
             </fieldset>
-            <button type="submit" onClick={createNewStoryAndSegment}>CREATE NEW STORY</button>
+            <button type="button" onClick={createNewStoryAndSegment}>CREATE NEW STORY</button>
         </form >
     )
 }

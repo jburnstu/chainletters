@@ -14,12 +14,13 @@ export function AuthorProfile(props) {
 
     async function getArrayOfRecentSegmentTraces() {
         const numberOfSegments = 3;
-        segmentByAuthorData = await contactAPI(`completed_segment_by_author/${authorDict.id}/`, "get");
-        randomSegmentSelection = getRandomItem(segmentByAuthorData, numberOfSegments);
+        let segmentByAuthorData = await contactAPI(`completed_segment_by_author/${authorDict.id}/`, "get");
+        let randomSegmentSelection = getRandomItem(segmentByAuthorData.segment, numberOfSegments, true);
 
         const segmentTraceDataArray = [];
         let segmentTraceData;
-        await Promise.all(randomSegmentIDArray.map(async (segmentID) => {
+        console.log(randomSegmentSelection)
+        await Promise.all(randomSegmentSelection.map(async (segmentID) => {
             segmentTraceData = await contactAPI(`segment_trace/${segmentID}`, "get");
             segmentTraceDataArray.push(segmentTraceData);
         }
@@ -29,8 +30,21 @@ export function AuthorProfile(props) {
 
     }
 
-    const arrayOfRecentSegmentTraces = getArrayOfRecentSegmentTraces();
+    const [arrayOfRecentSegmentTraces, setArrayOfRecentSegmentTraces] = useState([]);
 
+    useEffect(() => {
+        async function fetchData() {
+            let segmentTraceDataArray = await getArrayOfRecentSegmentTraces();
+            setArrayOfRecentSegmentTraces(segmentTraceDataArray);
+        }
+        if (authorDict?.id) {
+            fetchData();
+        }
+    }, [authorDict?.id]); // runs once when author loads
+
+
+
+    console.log(arrayOfRecentSegmentTraces)
     // const removeCurrentStory = (storyDict) => props.setDicts(storyDict, readOrWrite, "remove");
 
 
@@ -38,8 +52,8 @@ export function AuthorProfile(props) {
         <div className="authorProfileContainer" id={"authorProfileContainer" + { tabID }}>
             {/* <StoryHeader storyDict={storyDict} wordCount={wordCount} /> */}
             <div className="recentSegmentsContainer">
-                {getArrayOfRecentSegments.map(recentSegmentTrace =>
-                    <RecentSegmentDisplay segmentTraceInfo={recentSegmentTrace} />)
+                {arrayOfRecentSegmentTraces.map(recentSegmentTrace =>
+                    <RecentSegmentDisplay key={recentSegmentTrace.id} segmentTraceInfo={recentSegmentTrace} />)
                 }
             </div>
             <div className="recentActivity"></div>
@@ -48,15 +62,17 @@ export function AuthorProfile(props) {
     )
 }
 
-function RecentSegmentDisplay() {
+function RecentSegmentDisplay(props) {
 
-    let finalSegmentInfo = props.segmentTraceInfo.segment_trace.slice(-1)[0]
+    let finalSegment = props.segmentTraceInfo.segment_trace.slice(-1)[0]
     let penultimateSegment = props.segmentTraceInfo.segment_trace.slice(-2)[0]
 
+    console.log(props.segmentTraceInfo)
+    console.log(finalSegment)
     return (
         <div>
-            <textarea value={penultimateSegment.content}></textarea>
-            <textarea value={finalSegment.content}></textarea>
+            <textarea value={penultimateSegment.earlier_segment_content}></textarea>
+            <textarea value={finalSegment.earlier_segment_content}></textarea>
         </div>
     )
 }

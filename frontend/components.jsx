@@ -17,7 +17,7 @@ function AppByAuthor(props) {
     const [writeDicts, setWriteDicts] = useState(props.writeDicts);
     const [readDicts, setReadDicts] = useState(props.readDicts);
 
-    const [authorDicts, setAuthorDicts] = useState([]);
+    const [authorDicts, setAuthorDicts] = useState([{ "id": authorID, "display_name": displayName }]);
 
 
 
@@ -84,16 +84,16 @@ function AppByAuthor(props) {
                 newDictArray = dictArrayToChange.slice();
                 newDictArray.push(storyDict);
         }
-        setFunction(newDictArray, function () {
-            if (newDictArray == dictArrayToChange) {
-                console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
-            }
-            else { console.log("Successfully changed ", dictArrayToChange, " to ", dictArrayToChange, "via", newDictArray) };
-
-            return dictArrayToChange;
+        if (newDictArray == dictArrayToChange) {
+            console.warn("WARNING: ", storyDict, " was not successfully added to / removed from ", dictArrayToChange)
         }
-        )
+        else { console.log("Successfully changed ", newDictArray, " to ", dictArrayToChange) };
+
+        setFunction(newDictArray);
+        return newDictArray;
     }
+
+
 
 
     return (
@@ -190,7 +190,7 @@ function Dashboard(props) {
     }
     else {
         getTabName = (id, index) =>
-            getArrayObjByID(props.dicts, id).story_data.title ?? index + " .";
+            getArrayObjByID(props.dicts, id).story_data.title ?? `${index}.`;
 
         props.dicts.forEach(dictInArray => {
             presavedCurrentContentByStory[dictInArray.id] =
@@ -319,8 +319,8 @@ function StoryHeader(props) {
 
     return (<div className="storyHeader">
         <div>{storyData.title ? storyData.title : "Untitled"}</div>
-        <div>{"Section : " + length + (storyData.max_number_of_segments ? " / " + storyData.max_number_of_segments : null)}</div>
-        <div>{"Word Count :" + props.wordCount + (storyData.max_segment_length ? " / " + storyData.max_segment_length : null)}</div>
+        <div>{"Section : " + length + (storyData.max_number_of_segments ? " / " + storyData.max_number_of_segments : "")}</div>
+        <div>{"Word Count :" + props.wordCount + (storyData.max_segment_length ? " / " + storyData.max_segment_length : "")}</div>
     </div>)
 }
 
